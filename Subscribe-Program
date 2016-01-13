@@ -1,0 +1,64 @@
+/** Subscribe to Chester Banks!
+ * 
+ * You probably know what to do by now - just post a period in the "Subscribe Here" post in the Tips and Thanks.
+*/
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+textFont(createFont("Trebuchet MS Bold"));
+
+var xPos = [0, 0, 0, -100];
+
+var draw = function() {
+    noStroke();
+    
+    background(182, 219, 209);
+    fill(163, 199, 188);
+    triangle(xPos[3]+200, 160, xPos[3]+80, 300, xPos[3]+320, 300);
+    triangle(xPos[3]+280, 220, xPos[3]+160, 350, xPos[3]+400, 350);
+    triangle(xPos[3]+120, 220, xPos[3]+240, 350, xPos[3]+0, 350);
+    fill(145, 194, 179);
+    for(var i = xPos[2]-195; i < 500; i += 97){
+        triangle(i-160, 400, i+260, 400, i+50, 260);
+    }
+    fill(137, 176, 164);
+    for(var i = xPos[1]-165; i < 500; i += 193){
+        triangle(i-160, 400, i+260, 400, i+50, 260);
+    }
+    for(var i = 318; i > 259; i -= 1){
+        stroke(255, 255, 255, i*3 - 880);
+        line(0, i, 400, i);
+    }
+    noStroke();
+    fill(118, 150, 141);
+    for(var i = xPos[0]-135; i < 500; i += 193){
+        triangle(i-160, 400, i+260, 400, i+50, 250);
+    }
+    for(var i = 370; i > 325; i -= 1){
+        stroke(255, 255, 255, i*2.5 - 850);
+        line(0, i, 400, i);
+    }
+    
+    noStroke();
+    fill(237, 237, 223);
+    rect(200, 385, 400, 30);
+
+    fill(237, 237, 223);
+    textSize(56);
+    text("SUBSCRIBE TO", 200, 175);
+    textSize(50);
+    text("CHESTER BANKS", 200, 220);
+    textSize(14);
+    text('POST A SINGLE PERIOD/DOT IN THE "SUBSCRIBE HERE" POST', 200, 255);
+    
+    xPos[0] += 2;
+    xPos[1] += 0.5;
+    xPos[2] += 0.2;
+    xPos[3] += 0.05;
+    
+    for(var i = 0; i < xPos.length; i ++){
+        if(xPos[i] > 190){
+            xPos[i] = 0;
+        }
+    }
+};
