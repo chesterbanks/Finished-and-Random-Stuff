@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+<head>
+    <meta charset="utf-8">
+    <title>The Banks Blog</title>
+    
+    <link href='https://fonts.googleapis.com/css?family=Shadows+Into+Light' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Anton' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Gochi+Hand' rel='stylesheet' type='text/css'>
+    
+    <style>
+        body {
+            background: url("https://upload.wikimedia.org/wikipedia/commons/9/95/DmhImg3333.png") fixed center;
+            padding: 10px;
+        }
+        p, ol {
+            font-family: "Gochi Hand";
+            padding: 25px;
+            color: rgb(230, 230, 230);
+            font-size: 16px;
+        }
+        ol {
+            margin: -25px 0px -15px 40px;
+        }
+        footer {
+            background-color: rgba(255, 255, 255, 0.5);
+            font-family: "Shadows Into Light";
+            color: black;
+            padding: 5px;
+        }
+        .title {
+            font-family: Anton;
+            font-size: 50px;
+            text-align: CENTER;
+            color: rgb(255, 255, 255);
+            text-shadow: 10px 10px rgba(0, 0, 0, 0.2);
+        }
+        .heading {
+            background-color: rgba(255, 255, 255, 0.4);
+            color: rgb(0, 0, 0);
+            font-family: Shadows Into Light;
+            text-align: LEFT;
+            padding: 10px;
+            border: 3px rgba(255, 255, 255, 0.7) ;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">The Banks Blog</h1>
+    
+    <h2 class="heading">1-26-16: Some CSS + HTML Tips</h2>
+    <p></p>
+    
+    <h2 class="heading">1-26-16: Ten Underrated Programs You Need To See</h2>
+    <p></p>
+    
+    <h2 class="heading">1-26-16: <b>Saturday Scoop:</b> A Little Bit About Everland</h2>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You may have heard about a game I'm making called Everland. Today I'll tell some more about it. Basically, it's a game that combines the worlds of five books/movies - Lord of the Rings, Narnia, DC, Marvel, and Star Wars.
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The goal of the game is to collect the five Kingdom Crystals before time runs out. Your 'train station' in between worlds is The Wood Between the Worlds (Narnia). From there, you can click one of the ponds to go to one of the worlds.
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Along the way, there's minigames and missions you can complete for money, which you can buy armor and things with. You'll also battle some lesser villains (Saruman, Miraz, Loki, The Riddler, Count Dooku) to prepare for the big battles with the worst villains (Sauron, the White Witch, Ultron, The Joker, and Darth Sidious).
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;So how do you get the Kingdom Crystals? Once you've cleared a world from villains, and completed all of the missions, you get the Kingdom Crystal for that world.
+    <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you want to help with this game, right now it's in the planning stage. So give me all your ideas! Also, if there's any Marvel or DC lovers out there, you could inform me (since the only superhero movie I've seen is The Avengers).
+    
+    <h2 class="heading">1-26-16: Introducing This Blog</h2>
+    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;I've been thinking about making a blog for quite a while now. Peter Collingridge, Blaze, Aidabaida, and a few others have all made really cool blogs so I thought I might give it a shot. Here's some stuff you'll see on this blog:
+    </p>
+    <ol>
+        <li><i>"The Saturday Scoop"</i>: Each Saturday, I'll give you some inside info about one or two of my projects I'm working on.</li>
+        <li><i>"Helpful Hints"</i>: These kind of posts will tell you about some helpful coding things I have figured out and think might help others. It might also have some 'How To's.</li>
+        <li><i>"Random Reviews"</i>: I'll be reviewing some programs, they will be under this category.</li>
+        <li><i>Everything Else</i>: Everything (like this post) falls into this catergory.</li>
+    </ol>
+    <p>If you want to be notified whenever a new post comes out, then just post a single period/dot under the "Subscribe Here" post.</p>
+    
+    <footer>Blog completely coded by Chester Banks | 2016 | The Banks Blog</footer>
+    
+</body>
+
+</html>
+
