@@ -18,7 +18,7 @@
         }
         p, ol {
             font-family: "Gochi Hand";
-            padding: 25px;
+            padding:25px;
             color: rgb(230, 230, 230);
             font-size: 16px;
             box-shadow: 0px 0px 60px rgba(0, 0, 0, 0.5);
@@ -50,6 +50,9 @@
             margin: auto;
             box-shadow: 10px 10px 14px rgba(0, 0, 0, 0.4);
         }
+        img:hover{
+            border: 1px white dotted;
+        }
         .title {
             font-family: Anton;
             font-size: 50px;
@@ -70,7 +73,7 @@
 <body>
     <h1 class="title">The Banks Blog</h1>
     
-    <h2 class="heading">1-26-16: Some Tips on Design</h2>
+    <h2 class="heading">1-26-16: Some Tips on PJS Design</h2>
     <p>On KA, I always spend quite a bit of time on my program's design. I've decided to share some of the stuff I've learned over time. Here we go!</p>
     <ol>
         <li>I've said this before, but it really does help. Using  <code>textAlign(CENTER, CENTER);</code> both centers your text (which improves the design), and makes it easier to code. Instead of dragging the x position until you get what you want, you can just use <code>width/2</code>!</li>
@@ -81,16 +84,20 @@
     <p>Hope this article helps!</p>
     
     <h2 class="heading">1-26-16: Five Under-voted Programs You Need To See</h2>
-    <img src="https://www.khanacademy.org/computer-programming/colorbitron/6593583625011200/5681097123823616.png">
-    <h6>Colorbitron</h6>
-    <img src="https://www.khanacademy.org/computer-programming/tagxle-2-players/4784482299150336/5649050225344512.png">
-    <h6>Tagxle</h6>
-    <img src="https://www.khanacademy.org/computer-programming/archers-guild/6144390113525760/5643440998055936.png">
-    <h6>Archer's Guild</h6>
-    <img src="https://www.khanacademy.org/computer-programming/3d-pong/4679529666314240/5632457692938240.png">
-    <h6>3D Pong</h6>
-    <img src="https://www.khanacademy.org/computer-programming/tanks/4643026911887360/5643440998055936.png">
-    <h6>tanks</h6>
+    <a href = "https://www.khanacademy.org/computer-programming/colorbitron/6593583625011200"><img src="https://www.khanacademy.org/computer-programming/colorbitron/6593583625011200/5681097123823616.png"></a>
+    <h6>Colorbitron by Piology</h6>
+    
+    <a href = "https://www.khanacademy.org/computer-programming/tagxle-2-players/4784482299150336"><img src="https://www.khanacademy.org/computer-programming/tagxle-2-players/4784482299150336/5649050225344512.png"></a>
+    <h6>Tagxle by Thomas L.</h6>
+    
+    <a href = "https://www.khanacademy.org/computer-programming/archers-guild/6144390113525760"><img src="https://www.khanacademy.org/computer-programming/archers-guild/6144390113525760/5643440998055936.png"></a>
+    <h6>Archer's Guild by Larry Serflaten</h6>
+    
+    <a href = "https://www.khanacademy.org/computer-programming/3d-pong/4679529666314240"><img src="https://www.khanacademy.org/computer-programming/3d-pong/4679529666314240/5632457692938240.png"></a>
+    <h6>3D Pong by FUSION BLAST</h6>
+    
+    <a href = "https://www.khanacademy.org/computer-programming/tank-battle/5592703799918592"><img src="https://www.khanacademy.org/computer-programming/tank-battle/5592703799918592/5707702298738688.png"></a>
+    <h6>Tank Battle by Maxpelic</h6>
     
     <h2 class="heading">1-26-16: <b>Saturday Scoop:</b> A Little Bit About Everland</h2>
     <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You may have heard about a game I'm making called Everland. Today I'll tell some more about it. Basically, it's a game that combines the worlds of five books/movies - Lord of the Rings, Narnia, DC, Marvel, and Star Wars.
