@@ -1,0 +1,44 @@
+var subscribers = [
+    "- AlexT",
+    "- Benjamin",
+    "- Iron Man Mark 44",
+    "- Sketchgames",
+    "- BananaPeel",
+    "- Frustrated Programmer",
+    "- Jake",
+    "- Yatrick Patel",
+    "- Light Runner",
+    "- Xynix the Shadow Hunter",
+    "- Room 11",
+    "- Indie",
+    "- Maximus Prime",
+    "- Sy",
+    "- Harry.EPIC.Paul47",
+    "- ComputerKat",
+    "- Stargazer",
+    "- AquaOrchid",
+    "- KiwiAttack",
+    "- awk888",
+    "- Gorthon",
+    "- Maker of Boingy Picturez and Soccer Productions",
+    "- Ryan Wittmers",
+    "- Harrison",
+    "- retrojack",
+    "- Sam s",
+    "- YMarkov",
+    "- Krisha Jain",
+    "- otisw",
+    "- codeWizard",
+    "- #1 Catholic Proponent (God Loves You)",
+    "- SavageookwolfGaming",
+    "- unknown profile",
+];
+
+var luckySubscriber = subscribers[floor(random(0, subscribers.length))];
+
+textAlign(CENTER, CENTER);
+textFont(createFont("helveticaneue-light"), 30);
+
+background(245);
+fill(189, 36, 36);
+text(luckySubscriber, 200, 200);
