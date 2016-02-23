@@ -1,0 +1,70 @@
+/** Hanging Text
+ * Chester Banks
+ * February 16 2016
+ * 
+ * You can use this in your games/programs with credit!
+ * 
+ * Thanks to my subscribers! Subscribe here: https://www.khanacademy.org/cs/sub/4790207744704512
+ * This program's LUCKY SUBSCRIBER is ROOM 11! If you want to see some cool generated art and more, go here: https://www.khanacademy.org/profile/AlcuinRoom11/projects
+*/
+
+// Uh oh, this is starting to get overvoted...
+
+// Customize these
+var word = "#KhanAcademy";
+var word_color = color(255, 255, 255);
+var word_size = 48;
+var background_color = color(0, 255, 72);
+textFont(createFont("helveticaneue-bold"));
+
+// Don't change beyond this point
+textAlign(CENTER, CENTER); // Center the text
+
+var splitWord = word.split(""); // Turn the word into an array. If the word was "the", then this would turn it into ["t", "h", "e"].
+var letters = []; // This array holds the individual properties of each letter.
+
+for(var i = 0; i < splitWord.length; i ++){ // For every letter in the word,
+    letters.push({ // Add a
+        letter: splitWord[i],           // letter property
+        rot: random(-10, 10),           // random rotation
+        stringOpacity: random(100, 200),// random opacity of string
+        y: (-i * 20) - 200,               // random starting point
+        ySpeed: random(5, 6),           // random falling rate
+    });
+}
+
+draw = function() {
+    background(background_color); // Make a background the background color
+    for(var i = 0; i < width + 50; i += 50){ // For loop going to right of screen
+        for(var j = 0; j < height + 50; j += 50){ // For loop going to bottom of screen
+            noStroke(); // Not having a stroke often looks better than having one.
+            fill(0, 0, 0, 10); // Very transparent black
+            ellipse(i, j, 200, 200); // A large circle
+            fill(255, 255, 255, 30); // Transparent white
+            ellipse(i, j, 20, 20); // Smaller circle
+        }
+    }
+    
+    strokeWeight(1); // Make sure that the strings won't look like thick ropes
+    for(var i in letters){ // Loop through all the letters
+        stroke(255, 255, 255, letters[i].stringOpacity); // The stroke of the strings
+        
+        pushMatrix(); // Push the matrix. Watch out - he might push back!
+        translate(50 + i * word_size / 1.8, 200); // Translate each letter two its own x position
+        line(0, -200, sin((i + frameCount) * 5) * 3, letters[i].y - 8); // The string
+        rotate(letters[i].rot); // Rotate letters to their own rotation property
+        
+        fill(0, 0, 0, 30); // The shadow
+        textSize(word_size); // The word size
+        text(letters[i].letter, sin((i + frameCount) * 5) * 3, letters[i].y + 5); // A little lower than the actual word
+        
+        fill(word_color); // The word color
+        textSize(word_size); // The word size
+        text(letters[i].letter, sin((i + frameCount) * 5) * 3, letters[i].y); // The actual word
+        popMatrix(); // Pop the matrix. There's also Mama the matrix and Baby the matrix.
+        
+        if(letters[i].y < 0){ // If the letters haven't reached the middle of the screen,
+            letters[i].y += letters[i].ySpeed; // Move at their own speed
+        }
+    }
+}; // End
