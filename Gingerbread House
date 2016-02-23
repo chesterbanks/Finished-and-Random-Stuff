@@ -1,0 +1,214 @@
+// I've been programming somewhere around 2 years, and I have learned 100% of Intro to JS.
+// There is an easter egg!
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+
+// Variables for door
+var doorWidth = 100;
+
+// Gumdrop function
+var gumdrop = function(x, y, w, h, colo, left){
+    noStroke();
+    
+    // Fill the gumdrop with the specified color
+    fill(colo);
+    
+    // Draw the gumdrop
+    arc(x, y, w, h, -179, 0);
+    ellipse(x, y, w, 10);
+    fill(0, 0, 0, 20);
+    arc(x, y, w, h, -90, 0);
+    arc(x, y, w, 10, 0, 90);
+    
+    // Draw the gumdrop sprinkles
+    stroke(255, 255, 255, 100);
+    strokeWeight(3);
+    if(left){
+        point(x-w/3.04, y-30);
+        point(x-w/3.5, y-37);
+        point(x-w/4.6, y-44);
+        point(x-w/2.91, y-22);
+    } else {
+        point(x+w/3.04, y-30);
+        point(x+w/3.5, y-37);
+        point(x+w/4.6, y-44);
+        point(x+w/2.91, y-22);
+    }
+};
+
+// Candy corn function
+var candyCorn = function(x, y){
+    noStroke();
+    fill(235, 235, 82);
+    arc(x, y, 30, 90, -180, 0);
+    fill(235, 176, 82);
+    arc(x, y - 15, 29, 60, -180, 0);
+    fill(255);
+    arc(x, y -35, 18, 18, -180, 0);
+    fill(0, 0, 0, 30);
+    arc(x, y, 30, 90, -90, 0);
+};
+
+// Falling snow
+var snow = function(x, y, sz){
+    this.x = x;
+    this.y = y;
+    this.sz = sz;
+    this.deleteMe = false;
+};
+
+var Snow = []; // Array of all snowflakes
+
+// Snow prototype
+snow.prototype.draw = function() {
+    if(!this.deleteMe){
+        noStroke();
+        fill(255);
+        ellipse(this.x, this.y, this.sz, this.sz);
+        this.y += this.sz/2;
+        if(this.y > 320){
+            this.deleteMe = true;
+        }
+    }
+};
+
+var draw = function() {
+    background(85, 149, 186);
+    noStroke();
+    
+    // Draw falling snow
+    Snow.push(new snow(random(0, 400), random(-10, -50), random(1, 10)));
+    for(var i = 0; i < Snow.length/2; i++){
+        Snow[i].draw();
+    }
+    
+    noStroke();
+    // Snow hills
+    fill(235);
+    ellipse(0, 374, 100, 100);
+    ellipse(400, 374, 100, 100);
+    fill(255);
+    ellipse(200, 374, 420, 174);
+    
+    // Basic gingerbread
+    fill(202, 153, 78);
+    quad(100, 350, 300, 350, 350, 150, 50, 150);
+    triangle(50, 150, 350, 150, 200, 50);
+    rect(100, 95, 50, 100, 10);
+    fill(0, 0, 0, 20);
+    quad(286, 350, 300, 350, 350, 150, 268, 150);
+    triangle(270, 150, 350, 150, 200, 50);
+    rect(112, 82, 25, 65, 10);
+    
+    // Chimney m&ms
+    for(var i = 86; i < 125; i += 14){
+        for(var j = 51; j < 118; j += 14){
+            fill(255, 0, 0);
+            ellipse(i, j, 10, 10);
+            fill(0, 0, 0, i);
+            ellipse(i, j, 10, 10);
+            fill(255, 255, 255, 200);
+            textSize(7);
+            text("m", i, j-1);
+        }
+    }
+    
+    // Icing
+    strokeWeight(20);
+    stroke(0, 0, 0, 30);
+    line(60, 150, 200, 55);
+    line(200, 55, 340, 150);
+    line(80, 53, 120, 53);
+    stroke(255);
+    line(50, 150, 200, 50);
+    line(200, 50, 350, 150);
+    line(80, 50, 120, 50);
+    
+    // Door
+    pushMatrix();
+    translate(150, 245);
+    scale(1.0, 1.0);
+    noFill();
+    stroke(255);
+    strokeWeight(5);
+    arc(50, 0, doorWidth, 100, -180, 0);
+    line(0, 0, 15, 145);
+    line(100, 0, 85, 146);
+    strokeWeight(15);
+    point(75, 35); // door handle
+    popMatrix();
+    
+    // Gumdrops (using gumdrop() function from above)
+    gumdrop(65, 352, 70, 130, color(217, 56, 56), true);
+    gumdrop(340, 352, 70, 130, color(217, 56, 56), false);
+    gumdrop(100, 352, 80, 140, color(29, 181, 82), true);
+    gumdrop(300, 352, 80, 140, color(29, 181, 82), false);
+    gumdrop(135, 352, 60, 120, color(140, 55, 219), true);
+    gumdrop(265, 352, 60, 120, color(140, 55, 219), false);
+    
+    // Skittle stepping stones
+    noStroke();
+    fill(0, 145, 255);
+    ellipse(204, 370, 60, 20);
+    ellipse(218, 398, 60, 20);
+    noFill();
+    stroke(255, 255, 255, 100);
+    arc(204, 370, 50, 11, -180, 0);
+    arc(218, 398, 50, 11, -180, 0);
+    
+    // Mint
+    noStroke();
+    fill(255);
+    ellipse(200, 135, 60, 60);
+    pushMatrix();
+    translate(200, 135);
+    for(var i = 0; i < 360; i += 90){
+        rotate(i);
+        fill(224, 27, 27);
+        beginShape();
+        vertex(0, 0);
+        bezierVertex(-43, -4, -20, -28, -4, -29);
+        bezierVertex(-11, -11, -9, -10, 0, 0);
+        endShape(CLOSE);
+    }
+    popMatrix();
+    
+    // Chocolate windows
+    fill(107, 71, 0);
+    rect(110, 200, 40, 70, 5);
+    rect(290, 200, 40, 70, 5);
+    fill(87, 52, 0);
+    rect(100, 185, 15, 30, 3);
+    rect(119, 185, 15, 30, 3);
+    rect(100, 217, 15, 30, 3);
+    rect(119, 217, 15, 30, 3);
+    rect(300, 185, 15, 30, 3);
+    rect(300 - 19, 185, 15, 30, 3);
+    rect(300, 217, 15, 30, 3);
+    rect(300 - 19, 217, 15, 30, 3);
+    
+    // Candy corn railing (using candyCorn function from above)
+    for(var i = 150; i < 200; i += 5){
+        candyCorn(i, i*3 - 70);
+        candyCorn(i + 110, i*3 - 70);
+    }
+    
+    // Winston snowman
+    fill(255);
+    ellipse(70, 350, 70, 70);
+    ellipse(70, 300, 50, 50);
+    ellipse(70, 250, 60, 60);
+    fill(207, 207, 207);
+    ellipse(62, 238, 7, 7);
+    ellipse(90, 236, 7, 7);
+    ellipse(82, 255, 23, 24);
+    stroke(117, 83, 14);
+    strokeWeight(4);
+    line(94, 296, 116, 275 + sin(frameCount * 30) * 10);
+    line(52, 300, 24, 275);
+    
+    if(dist(70, 250, mouseX, mouseY) < 30 && mouseIsPressed){
+        filter(INVERT, 4);
+    }
+};
