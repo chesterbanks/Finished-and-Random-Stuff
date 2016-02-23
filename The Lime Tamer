@@ -1,0 +1,113 @@
+// To see more, go to:
+// https://www.khanacademy.org/cs/cute-fruits-veggies-combined/6389536384352256
+//Friday August 15th 2014: 3rd on the Hot List !!
+// Ditto at 9:30ish: 2nd on the Hot List !!! [Just as far as Let it Code got]
+// Click for a surprise!
+
+var watermark = function(x, y, sz){pushMatrix();rectMode(LEFT);translate(x, y);scale(sz);mouseClicked = function(){if(mouseX > x && mouseX < x+(sz*50) && mouseY > y && mouseY < y+(sz*50)){println("CHESTER BANKS' PROFILE\nkhanacademy.org/profile/chesterbanks");}};stroke(255, 255, 255, 100);strokeWeight(3);fill(0, 102, 191);rect(0, 0, 50, 50);pushMatrix();rotate(0);noFill();strokeCap(SQUARE);stroke(255, 255, 255);strokeWeight(sin(frameCount * 15) + 4);arc(25, 20, 20, 20, -180, 0);arc(25, 30, 20, 20, 0, 180);line(15, 21, 15, 30);popMatrix();rectMode(CENTER);popMatrix();};
+
+var s = 4;
+var surprise = false;
+var draw = function() {
+    background(31, 31, 31);
+    /*noFill();
+    stroke(0, 153, 255);
+    strokeWeight(10);
+    ellipse(124, 277, 80, 80);*/
+    for(var i = 0; i < 315; i+=50){noStroke();translate(126, 266);rotate(i);fill(0, 153, 255);arc(0, 0, 100, 100, -49, -22);resetMatrix();}for(var j = 29; j < 346; j+= 50){resetMatrix();translate(126, 266);rotate(j);fill(255, 255, 255);arc(0, 0, 100, 100, -49, -22);fill(41, 41, 41);ellipse(0, 0, 90, 90);resetMatrix();}
+    noStroke();
+    fill(255, 191, 0);
+    ellipse(100, 295, 65, 60);
+    fill(240, 180, 0);
+    ellipse(100, 295, 59, 52);
+    fill(242, 182, 0);
+    ellipse(100, 295, 50, 43);
+    fill(0, 0, 0);
+    ellipse(83, 300, 10, 10);
+    ellipse(117, 300, 10, 10);
+    arc(100, 303, 20, 20, 0, 180);
+    fill(255, 255, 255);
+    ellipse(84, 298, 4, 4);
+    ellipse(118, 298, 4, 4);
+    fill(255, 84, 84);
+    arc(100, 311, 11, 7, -180, 0);
+    fill(204, 153, 0);
+    ellipse(83, 313, s, s);
+    ellipse(117, 313, s, s);
+    ellipse(78, 308, s, s);
+    ellipse(114, 308, s, s);
+    ellipse(86, 308, s, s);
+    ellipse(121, 308, s, s);
+    translate(97, 273);
+    rotate(-7);
+    fill(0, 0, 0);
+    rectMode(CENTER);
+    rect(0, 0, 89, 7, 20);
+    rect(0, -25, 50, 48);
+    ellipse(0, -50, 50, 7);
+    fill(255, 0, 0);
+    rect(0, -13, 50, 15);
+    resetMatrix();
+    fill(0, 115, 255);
+    quad(200, 325, 300, 325, 285, 305, 215, 305);
+    ellipse(250, 326, 99, 19);
+    fill(255, 255, 255);
+    ellipse(250,305, 68, 19);
+    fill(230, 230, 230);
+    ellipse(250, 305, 41, 7);
+    fill(66, 255, 28);
+    ellipse(250, 265, 69, 75);
+    ellipse(250, 265, 49, 82);
+    fill(0, 0, 0);
+    triangle(250, 282, 243, 275, 257, 275);
+    ellipse(265, 273, 10, 10);
+    ellipse(235, 273, 10, 10);
+    rect(237, 275, 5, 5);
+    rect(262, 275, 5, 5);
+    fill(255, 255, 255);
+    ellipse(266, 271, 5, 5);
+    ellipse(236, 271, 5, 5);
+    noFill();
+    stroke(0, 0, 0);
+    strokeWeight(2);
+    arc(255, 282, 10, 10, 0, 180);
+    arc(245, 282, 10, 10, 0, 180);
+    arc(222, 282, 19, 5, 0, 180);
+    arc(282, 282, 19, 5, 0, 180);
+    translate(222, 282);
+    rotate(-10);
+    arc(0, 5, 19, 5, 0, 180);
+    resetMatrix();
+    translate(282, 282);
+    rotate(10);
+    arc(0, 5, 19, 5, 0, 180);
+    resetMatrix();
+    textAlign(CENTER, CENTER);
+    textFont(createFont("Century Gothic", 25));
+    fill(255, 255, 255);
+    noStroke();
+    rect(200, 375, 200, 30, 30);
+    fill(0, 0, 0);
+    text("The Lime Tamer", 200, 375);
+    fill(255, 255, 0, 60);
+    triangle(28, 329, 300, 327, 338, -97);
+    ellipse(164, 328, 271, 20);
+    ellipse(164, 328, 271, 20);
+    ellipse(164, 328, 271, 20);
+    ellipse(164, 328, 271, 20);
+    if(mouseIsPressed){
+        surprise = true;
+    } else {
+        surprise = false;
+    }
+    if(surprise === true){
+        stroke(0, 0, 0);
+        line(225, 265, 240, 269);
+        line(274, 265, 260, 269);
+        noStroke();
+        fill(255, 255, 255);
+        triangle(253, 287, 258, 287, 255, 294);
+        triangle(243, 287, 248, 287, 247, 294);
+    }
+    watermark(360, 360, 0.7);
+};
