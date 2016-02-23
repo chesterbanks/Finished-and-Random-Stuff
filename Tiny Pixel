@@ -1,0 +1,158 @@
+// You are the tiny pixel.
+// Dodge the bombs by using the arrow keys.
+// Don't touch the edges
+
+// OOP makes stuff WAY easier!!!
+// This would have taken a week before, and this took me like 25 minutes! :P
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+textAlign(CENTER, CENTER);
+textFont(createFont("Century Gothic Bold"));
+
+var keys = [];
+
+var keyPressed = function(){keys[keyCode] = true;};
+var keyReleased = function(){keys[keyCode] = false;};
+
+var x = 200;
+var y = 200;
+
+var num = 5;
+
+var scene = -1;
+var score = 0;
+
+var melon = function(x, y){
+    this.x = x;
+    this.y = y;
+};
+
+var Melons = [];
+
+melon.prototype.draw = function() {
+    if(!this.deleteMe){
+        strokeWeight(3);
+        stroke(46, 46, 46);
+        fill(0, 0, 0);
+        ellipse(this.x, this.y, 20, 20);
+    }
+};
+melon.prototype.move = function(){
+    if(!this.deleteMe){
+        this.y += 3;
+    }
+};
+melon.prototype.kill = function(){
+    if(!this.deleteMe){
+        if(dist(x, y, this.x, this.y) < 10){
+            scene = "Lose";
+        }
+        if(this.y > 410){
+            this.deleteMe = true;
+            score++;
+        }
+    }
+};
+
+var button = function(y, txt, newNum){
+    fill(255, 255, 255, 50);
+    if(mouseX > 25 && mouseX < 375 && mouseY > y - 25 && mouseY < y + 25){
+        fill(0, 0, 0, 50);
+        if(mouseIsPressed){
+            scene = 0;
+            num = newNum;
+        }
+    }
+    strokeWeight(5);
+    rectMode(CENTER);
+    rect(200, y, 350, 50);
+    fill(0, 0, 0, 100);
+    textSize(30);
+    text(txt, 203, y + 3);
+    fill(245, 245, 245, 200);
+    text(txt, 200, y);    
+};
+
+var draw = function() {
+    if(scene === -1){
+        background(0, 58, 97);
+        for(var i = 0; i < 841; i+=20){
+            strokeWeight(43);
+            stroke(255, 255, 255, 15);
+            line(0, i, 400, i/2);
+            line(i, 0, i/2, 400);
+        }
+        fill(0, 0, 0, 100);
+        textSize(30);
+        text("how do you want to be\ndemolished?", 203, 53);
+        fill(245, 245, 245, 200);
+        text("how do you want to be\ndemolished?", 200, 50);  
+        button(130, "BARELY A BOMB", 15);
+        button(190, "DECENTLY DODGABLE", 10);
+        button(250, "NO BREATHING ROOM", 4);
+        button(310, "MEET YOUR DOOM", 2);
+    } else if(scene === 0){
+        background(0, 97, 15);
+        for(var i = 0; i < 841; i+=20){
+            strokeWeight(43);
+            stroke(255, 255, 255, 15);
+            line(0, i, 400, i/2);
+            line(i, 0, i/2, 400);
+        }
+        fill(0, 0, 0, 100);
+        textSize(49);
+        text("TINY PIXEL", 203,45);
+        fill(245, 245, 245, 200);
+        text("TINY PIXEL", 200, 40);
+        fill(0, 0, 0, 100);
+        textSize(194);
+        text(score, 200, 200);
+        Melons.push(new melon(random(0, 400), random(-100, -400)));
+        for(var i = 0; i < Melons.length/num; i++){
+            Melons[i].draw();
+            Melons[i].move();
+            Melons[i].kill();
+        }
+        noStroke();
+        fill(0);
+        rect(x, y, 4, 4);
+        if(keys[RIGHT]){x+=3;}
+        if(keys[LEFT]){x-=3;}
+        if(keys[UP]){y-=3;}
+        if(keys[DOWN]){y+=3;}
+        if(x < 0 || x > 400 || y < 0 || y > 400){
+            scene = 3;
+        }
+    } else {
+        background(161, 0, 0);
+        for(var i = 0; i < 841; i+=20){
+            strokeWeight(43);
+            stroke(255, 255, 255, 15);
+            line(0, i, 400, i/2);
+            line(i, 0, i/2, 400);
+        }
+        fill(0, 0, 0, 100);
+        textSize(49);
+        text("YOU LOST WITH\nA SCORE OF\n" + score, 203,205);
+        fill(245, 245, 245, 200);
+        text("YOU LOST WITH\nA SCORE OF\n" + score, 200, 200);
+    }
+};
