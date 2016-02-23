@@ -1,0 +1,420 @@
+/** Gingerbread Fall
+ * By Chester Banks
+ * December 11 2015
+ * 
+ * An entry to Contest: Gingerbread House
+ * 
+ * I have been programming somewhere around 2 years, and understand 100% of Intro to JS.
+ * 
+ * Instructions are in the game.
+ * Enjoy!
+*/
+
+/* High Scores [only the top 3]
+    1. 332 - JesusLives
+    2. 220 - KimberlyPK
+    3.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+/** Text + rect settings */
+textAlign(CENTER, CENTER); // Center the text
+textFont(createFont("gillsans-light")); // Set Gill Sans Light as the font
+rectMode(CENTER); // Center all rects
+
+/** Key movement */
+var keys = []; // Array of which key is being pressed
+var keyPressed = function(){keys[keyCode] = true;}; // If key is being pressed, it's 'true'
+var keyReleased = function(){keys[keyCode] = false;}; // If key is released, it's 'false'
+
+/** Player variables */
+var x = 200; // x position of player
+var playerSpin = 0; // Rotating variable
+var shield = false; // Shield
+var shieldTimer = 120; // Shield timer
+var player = function(xPos, yPos, onMenu){
+    pushMatrix();
+    translate(xPos, yPos);
+    if(onMenu){
+        scale(1.5);
+    } else {
+        scale(0.3);
+    }
+    rotate(playerSpin);
+    noStroke();
+    fill(255);
+    ellipse(0, 0, 60, 60);
+    for(var i = 0; i < 360; i += 90){
+        rotate(i);
+        fill(224, 27, 27);
+        beginShape();
+        vertex(0, 0);
+        bezierVertex(-43, -4, -20, -28, -4, -29);
+        bezierVertex(-11, -11, -9, -10, 0, 0);
+        endShape(CLOSE);
+    }
+    popMatrix();
+}; // Player/mint function
+
+/** Game setup variables */
+var scene = "Menu"; // Which page the user is on
+var score = 0; // Your score
+var mobile = false; // Mobile or not?
+
+/** Gingerbread house object + array */
+var house = function(x, y){
+    this.x = x; // x position of house
+    this.y = y; // y position of house
+    this.inDoor = false; // is the player in the door?
+    this.canKill = true; // is the house active [can it kill the player]?
+    this.deleteMe = false; // is it visible?
+    this.trans = 255; // the transparency of the house
+};
+var Houses = []; // Array that stores all houses coming down
+house.prototype.draw = function() {
+    if(!this.deleteMe){ // If the house is visible run the code below
+        noStroke(); // Remove stroke
+        fill(217, 156, 76, this.trans); // Nice gingerbread color
+        beginShape(); // Begin the gingerbread house
+        vertex(this.x - 40, this.y - 16);
+        vertex(this.x, this.y - 80);
+        vertex(this.x + 40, this.y-16);
+        vertex(this.x + 40, this.y + 16);
+        vertex(this.x + 12, this.y + 16);
+        vertex(this.x + 12, this.y - 16);
+        vertex(this.x - 12, this.y - 16);
+        vertex(this.x - 12, this.y + 16);
+        vertex(this.x - 40, this.y + 16);
+        endShape(); // End the gingerbread house
+        /* Roof icing */
+        stroke(255, 255, 255, this.trans); // White stroke
+        strokeWeight(10); // Thick stroke
+        line(this.x - 40, this.y - 8, this.x, this.y - 80); // Left roof icing
+        line(this.x + 40, this.y - 8, this.x, this.y - 80); // Right roof icing 
+        if(!this.canKill){ // If it isn't active
+            this.trans-=0.5; // Then slowly fade away
+        }
+    }
+};
+house.prototype.move = function(){
+    if(!this.deleteMe){ // If it is visible...
+        if(this.canKill){ // ..and active...
+            this.y += 3; // ...then increase the y position, making the house fall downwardss
+        }
+    }
+};
+house.prototype.kill = function(){
+    if(!this.deleteMe){ // If it is visible
+        if(this.canKill){ // And active, then run the following code
+            /* Checks if player is in door */
+            if(x > this.x-12 && x < this.x+12){
+                this.inDoor = true;
+            } else {
+                this.inDoor = false;
+            }
+            
+            /* Checks if player is hit by house */
+            if(x < this.x + 50 && x > this.x - 50 && this.y > 330 && this.y < 362){
+                if(!this.inDoor){ // If player isn't in door 
+                    if(!shield){ // and doesn't have a shield,
+                        scene = "Lose"; // Then the player lost
+                    }
+                } else{ // But if the player IS in the door,
+                    score += 2; // Increase score by two
+                    this.canKill = false; // And deactivate it.
+                }
+            }
+            
+            /* House disappears if out of sight */
+            if(this.y > 440){
+                this.deleteMe = true;
+            }
+        }
+    }
+};
+
+/** Button object + array */
+var button = function(x, y, txt, w, h, n, tSize, mobile1){ // x, y, text, width, height, next page, text size
+    this.x = x; // x
+    this.y = y; // y
+    this.txt = txt; // text
+    this.trans = 20; // transparency
+    this.tSp = 20; // transparency speed
+    this.txtColor = 255; // text color
+    this.w = w; // width
+    this.h = h; // height
+    this.n = n; // next page
+    this.tSize = tSize; // textSize
+    this.mobile1 = mobile1; // mobile?
+};
+button.prototype.draw = function() {
+    stroke(255); // White stroke
+    strokeWeight(2); // Thin stroke
+    fill(255, 255, 255, this.trans); // Fill it white with the current transparency (20)
+    rect(this.x, this.y, this.w, this.h); // Draw button
+    this.trans += this.tSp; // Transparency rising with the transparency speed (which is -20)
+    fill(this.txtColor, this.txtColor, this.txtColor); // Text color
+    this.txtColor -= this.tSp; // Text color decreasing with the transparency speed (which is -20)
+    textSize(this.tSize); // Text size
+    if(!this.mobile1){
+        text(this.txt, this.x, this.y); // The text
+    } else {
+        text(this.txt + ": " + mobile, this.x, this.y); // The text
+    }
+    /* Checks if mouse is in button */
+    if(mouseX > this.x - this.w/2 && mouseX < this.x + this.w/2 && mouseY > this.y - this.h/2 && mouseY < this.y + this.h/2){
+        this.tSp = 10; // If mouse is in button, then set transparency speed to +10
+        if(mouseIsPressed){ // If mouse is pressed,
+            this.trans = 0; // Transparency is zero
+            this.txtColor = 255; // Text color is white
+            if(!this.mobile1){ // If it's a regular button
+                scene = this.n; // And we're off the current page.
+            } else { // If it's a mobile button
+                // Then do nothing!
+            }
+        }
+    } else { // If mouse isn't in button
+        this.tSp = -10; // Set transparency speed to -10
+        this.txtColor = 255; // And text color to white
+    }
+    if(this.trans > 255){ // If transparency is any more than 255,
+        this.trans = 255; // Then it will return back to 255.
+    }
+    if(this.trans < 20){ // If transparency is any less than 20,
+        this.trans = 20; // Then it will return back to 20.
+    }
+};
+var buttons = [
+    new button(200, 180, "START", 200, 50, "Playing", 28, false), // Start button
+    new button(200, 225, "INSTRUCTIONS", 200, 30, "How", 18, false), // How to button
+    new button(200, 260, "SETTINGS", 200, 30, "Settings", 18, false), // Settings button
+    new button(60, 370, "BACK", 100, 40, "Menu", 13, false), // Back button [to menu]
+    
+    new button(200, 320, "Play again", 200, 40, "Reset", 18, false), // Play again button
+    
+    new button(200, 200, "MOBILE", 200, 60, "", 28, true), // Mobile button
+]; // Array that stores all buttons
+
+/** Power-ups object + array */
+var powerup = function(x, y, whichKind){
+    this.x = x; // x position
+    this.y = y; // y position
+    this.whichKind = whichKind; // which kind of power up
+    this.deleteMe = false; // is it deleted?
+};
+var Powerups = []; // Array that stores all powerups
+powerup.prototype.draw = function() {
+    if(!this.deleteMe){
+        strokeWeight(4);
+        stroke(38, 224, 75);
+        fill(38, 224, 75, 100);
+        ellipse(this.x, this.y, 30, 30);
+        if(this.whichKind === 0){
+            noStroke();
+            fill(255, 0, 0);
+            ellipse(this.x, this.y, 15, 15);
+            textSize(11);
+            fill(255);
+            text("m", this.x, this.y);
+        } else {
+            strokeWeight(5);
+            stroke(255);
+            noFill();
+            arc(this.x, this.y-3, 8, 8, -180, 0);
+            line(this.x-4, this.y-4, this.x-4, this.y+4);
+        strokeWeight(3);
+        stroke(255, 0, 0);
+        point(this.x+4, this.y-3);
+        point(this.x-4, this.y+5);
+        point(this.x-4, this.y+1);
+        point(this.x-4, this.y-3);
+        point(this.x-3, this.y-7);
+        point(this.x+2, this.y-7);
+        }
+        this.y += 3;
+    }
+};
+powerup.prototype.collect = function(){
+    if(!this.deleteMe){
+        if(dist(this.x, this.y, x, 345) < 30){
+            if(this.whichKind === 0){
+                score += 10;
+            } else {
+                shield = true;
+            }
+            this.deleteMe = true;
+        }
+    }
+};
+
+/** Background [sprinkles array + background function] */
+var sprinkles = []; // Array of sprinkles
+for(var i = 0; i < 400; i += 20){
+    for(var j = 0; j < 400; j += 20){
+        sprinkles.push({ // Add to the sprinkles array
+            x: i + random(0, 20),  // An x position of i + somewhere from 0 to 20
+            y: j + random(0, 20),  // A y position of j + somewhere from 0 to 20
+            sz: random(1, 3), // A random size from 0 to 3
+            bright: random(20, 255) // A random brightness from 50 to 255
+        });
+    }
+}
+var gingerBG = function(dark){
+    if(dark){ // If the screen should be darker
+        background(110, 59, 23);
+    } else { // Otherwise, just do normal...
+        background(161, 89, 34); // ...ginger background.
+    }
+    for (var i = 0; i < sprinkles.length; i++) { // For loop running through all of the sprinkles array
+        fill(255, 255, 255, sprinkles[i].bright); // Fill white with .bright transparency
+        noStroke(); // Remove stroke
+        ellipse(sprinkles[i].x, sprinkles[i].y, sprinkles[i].sz, sprinkles[i].sz); // Draw sprinkles with .x, .y and .sz
+    }
+};
+
+/** The draw function, containing the game */
+var draw = function() {
+    /** Menu + How + Settings pages */
+    if(scene === "Menu"){
+        gingerBG(false); // Draw ginger background, just normal (dark = false)
+        player(200, 340, true); // Big mint
+        textSize(60); // Large text size
+        fill(255, 255, 255); // White
+        text("gingerbread fall", 200, 100); // Title text
+        textSize(15); // Small text size
+        text("a game of falling gingerbread houses", 230, 129); // Subtitle text
+        buttons[0].draw(); // Draw start button
+        buttons[1].draw(); // Draw how to button
+        buttons[2].draw(); // Draw settings button
+    }
+    if(scene === "How"){
+        gingerBG(false); // Draw ginger background, just normal (dark = false)
+        fill(255); // White
+        textSize(35); // A large-ish text size
+        text("How to Play", 200, 42); // "How to Play" text
+        textSize(15); // Small text size
+        
+        // How to text
+        text("You are the mint. Move with the\nleft & right arrow keys.\n\nIf you are inside a gingerbread house's\ndoorway, you gain two points.\n\nIf you get hit by a gingerbread house\nand not in its doorway, you lose the game.\n\nIf you completely avoid the gingerbread\nhouse, you don't get any points.\n\nCandy canes give you a shield for a \nshort amount of time.\n\nM&M's give you a point bonus.", 200, 220);
+        
+        buttons[3].draw(); // Draw back button
+    }
+    if(scene === "Settings"){
+        gingerBG(false); // Draw ginger background, normal (not dark)
+        textSize(35); // Large text size
+        fill(255); // White
+        text("Settings", 200, 100); // "Settings" text
+        buttons[5].draw(); // Mobile button
+        buttons[3].draw(); // Back button
+    }
+    
+    /** Playing + Lose pages */
+    if(scene === "Playing"){
+        gingerBG(false); // Draw ginger background, just normal (dark = false)
+        fill(0, 0, 0, 100); // Fill transparent black
+        textSize(194); // Very large text size
+        text(score, 200, 200); // Score in the middle of screen
+        
+        /* The edge gumdrops */
+        var gumdropColors = [color(219, 68, 68), color(28, 219, 51), color(179, 51, 230)]; // Array of possible gumdrop colors
+        for(var i = 0; i < 400; i+= 30){
+            noStroke(); // Remove stroke
+            fill(gumdropColors[(i/30)%gumdropColors.length]); // Confusing, but it makes the gumdrops switch colors in a pattern
+            arc(0, i, 30, 30, -90, 90); // Gumdrops on left
+            arc(400, i, 30, 30, -270, -90); // Gumdrops on right
+        }
+        
+        Houses.push(new house(random(50, 350), random(-100, -400))); // Add on to Houses array a new house with random x + y pos
+        for(var i = 0; i < Houses.length/50; i++){ // For loop with every 1 out of 50 from Houses array
+            Houses[i].draw(); // Draw gingerbread houses
+            Houses[i].move(); // Make them move
+            Houses[i].kill(); // And make them be able to defeat player
+        }
+        
+        // Add new powerups on to Powerups array with random properties
+        Powerups.push(new powerup(random(50, 350), random(-100, -400), round(random(0, 1))));
+        for(var i = 0; i < Powerups.length/450; i++){ // For loop with every 1 out of 50 from Powerups array
+            Powerups[i].draw(); // Draw powerups
+            Powerups[i].collect(); // And make player be able to collect them
+        }
+        
+        /* Shield stuff */
+        if(shield === true){
+            strokeWeight(3);
+            stroke(0, 255, 77);
+            noFill();
+            arc(x, 345, 50, 50, -180, 0);
+            shieldTimer -= 1;
+        }
+        if(shieldTimer < 0){
+            shieldTimer = 120;
+            shield = false;
+        }
+        
+        noStroke(); // Remove stroke
+        fill(255, 255, 255); // White
+        rect(200, 380, 400, 60); // The snowy ground
+        fill(0, 0, 0, 50); // Shadow color
+        ellipse(x, 355, 15, 5); // Shadow
+        player(x,345,false); // Your player
+        
+        /* Key movement */
+        if(!mobile){
+            if(keys[RIGHT] && x < 385){ // If right key is pressed + not on the edge,
+                x+=3; // Go right
+                playerSpin += 12; // Rotate
+            }
+            if(keys[LEFT] && x > 15){ // If the left key is pressed + not on the edge,
+                x-=3; // Go left
+                playerSpin -= 12; // Rotate
+            }
+        } else {
+            /* Mobile movement */
+            if(mouseIsPressed && mouseX > x && x < 385){ // If mouse is pressed + not on the edge + right of player,
+                x+=3; // Go right
+                playerSpin += 12; // Rotate
+            }
+            if(mouseIsPressed && mouseX < x && x > 15){ // If the mouse is pressed + not on the edge + left of player,
+                x-=3; // Go left
+                playerSpin -= 12; // Rotate
+            }
+        }
+    } 
+    if(scene === "Lose"){
+        gingerBG(true); // Draw ginger background, but this time, dark = true!
+        textSize(25); // Medium text size
+        fill(255, 255, 255); // White fill
+        text("YOU LOST WITH A SCORE OF:", 200, 130); // Lost text
+        textSize(120); // Very large text size
+        text(score, 200, 220); // Final score
+        buttons[4].draw(); // Draw Play Again button
+    }
+    if(scene === "Reset"){ // A page that resets scores + houses, but isn't visible to the player.
+        score = 0; // Set score back to zero
+        x = 200; // Move player back to center of screen
+        Powerups = []; // Clear the Powerups array
+        Houses = []; // Clear the Houses array
+        scene = "Playing"; // Go to the Playing scene.
+    }
+};
+
+/** Mobile button stuff */
+var mouseClicked = function(){
+    if(mouseX > buttons[5].x - buttons[5].w/2 && mouseX < buttons[5].x + buttons[5].w/2 && mouseY > buttons[5].y - buttons[5].h/2 && mouseY < buttons[5].y + buttons[5].h/2 && scene === "Settings"){
+        if(!mobile){
+            mobile=true;
+        } else {
+            mobile=false;
+        }
+    }
+};
