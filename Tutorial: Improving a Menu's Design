@@ -1,0 +1,265 @@
+/** Tutorial: Improving a Menu's Design (Part 1)
+ * January 28 2016
+ * Chester Banks
+ * 
+ * I hope you learn some stuff from this tutorial about making game menus!
+ * This may be the first in a series of tutorials. #ThursdayTutorials, anyone? :P
+ * If you have any more tutorial ideas I'd like to hear them!
+ * 
+ * awk888 made a shadowTxt() function: https://www.khanacademy.org/cs/-/6320328027013120
+*/
+
+
+// Thanks to my subcribers! Almost forgot about the lucky subscriber:
+// This program's lucky subscriber is LIGHT RUNNER! Check out his fun games and cool drawings here: https://www.khanacademy.org/profile/CandyExplorer/projects
+
+// Subscribe to me here: https://www.khanacademy.org/cs/subscribe/4790207744704512
+
+
+
+
+
+
+
+imageMode(CENTER);
+textAlign(CENTER, CENTER);
+var fonts = [createFont(""), createFont("Trebuchet MS Bold"), createFont("Trebuchet MS"), createFont("Courier")];
+
+var scene = 0;
+
+var xPositions = [200];
+var yPositions = [0];
+var rotations = [0];
+
+var messages = [
+    "Okay, we're going to start out with a program that has really bad design. Doesn't this menu make you cringe?",
+    "First thing we're going to do is get rid of this awful mess of colors. Let's choose a color scheme - dark red with white and black. That usually makes a good color scheme - one color with white and/or black.",
+    "Next, let's resize some things. On a menu, making the title text as big as you can while still leaving a little \"white space\" on the sides often looks good. Make the buttons medium size, and the small subtitles a small text size.",
+    "After resizing comes repositioning. On a menu, usually you should put the title text in the center of the screen (if you have a lot of buttons then it can go higher), the creator right below it (and sometimes off-centered), and the buttons below that.",
+    "Okay, let's make this a little more professional. Be sure not to misspell anything in your game, it makes it look very unprofessional. Let's also remove the 'if you like please vote', because that breaks the Program Guidelines.",
+    "Even though the default font didn't look that bad, let's add a different font. I like to use Impact for titles, but since that one apparently isn't on all computers, we'll use Trebuchet MS Bold and Trebuchet MS does well for subtitles and buttons.",
+    "Speaking of buttons, let's change that plain text button into a real button.",
+    "Next, let's add a few details. Drop shadows usually look pretty good. If you have a lot of drop shadows in a program, you may want to make a shadowTxt(); function.",
+    "Hm, what could we add to make this program better? How about a cool background? Spending some time on a background is pretty much always worth it - it makes it look a lot better (even if it's a simple noise-ish background like this)!",
+    "All right, we're just about done! Last thing to do is add a special touch. It appears this game is about leaves, so let's add some more leaves (falling from the sky and a few more on the menu)!",
+    "And we're done! Celebrate!!",
+];
+var whichMessage = 0;
+
+var circleButton = function(x, y, sz, txt, txtSize){ // x, y, size, text
+    if(dist(mouseX, mouseY, x, y) <= (sz/2)){
+            fill(245);
+    } else {
+        fill(245,245, 245, 200);
+    }
+    ellipse(x, y, sz, sz);
+    fill(41, 41, 41);
+    textSize(sz/4);
+    text(txt, x, y);
+};
+
+var possibleLeaves = [getImage("avatars/leaf-orange"), getImage("avatars/leaf-green")];
+var leaf = function(){
+    this.x = random(0, 400);
+    this.y = -20;
+    this.r = random(0, 360);
+    this.sz = random(20, 40);
+    this.leafy = round(random(0, possibleLeaves.length-1));
+    this.speed = random(3, 10);
+};
+var leaves = [];
+leaf.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(frameCount*5 + this.r);
+    image(possibleLeaves[this.leafy], 0, 0, this.sz, this.sz);
+    this.y += this.speed;
+    popMatrix();
+};
+
+var textureRects = [];
+for(var i = 5; i < width; i += 20){
+    for(var j = -20; j < height+20; j += 20){
+        textureRects.push({x: i, y: j, br: random(0, 20)});
+    }
+}
+
+draw = function() {
+    switch(scene){
+        case 0:
+            background(255, 0, 0);
+            fill(0, 0, 255);
+            textFont(fonts[0], 50);
+            text("Leef game\nby C. Banks", 200, 200);
+            image(getImage("avatars/leaf-orange"), 200, 100);
+            fill(0, 255, 0);
+            text("Play!!!!", 200, 320);
+            fill(255, 0, 255);
+            text("if you like plz vote", 200, 371);
+            break;
+        case 1:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[0], 50);
+            text("Leef game\nby C. Banks       ", 205, 200);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            text("Play!!!!", 200, 320);
+            fill(56, 56, 56);
+            text("if you like plz vote", 200, 371);
+            break;
+        case 2:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[0], 70);
+            text("Leef game", 200, 200);
+            textSize(20);
+            text("By C. Banks", 200, 260);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            textSize(40);
+            text("Play!!!!", 200, 320);
+            fill(56, 56, 56);
+            textSize(13);
+            text("if you like plz vote", 200, 371);
+            break;
+        case 3:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[0], 70);
+            text("Leef game", 200, 200);
+            textSize(20);
+            text("By C. Banks", 290, 240);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            textSize(40);
+            text("Play!!!!", 200, 310);
+            fill(56, 56, 56);
+            textSize(13);
+            text("if you like plz vote", 340, 385);
+            break;
+        case 4:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[0], 70);
+            text("Leaf game", 200, 200);
+            textSize(20);
+            text("By C. Banks", 290, 240);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            textSize(40);
+            text("Play", 200, 310);
+            break;
+        case 5:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[1], 65);
+            text("LEAF GAME", 200, 200);
+            textFont(fonts[2], 20);
+            text("by c. banks", 305, 240);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            textSize(40);
+            text("PLAY", 200, 310);
+            break;
+        case 6:
+            background(212, 32, 32);
+            fill(255, 255, 255);
+            textFont(fonts[1], 65);
+            text("LEAF GAME", 200, 200);
+            textFont(fonts[2], 20);
+            text("by c. banks", 305, 240);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(255, 255, 255);
+            textSize(40);
+            circleButton(200, 320, 100, "PLAY");
+            break;
+        case 7:
+            background(212, 32, 32);
+            textFont(fonts[1], 65);
+            fill(0, 0, 0, 30);
+            text("LEAF GAME", 200, 210);
+            fill(255, 255, 255);
+            text("LEAF GAME", 200, 200);
+            textFont(fonts[2], 20);
+            fill(0, 0, 0, 30);
+            text("by c. banks", 305, 245);
+            fill(255);
+            text("by c. banks", 305, 240);
+            image(getImage("avatars/leaf-orange"), 200, 101);
+            fill(0, 0, 0, 30);
+            ellipse(200, 330, 100, 100);
+            circleButton(200, 320, 100, "PLAY");
+            break;
+        case 8:
+            background(212, 32, 32);
+            for(var i in textureRects){
+                fill(0, 0, 0, textureRects[i].br);
+                rect(textureRects[i].x, textureRects[i].y, 20, 20);
+            }
+            textFont(fonts[1], 65);
+            fill(0, 0, 0, 30);
+            text("LEAF GAME", 200, 210);
+            fill(255, 255, 255);
+            text("LEAF GAME", 200, 200);
+            textFont(fonts[2], 20);
+            fill(0, 0, 0, 30);
+            text("by c. banks", 305, 245);
+            fill(255);
+            text("by c. banks", 305, 240);
+            image(getImage("avatars/leaf-orange"), 200, 100);
+            fill(0, 0, 0, 30);
+            ellipse(200, 330, 100, 100);
+            circleButton(200, 320, 100, "PLAY");
+            break;
+        case 9:
+        case 10:
+            background(212, 32, 32);
+            for(var i in textureRects){
+                fill(0, 0, 0, textureRects[i].br);
+                rect(textureRects[i].x, textureRects[i].y, 20, 20);
+            }
+            if(frameCount % 6 === 3){
+                leaves.push(new leaf());
+            }
+            for(var i in leaves){
+                leaves[i].draw();
+                if(leaves[i].y > 420){
+                    leaves.splice(i, 1);
+                }
+            }
+            textFont(fonts[1], 65);
+            fill(0, 0, 0, 30);
+            text("LEAF GAME", 200, 210);
+            fill(255, 255, 255);
+            text("LEAF GAME", 200, 200);
+            textFont(fonts[2], 20);
+            fill(0, 0, 0, 30);
+            text("by c. banks", 305, 245);
+            fill(255);
+            text("by c. banks", 305, 240);
+            image(getImage("avatars/leaf-green"), 250, 100, 100, 100);
+            image(getImage("avatars/leaf-green"), 150, 100, 100, 100);
+            image(getImage("avatars/leaf-orange"), 200, 100);
+            fill(0, 0, 0, 30);
+            ellipse(200, 330, 100, 100);
+            circleButton(200, 320, 100, "PLAY");
+            break;
+    }
+    fill(255, 255, 255, 100);
+    noStroke();
+    rectMode(LEFT);
+    rect(0, 0, 400, 90);
+    fill(255);
+    textAlign(LEFT, TOP);
+    textFont(fonts[3], 12);
+    text(messages[whichMessage], 20, 10, 380, 380);
+    textAlign(CENTER, CENTER);
+};
+
+var mouseClicked = function(){
+    if(whichMessage < messages.length-1){
+        scene++;
+        whichMessage++;
+    }
+};
