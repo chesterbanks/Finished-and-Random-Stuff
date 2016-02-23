@@ -1,0 +1,37 @@
+//WHOA! I didn't think it would get this many votes in so little time! :D
+//You are welcome to copy the background if you like.
+//If you haven't watched "Frozen" this will most likely not make any sense. Just warnin' ya
+
+// 700th vote goes to IceSerpent!!
+
+var mono = createFont("Courier New");
+var oo = createFont("Impact", 70);
+var froze = createFont("Century Gothic Bold", 17);
+textAlign(LEFT, LEFT);
+background(0, 0, 0);
+fill(145, 255, 0);
+textFont(mono);
+var stuff = function(a){
+text("var a = g + bezier(100, 100, m + 5, 70, 60); rect(40, 40, \nthis.push[m, n, o, a]; popMatrix(); var generate = function \nfor(var i = 0; i < 400; i++){selected num(random, 0, 400 \nif(generate > 40){this.a = 40} else if {fill(70, 60, random( \n0, 400); var theThing = function(){colorMode(RGB), rect( \nstroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,", 0, a);
+};
+
+var stuff2 = function(b){
+text("while(var i = 30){i = i + 1; o = o + 2;) draw = function\npopMatrix(); if(!bob > 40){ms.println(ms(milliseconds); \ntext('welcome to khan'), 50, m + 50); frameRate(45); color(40) \ncos(40*sin, 50*tan); var m0 = 70*m(random(60, 50), 0, 400 \nconstrain(vz, 50 + m, this.object2.ob.3); var b = g + rect \nthis.that(simonSays + 3); angleMode(30 * hi); if(j < 50 &&", 0, b);
+};
+
+
+stuff(10);
+stuff(90);
+stuff(250);
+stuff2(170);
+stuff(331);
+textFont(oo);
+fill(255, 255, 255);
+textAlign(CENTER, CENTER);
+text("THE CODE \n NEVER \n BOTHERED ME \n ANYWAY", 200, 200);
+textAlign(CENTER, LEFT);
+textFont(froze);
+fill(0, 0, 0);
+rect(0, 358, 400, 50);
+fill(255, 255, 255);
+text("The ellipses glow 255, 255, 255 on the triangle(); \n tonight, not an error buddy to be seen.", 200, 375);
