@@ -1,0 +1,310 @@
+/** Block Ninja
+ * Chester Banks
+ * October 13 2015
+ * 
+ * #Khantober2015
+ * 
+ * Works on mobile!
+ * Game is only slightly based off of Make Them Jump (the Ketchapp game)
+ * 
+ * @Suggestions
+These will most likely be added in Block Ninja 2
+    - More ninjas
+    - Levels
+*/
+
+// Can you beat 35?
+
+
+
+
+
+
+
+var jumping = [false, false]; // blue, red
+var gravity = [10, 10]; // how high the player can jump
+var playerY = [155, 350];
+var playerYOriginal = [155, 350];
+var fills = [color(66, 160, 222), color(222, 66, 66)];
+var lives = 5;
+var score = 0;
+var blockSpeed = 3;
+var blockDensity = [190, 200];
+
+var highScore = 0;
+var isHighScore = false;
+
+var scene = "Font Test";
+var font = "AppleGothic";
+
+var block = function(x, y, which){
+    this.x = x;
+    this.y = y;
+    this.deleteMe = false;
+    this.trans = 255;
+    this.which = which;
+    this.hit = false;
+};
+
+var BlueBlox = [];
+var RedBlox = [];
+
+block.prototype.draw = function() {
+    if(!this.deleteMe){
+        noStroke();
+        fill(45);
+        rect(this.x, this.y, 30, 30);
+        this.x -= blockSpeed;
+        if(this.x > 25 && this.x < 55 && playerY[this.which] > this.y - 25){
+            lives--;
+            this.deleteMe = true;
+        }
+        if(this.x < -50){
+            this.deleteMe = true;
+        }
+    }
+};
+
+var jumpStuff = function(whichNum){
+    fill(45);
+    rect(40, playerY[whichNum], 20, 20);
+    if(jumping[whichNum] === true){
+        playerY[whichNum] -= gravity[whichNum];
+        gravity[whichNum] -= 0.5; // how fast the player comes down
+    }
+    if(playerY[whichNum] >= playerYOriginal[whichNum]){
+        jumping[whichNum] = false;
+        gravity[whichNum] = 10; // how high the player can jump
+    }
+};
+var heart = function(x, y){
+    pushMatrix();
+    rectMode(CENTER);
+    translate(x, y);
+    rotate(45);
+    fill(45);
+    rect(5, 0, 11, 20);
+    rotate(-90);
+    rect(-5, 0, 11, 20);
+    popMatrix();
+};
+var txtButton = function(x, y, w, h, sz, word, color, n){
+    pushMatrix();
+    translate(x, y);
+    if(mouseX > x-(w/2) && mouseX < x+(w/2) && mouseY > y-(h/2) && mouseY < y + (h / 2)){
+        rotate(sin(frameCount * 10) * 10);
+        if(mouseIsPressed){
+            scene = n;
+        }
+    } else {
+        rotate(0);
+    }
+    fill(0, 0, 0, 30);
+    textSize(sz);
+    text(word, 5, 5);
+    fill(color);
+    text(word, 0, 0);
+    popMatrix();
+};
+var fontButton = function(x, y, w, h, sz, word, color, n, fon){
+    pushMatrix();
+    translate(x, y);
+    if(mouseX > x-(w/2) && mouseX < x+(w/2) && mouseY > y-(h/2) && mouseY < y + (h / 2)){
+        rotate(sin(frameCount * 10) * 10);
+        if(mouseIsPressed){
+            font = fon;
+            scene = n;
+        }
+    } else {
+        rotate(0);
+    }
+    fill(0, 0, 0, 30);
+    textSize(sz);
+    text(word, 5, 5);
+    fill(color);
+    text(word, 0, 0);
+    popMatrix();
+};
+
+
+textAlign(CENTER, CENTER);
+textFont(createFont(font));
+
+draw = function() {
+    if(scene === "Font Test"){
+        for (var i = 0; i <= height; i ++) {
+            var color1 = color(0, 0, 0);
+            var color2 = color(0, 52, 87);
+            stroke(lerpColor(color1, color2, i/height));
+            line(0, i, height, i);
+        }
+        fill(255);
+        textSize(27);
+        text("What kind of computer are\nyou on?", 200, 100);
+        fontButton(200, 200, 150, 50, 40, "Apple", color(245), "Menu", "AppleGothic");
+        fontButton(200, 260, 150, 50, 40, "Windows", color(245), "Menu", "Segoe UI Light");
+        fontButton(200, 315, 150, 50, 40, "Other", color(245), "Menu", "Century Gothic");
+    }
+    if(scene === "Menu"){
+        textFont(createFont(font));
+        rectMode(CORNER);
+        for (var i = 0; i <= height; i ++) {
+            var color1 = color(0, 43, 56);
+            var color2 = color(0, 65, 97);
+            stroke(lerpColor(color1, color2, i/height));
+            line(0, i, height, i);
+        }
+        fill(255);
+        noStroke();
+        beginShape();
+        vertex(100, 100);
+        vertex(100, 230);
+        vertex(180, 230);
+        vertex(180, 185);
+        vertex(150, 165);
+        vertex(180, 140);
+        vertex(180, 100);
+        endShape();
+        rect(220, 100, 25, 130);
+        rect(280, 100, 25, 130);
+        quad(245, 100, 245, 175, 280, 230, 280, 175);
+        fill(230, 230, 230);
+        triangle(150, 165, 155, 205, 180, 185);
+        triangle(245, 175, 280, 230, 300, 210);
+        triangle(280, 100, 280, 170, 296, 109);
+        fill(0, 0, 0, 50);
+        textSize(35);
+        text("b l o c k   n i n j a", 205, 268);
+        textSize(23);
+        text("a game by chester banks", 196, 293);
+        fill(255);
+        textSize(35);
+        text("b l o c k   n i n j a", 200, 263);
+        textSize(23);
+        text("a game by chester banks", 195, 290);
+        txtButton(200, 345, 100, 60, 45, "play", color(245), "How");
+    }
+    if(scene === "How"){
+        noStroke();
+        rectMode(CENTER);
+        // backgrounds
+        fill(fills[1]);
+        rect(200, 300, 400, 200);
+        fill(fills[0]);
+        rect(200, 100, 400, 200);
+        fill(0, 0, 0, 30);
+        rect(200, 200, 400, 400);
+        
+        // platforms
+        fill(45);
+        rect(200, 380, 400, 40);
+        fill(45);
+        rect(200, 185, 400, 40);
+        
+        rect(40, 155, 20, 20);
+        rect(40, 350, 20, 20);
+        rect(340, 340, 40, 40);
+        
+        fill(0);
+        textSize(17);
+        text("Click here to make the first ninja jump", 200, 85);
+        text("Click here to make the second ninja jump", 200, 285);
+        textSize(15);
+        text("Jump over those \u2192", 241, 340);
+        text("Those are your lives \u2192", 199, 25);
+        heart(365, 20);
+        heart(330, 20);
+        heart(295, 20);
+        
+        txtButton(361, 380, 80, 40, 24, "begin", color(245), "Play");
+    }
+    if(scene === "Play"){
+        noStroke();
+        rectMode(CENTER);
+        // backgrounds
+        fill(fills[1]);
+        rect(200, 300, 400, 200);
+        fill(fills[0]);
+        rect(200, 100, 400, 200);
+        fill(0, 0, 0, 30);
+        rect(200, 200, 400, 400);
+        
+        // platforms
+        fill(45);
+        rect(200, 380, 400, 40);
+        fill(45);
+        rect(200, 185, 400, 40);
+        
+        // jumping mechanics
+        jumpStuff(0);
+        jumpStuff(1);
+        
+        RedBlox.push(new block(random(400, 600), 345, 1));
+        for(var i = 0; i < RedBlox.length / blockDensity[1]; i++){
+            RedBlox[i].draw();
+        }
+        BlueBlox.push(new block(random(400, 600), 150,  0));
+        for(var i = 0; i < BlueBlox.length / blockDensity[0]; i++){
+            BlueBlox[i].draw();
+        }
+        
+        for(var k = 0; k < lives; k++){
+            heart(247 + k * 32, 20);
+        }
+        if(lives < 0){
+            scene = "Lost";
+        }
+        
+        blockSpeed += 0.001;
+        blockDensity[0] -= 0.05;
+        blockDensity[1] -= 0.05;
+        
+        textSize(15);
+        fill(0);
+        text("Score: " + score, 55, 30);
+        if(frameCount % 60 === 29){
+            score++;
+        }
+    }
+    if(scene === "Lost"){
+        background(245);
+        txtButton(200, 200, 300, 40, 47, "t r y   a g a i n", color(45), "InBetween");
+        textSize(35);
+        if(score >= highScore){
+            isHighScore = true;
+            highScore = score;
+        } else {
+            isHighScore = false;
+        }
+        if(isHighScore === true){
+            fill(0, 0, 0, 30);
+            text("new best - " + highScore, 204, 103);
+            fill(45);
+            text("new best - " + highScore, 200, 100);
+        }
+        fill(45);
+        textSize(20);
+        text("Thanks for playing!", 200, 260);
+    }
+    if(scene === "InBetween"){
+        lives = 5;
+        score = 0;
+        scene = "Play";
+        blockSpeed = 3;
+        blockDensity[0] = 190;
+        blockDensity[1] = 200;
+        RedBlox = [];
+        BlueBlox = [];
+    }
+};
+
+var mouseClicked = function(){
+    if(scene === "Play"){
+        if(mouseY < 200){
+            jumping[0] = true;
+        }
+        if(mouseY > 200){
+            jumping[1] = true;
+        }
+    }
+};
