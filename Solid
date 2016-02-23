@@ -1,0 +1,227 @@
+/** Solid
+ * By Chester Banks
+ * September 14 2015
+ * 
+ * Idea from: https://scratch.mit.edu/projects/63013650/
+ * 
+ * Space to swap paddles. 
+ * Arrow keys to move.
+ * You have to catch solid boxes with the solid paddle, and transparent boxes with a transparent paddle. If one goes by or if you catch one with the wrong paddle, you lose a circle/life.
+*/
+
+// 200+ votes and top of the hot list! Yay! :D
+
+var pg = "Menu";
+var bgColor = color(0, 168, 219);
+
+var c = 100;
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+textFont(createFont("Trebuchet MS"));
+
+{
+    var keys= [];
+var keyPressed = function(){
+    keys[keyCode] = true;
+};
+var keyReleased = function(){
+    keys[keyCode] = false;
+};
+}
+
+var x = 200;
+var tSolid = false;
+var tSpeed = 7;
+var lives = 5;
+var score = 0;
+
+var block = function(x, y){
+    this.x = x;
+    this.y = y;
+    this.deleteMe = false;
+    this.solid = round(random(0, 1)); // 0 = solid, 1 = not solid
+    this.trans = 255;
+    this.minus = false;
+    this.speed = +3;
+};
+
+var Blocks = [];
+
+var menuX = 400;
+var menuXS = 15;
+var menuXSS = 0.28;
+
+block.prototype.draw = function() {
+    if(!this.deleteMe){
+        if(this.solid === 0){
+            fill(255, 255, 255, this.trans);
+            noStroke();
+            rect(this.x, this.y, 35, 35);
+        } else {
+            strokeWeight(1);
+            stroke(255, 255, 255, this.trans);
+            noFill();
+            rect(this.x, this.y, 34, 34);
+        }
+        this.y += this.speed;
+    }
+};
+block.prototype.grab = function(){
+    if(!this.deleteMe){
+        if(this.y > 360 && this.y < 370 && this.x > x - 68 && this.x < x + 68){
+            if(this.solid === 0 && tSolid === true){
+                this.speed = -3;
+                this.minus = true;
+                score++;
+            } else if (this.solid === 1 && tSolid === false){
+                this.speed = -3;
+                this.minus = true;
+                score++;
+            } else {
+                lives--;
+                this.speed = -3;
+                this.minus = true;
+            }
+        }
+        if(this.minus === true){
+            this.trans-=5;
+        }
+        if(this.trans < 0){
+            this.deleteMe = true;
+        }
+        if(this.y > 415){
+            this.deleteMe = true;
+            lives--;
+        }
+    }
+};
+
+var keyTyped = function(){
+    if(key.toString() === " "){
+        if(tSolid === false){
+            tSolid = true;
+        } else {
+            tSolid = false;
+        }
+    }
+};
+
+var sIcon = function(x, y){
+    pushMatrix();
+    translate(x, y);
+    noStroke();
+    fill(235);
+    quad(200, 120, 200, 140, 250, 160, 250, 140);
+    quad(150, 200, 150, 220, 200, 240, 200, 220);
+    quad(150, 160, 150, 140, 250, 200, 250, 220);
+    fill(255);
+    quad(200, 120, 200, 140, 150, 160, 150, 140);
+    quad(250, 200, 250, 220, 200, 240, 200, 220);
+    fill(0, 0, 0, 15);
+    triangle(240, 195, 230, 208, 250, 200);
+    triangle(170, 152, 150, 160, 160, 165);
+    popMatrix();
+};
+var button = function(x, y, w, h, txt, next){
+    fill(245);
+    rect(x, y, w, h);
+    if(mouseX > x-(w/2) && mouseX < x+(w/2) && mouseY > y-(h/2) && mouseY < y+(h/2)){
+        fill(255);
+        rect(x, y, w, h);
+        textSize(25);
+        fill(bgColor);
+        text(txt, x, y);
+        if(mouseIsPressed){
+            pg = next;
+            score = 0;
+            c = 100;
+            lives = 5;
+            menuX = 400;
+            menuXS = 15;
+            menuXSS = 0.28;
+            
+        }
+    } else {
+        fill(255);
+        rect(x, y - 6, w, h);
+        textSize(25);
+        fill(bgColor);
+        text(txt, x, y-6);
+    }
+};
+
+var texts = ["space to swap paddles", "arrow keys to move", "catch the solid blocks with the\nsolid paddle", "catch the clear blocks with the\nclear paddle"];
+var whichText = 0;
+
+var draw = function() {
+    if(pg === "Menu"){
+        lives = 5;
+        background(bgColor);
+        sIcon(menuX, -55);
+        textSize(50);
+        fill(255, 255, 255);
+        text("S O L I D", menuX + 200, 230);
+        button(menuX + 200, 315, 110, 50, "start", "Play");
+        fill(255, 255, 255);
+        textSize(15);
+        text("chester banks", 345, 389);
+        //button(85, 350, 100, 40, "how to", "Play");
+        // button(315, 350, 100, 40, "credits", "Play");
+        if(menuX > 0){
+        menuX-=menuXS;
+        menuXS -= menuXSS;
+        }
+    }
+    if(pg === "Play"){
+        background(bgColor);
+        Blocks.push(new block(random(0, 400), random(-100, -400)));
+        for(var i = 0; i < Blocks.length / c; i++){
+            Blocks[i].draw();
+            Blocks[i].grab();
+        }
+        if(tSolid === true){
+            fill(255);
+            noStroke();
+        } else {
+            strokeWeight(1);
+            stroke(255, 255, 255);
+            noFill();
+        }
+        rect(x, 380, 100, 10);
+        if(keys[RIGHT]){x += +tSpeed;}
+        if(keys[LEFT]){x += -tSpeed;}
+        for(var i = 0; i < lives; i++){
+            noStroke();
+            fill(255);
+            ellipse(i * 20 + 302, 15, 20, 20);
+            fill(0, 0, 0, 20);
+            arc(i*20 + 302, 15, 20, 20, -115, 64);
+        }
+        fill(245);
+        textSize(13);
+        text("Score: " + score, 37, 20);
+        fill(255, 255,255, 50 + sin(frameCount*2)*50);
+        if(50 + sin(frameCount*2)*50 === 0){
+            whichText++;
+        }
+        if(whichText >= texts.length){
+            whichText = 0;
+        }
+        textSize(20);
+        text(texts[whichText], 200, 200);
+        if(lives < 0){
+            pg = "Lose";
+        }
+        c-=0.02;
+    }
+    if(pg === "Lose"){
+        background(bgColor);
+        fill(245);
+        textSize(38);
+        text("Y O U R  S C O R E :", 200, 150);
+        textSize(105);
+        text(score, 200, 230);
+        button(200, 340, 110, 50, "menu", "Menu");
+    }
+};
