@@ -1,0 +1,350 @@
+/** Scoop It!
+ * By Chester Banks
+ * October 27 2015
+ * 
+ * #Khantober2015
+*/
+
+// Yay, top of the hot list!
+
+/** Suggestions
+Done!   Bigger Submit button                            Larry Serflaten
+        Menu                                            Drax
+        Starting over, but keeping your achievements    Base 12
+        Achievements page                               First Tiger Hobbes
+        Choosing the difficulty                         First Tiger Hobbes
+        "Backspace" scoop button                        JesusLives
+        Slower                                          jane the pirate
+Done!   Infinite/random levels                          Africanlove
+        Clear the cone when you get it wrong            SlingBlade100
+        Instructions page                               Queen_Awesomeness
+        Make it harder (multiple orders or faster)      Queen_Awesomeness
+*/
+
+
+
+
+
+
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+textFont(createFont("AppleGothic"));
+
+var scoop = function(y, colo){
+    this.y = y;
+    this.colo = colo;
+};
+var Scoops = [];
+scoop.prototype.draw = function() {
+    noStroke();
+    fill(0, 0, 0, 30);
+    ellipse(200, this.y + 5, 40, 40);
+    fill(this.colo);
+    ellipse(200, this.y, 40, 40);
+    fill(0, 0, 0, 30);
+    arc(200, this.y, 40, 40, -90, 90);
+};
+
+var scene = "Menu";
+var inBetween = false;
+var trans = 0;
+var transSpeed = +5;
+var speed = 0.8;
+
+var scoopY = 340;
+var scoopColors = [
+    [color(82, 53, 10), true], // chocolate
+    [color(254, 255, 229), true], // vanilla
+    [color(232, 106, 188), false], // strawberry
+    [color(106, 230, 159), false], // mint
+    [color(255, 132, 0), false], // orange
+    [color(247, 247, 118), false], // banana
+];
+var scoopColor = 0;
+var howManyFlavors = 2;
+
+var scoops = [];
+var orders = [
+    [round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1))],
+];
+var orderText = [[0, 0, 0, 0, 0]];
+var whichOrder = 0;
+
+var orderSlide = function(){
+    this.x = 200;
+    this.deleteMe = false;
+};
+var OrderSlides = [new orderSlide()];
+orderSlide.prototype.draw = function() {
+    if(!this.deleteMe){
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(this.x + 335, 60, 60, 90);
+        textSize(12);
+        fill(105, 105, 105);
+        rect(this.x + 200, 16, 400, 10);
+        fill(148, 148, 148);
+        rect(this.x + 200, 14, 400, 3);
+        fill(255, 255, 255);
+        rect(this.x + 335, 55, 70, 90);
+        for(var i = 39; i < 96; i += 15){
+            stroke(188, 230, 247);
+            strokeWeight(1);
+            line(this.x + 300, i, this.x + 370, i);
+        }
+        fill(25);
+        text(orderText[0][0] + "\n" + orderText[0][1] + "\n" + orderText[0][2] + "\n" + orderText[0][3] + "\n" + orderText[0][4] + "\n", this.x + 335, 70);
+        this.x -= speed;
+        if(this.x < -380){
+            this.deleteMe = true;
+            scene = "Lost";
+        }
+    }
+};
+
+var scoopButton = function(x, y, colo, active){
+    if(dist(mouseX, mouseY, 55, y) < 25 && active === true){
+        fill(0, 0, 0, 30);
+        ellipse(x, y + 5, 65, 65);
+        fill(scoopColors[colo][0]);
+        ellipse(x, y, 65, 65);
+        fill(0, 0, 0, 30);
+        arc(x, y, 65, 65, -90, 90);
+        if(mouseIsPressed){
+            scoopColor = colo;
+        }
+    } else {
+        fill(0, 0, 0, 30);
+        ellipse(x, y + 5, 50, 50);
+        fill(scoopColors[colo][0]);
+        ellipse(x, y, 50, 50);
+        fill(0, 0, 0, 30);
+        arc(x, y, 50, 50, -90, 90);
+    }
+};
+var lockedFlavor = function(x, y){
+    noStroke();
+    fill(0, 0, 0, 30);
+    ellipse(x, y + 5, 50, 50);
+    fill(179, 179, 179);
+    ellipse(x, y, 50, 50);
+    fill(0, 0, 0, 100);
+    rect(x, y + 4, 25, 20, 3);
+    noFill();
+    strokeWeight(5);
+    strokeCap(SQUARE);
+    stroke(0, 0, 0, 100);
+    arc(x, y - 7, 15, 15, -180, 0);
+    fill(0, 0, 0, 30);
+    noStroke();
+    arc(x, y, 50, 50, -90, 90);
+};
+var button2 = function(x, y, w, h, txt, txtSize){
+    rectMode(LEFT);
+    noStroke();
+    fill(214, 214, 214);
+    rect(x-2, y+2, w, h, 2);
+    stroke(181, 181, 181);
+    strokeWeight(1);
+    fill(255, 255, 255);
+    if(mouseX > x && mouseX < x+w && mouseY > y && mouseY < y+h){
+        fill(240, 240, 240);
+        rect(x-2, y+2, w, h, 2);
+        textSize(txtSize);
+        fill(0, 0, 0);
+        text(txt, (x + (w/2)) - 2, (y + (h/2)) + 2);
+        if(mouseIsPressed){
+            if(txt === "clear"){
+                scoops = [];
+                Scoops = [];
+                scoopY = 340;
+            }
+            if(txt === "submit"){
+                if(scoops[0] === orders[0][0] && scoops[1] === orders[0][1] && scoops[2] === orders[0][2] && scoops[3] === orders[0][3] && scoops[4] === orders[0][4]){
+                    for(var i = 0; i < OrderSlides.length; i++){
+                        OrderSlides[i].deleteMe = true;
+                    }
+                    inBetween = true;
+                }
+            }
+        }
+    } else {
+        rect(x, y, w, h, 2);
+        textSize(txtSize);
+        fill(0, 0, 0);
+        text(txt, x + (w/2), y + (h/2));
+    }
+    rectMode(CENTER);
+};
+var achievement = function(whichOrderDone, name){
+    if(whichOrder === whichOrderDone){
+        textSize(11);
+        fill(0, 0, 0);
+        text("New Achievement! ", 57, 376);
+        textAlign(LEFT, CENTER);
+        textSize(15);
+        text(name, 7, 388);
+        textAlign(CENTER, CENTER);
+    }
+};
+var unlock = function(whichOrderDone, whichFlavor, flavorName){
+    if(whichOrder === whichOrderDone){
+        scoopColors[whichFlavor][1] = true;
+        howManyFlavors = whichFlavor+1;
+    }
+};
+
+var mouseClicked = function(){
+    if(mouseX < 80 && mouseX > 30 && mouseY > 40 && mouseY < 365){
+        Scoops.push(new scoop(scoopY, scoopColors[scoopColor][0]));
+        scoopY -= 30;
+        scoops.push(scoopColor);
+    }
+};
+var draw = function() {
+    for(var i = 0; i < orders[0].length; i++){
+        if(orders[0][i] === 0){orderText[0][i] = "Chocolate";}
+        if(orders[0][i] === 1){orderText[0][i] = "Vanilla";}
+        if(orders[0][i] === 2){orderText[0][i] = "Strawberry";}
+        if(orders[0][i] === 3){orderText[0][i] = "Mint";}
+        if(orders[0][i] === 4){orderText[0][i] = "Orange";}
+        if(orders[0][i] === 5){orderText[0][i] = "Banana";}
+    }
+    
+    if(scene === "Menu"){
+        for (var i = 0; i <= height; i += 2) {
+            var color1 = color(235, 235, 235);
+            var color2 = color(255, 255, 255);
+            strokeWeight(2);
+            stroke(lerpColor(color1, color2, i/height));
+            line(0, i, height, i);
+        }
+        noStroke();
+        for(var i = 0; i < scoopColors.length; i++){
+            scoopButton(71 + i * 53, 250, i, false);
+        }
+        textFont(createFont("Impact"));
+        fill(0, 0, 0, 30);
+        textSize(80);
+        text("Scoop It!", 200, 185);
+        fill(54, 54, 54);
+        text("Scoop It!", 200, 180);
+        fill(0, 0, 0, 30);
+        textSize(30);
+        text("t a p   t o   s t a r t", 200, 333);
+        fill(74, 74, 74);
+        text("t a p   t o   s t a r t", 200, 330);
+        textFont(createFont("AppleGothic"));
+        if(mouseIsPressed){
+            scene = 0;
+        }
+    }
+    if(scene === 0){
+        for (var i = 0; i <= height; i += 2) {
+            var color1 = color(235, 235, 235);
+            var color2 = color(255, 255, 255);
+            strokeWeight(2);
+            stroke(lerpColor(color1, color2, i/height));
+            line(0, i, height, i);
+        }
+        noStroke();
+        fill(0, 0, 0, 30);
+        ellipse(200, 200, 78, 78);
+        textSize(45);
+        fill(245);
+        text(whichOrder, 200, 200);
+        noStroke();
+        for(var i = 0; i < Scoops.length; i++){
+            Scoops[i].draw();
+        }
+        fill(0, 0, 0, 30);
+        triangle(180, 355, 220, 355, 200, 400);
+        fill(230, 183, 101);
+        triangle(180, 350, 220, 350, 200, 395);
+        fill(0, 0, 0, 30);
+        triangle(180, 350, 200, 350, 200, 395);
+        for(var i = 0; i < scoopColors.length; i++){
+            if(scoopColors[i][1] === true){
+                scoopButton(55, 65 + i * 55, i, true);
+            } else {
+                lockedFlavor(55, 65 + i*55);
+            }
+        }
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(200, 20, 394, 10);
+        textSize(12);
+        fill(105, 105, 105);
+        rect(200, 16, 400, 10);
+        fill(148, 148, 148);
+        rect(200, 14, 400, 3);
+        button2(270, 302, 120, 40, "clear", 18);
+        button2(270, 350, 120, 40, "submit", 18);
+        achievement(1, "New Scooper");
+        achievement(3, "Strawberry");
+        achievement(5, "High Five");
+        achievement(6, "Mint Master");
+        achievement(7, "Lucky Seven");
+        achievement(8, "Orange Sherbet");
+        achievement(10, "Double Digits");
+        achievement(11, "Banana");
+        achievement(12, "Boxcars");
+        achievement(15, "Super Scooper");
+        unlock(3, 2, "Strawberry");
+        unlock(5, 3, "Mint");
+        unlock(7, 4, "Orange");
+        unlock(10, 5, "Banana");
+        for(var i = 0; i < OrderSlides.length; i++){
+            OrderSlides[i].draw();
+        }
+    }
+    if(scene === "Lost"){
+        for (var i = 0; i <= height; i += 2) {
+            var color1 = color(235, 235, 235);
+            var color2 = color(255, 255, 255);
+            strokeWeight(2);
+            stroke(lerpColor(color1, color2, i/height));
+            line(0, i, height, i);
+        }
+        noStroke();
+        for(var i = 0; i < scoopColors.length; i++){
+            scoopButton(71 + i * 53, 255, i, false);
+        }
+        textFont(createFont("Impact"));
+        fill(0, 0, 0, 30);
+        textSize(50);
+        text("you lost", 200, 190);
+        fill(54, 54, 54);
+        text("you lost", 200, 185);
+        textFont(createFont("Consolas Bold"));
+        textSize(90);
+        fill(54);
+        pushMatrix();
+        translate(200, 90);
+        rotate(90);
+        text(":(", 0, 0);
+        popMatrix();
+        textFont(createFont("AppleGothic"));
+        fill(0, 0, 0, 30);
+        textSize(20);
+        text("You got to " + whichOrder + " orders!", 200, 313);
+        textSize(13);
+        text("What did you think of this game? Leave complaints,\ncompliments, and suggestions in the Tips & Thanks!", 200, 356);
+        fill(54);
+        textSize(20);
+        text("You got to " + whichOrder + " orders!", 200, 310);
+        textSize(13);
+        text("What did you think of this game? Leave complaints,\ncompliments, and suggestions in the Tips & Thanks!", 200, 353);
+    }
+    if(inBetween){
+        orders[0] = [round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1)), round(random(0, howManyFlavors-1))];
+        whichOrder++;
+        speed += 0.02;
+        scoops = [];
+        Scoops = [];
+        scoopY = 340;
+        OrderSlides.push(new orderSlide());
+        inBetween = false;
+    }
+};
