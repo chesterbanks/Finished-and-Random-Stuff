@@ -1,0 +1,912 @@
+/** Cyber Trek Full available later...maybe. */
+// Unfortunately, I couldn't finish this game on time, so there's lots of bugs. :|
+// Enjoy what's made! :D :D :D
+
+// Your mission: collect 50 coins.
+// Go over Cyber Citizens to see what they want.
+// Collect coins & computer chips.
+// DISCOVER.
+
+/** ****************************************************** */
+var DEFAULT_FONT = createFont("Trebuchet MS"); 
+//If you have Avenir on your computer, change it to that.
+/** ****************************************************** */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var mode = "Load";
+var tutorial = true; // If you do not want tutorial mode, set this false.
+var scrollY = 310;
+var transp = 0;
+var gridS = 50;
+var keys = [];
+var cyberX = -50;
+var cyberSpeed = +2;
+var cyberSz = 4;
+
+var greensInfo = false;
+var chillInfo = false;
+var bizzInfo = false;
+var fireInfo = false;
+
+frameRate(30);
+
+var playerX = 110;
+var playerY = 110;
+var playerX2 = 50;
+var playerY2 = 50;
+var playerX3 = 50;
+var playerY3 = 50;
+var playerX4 = 50;
+var playerY4 = 50;
+var playerX5 = 50;
+var playerY5 = 50;
+var playerX6 = 50;
+var playerY6 = 50;
+
+//TICKET VARIABLES:
+var FV = 20;
+var CV = 20;
+var TG = 20;
+var B = 20;
+
+var introText = "";
+var fullIntro = "var a = g + bezier(100, 100, m + 5, 70, 60); rect(40, 40, this.push[m, n, o, a]; popMatrix(); var generate = function for(var i = 0; i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = function(){colorMode(RGB), rect( stroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,while(var i = 30){i = i + 1; o = o + 2;) draw = functionpopMatrix(); if(!bob > 40){ms.println(ms(milliseconds); text('welcome to khan'), 50, m + 50); frameRate(45); color(40) cos(40*sin, 50*tan); var m0 = 70*m(random(60, 50), 0, 400 constrain(vz, 50 + m, this.object2.ob.3); var b = g + rect this.that(simonSays + 3); angleMode(30 * hi); if(j < 50 &&i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = function(){colorMode(RGB), rect( stroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,while(var i = 30){i = i + 1; o = o + 2;) draw = functionpopMatrix(); if(!bob > 40){ms.println(ms(milliseconds var a = g + bezier(100, 100, m + 5, 70, 60); rect(40, 40, this.push[m, n, o, a]; popMatrix(); var generate = function for(var i = 0; i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = function(){colorMode(RGB), rect( stroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,while(var i = 30){i = i + 1; o = o + 2;) draw = functionpopMatrix(); if(!bob > 40){ms.println(ms(milliseconds); text('welcome to khan'), 50, m + 50); frameRate(45); color(40) cos(40*sin, 50*tan); var m0 = 70*m(random(60, 50), 0, 400 constrain(vz, 50 + m, this.object2.ob.3); var b = g + rect this.that(simonSays + 3); angleMode(30 * hi); if(j < 50 &&i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = function(){colorMode(RGB), rect( stroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,while(var i = 30){i = i + 1; o = o + 2;) draw = functionpopMatrix(); if(!bob > 40){ms.println(ms(milliseconds var a = g + bezier(100, 100, m + 5, 70, 60); rect(40, 40, this.push[m, n, o, a]; popMatrix(); var generate = function for(var i = 0; i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = function(){colorMode(RGB), rect( stroke(9, 8, 7); ellipse(50, 50, 50, 50); rotate(30*sin,while(var i = 30){i = i + 1; o = o + 2;) draw = functionpopMatrix(); if(!bob > 40){ms.println(ms(milliseconds); text('welcome to khan'), 50, m + 50); frameRate(45); color(40) cos(40*sin, 50*tan); var m0 = 70*m(random(60, 50), 0, 400 constrain(vz, 50 + m, this.object2.ob.3); var b = g + rect this.that(simonSays + 3); angleMode(30 * hi); if(j < 50 &&i < 400; i++){selected num(random, 0, 400 if(generate > 40){this.a = 40} else if {fill(70, 60, random( 0, 400); var theThing = functio";
+
+var loadingStuff = ["Initializing Jumping", "Gathering Scale", "Scanning Code", "Resetting Errors", "Engaging Speed", "Eating Hamballs", "Filling Hard Drive", "Downloading Info", "Locating Pixels", "Playing Transcolors", "Deleting Copies", "Searching for Winston Viruses", "Tighening Bolts", "Floating Pages", "Counting Lines of Code", "Giving Credit", "Fluffing Clouds", "Bouncing Trampoline", "Exercising Player"];
+
+var coinWidth = 30;
+var turnSpeed = +2;
+var coins = 5;
+var coinXs = [0, 0, 0, 0];
+var axeX = 0;
+var axeY = 0;
+var axeIsHeld = false;
+var chips = 0;
+
+var n = 0;
+var t = 1;
+
+var ant = 0;
+
+var info = false;
+var setStuff = false;
+var help = 0;
+
+textAlign(CENTER, CENTER);
+var keyPressed = function(){ // Key movement
+    keys[keyCode] = true;
+};
+var keyReleased = function(){ // More key movement
+    keys[keyCode] = false;
+};
+var drawGear=function(x,y,N,a){
+    translate(x,y);
+    noStroke();
+    for (var i = 0; i < N; i++) {
+        pushMatrix();
+        rotate(i*360/N+a);
+        translate(0,-11);
+        rect(23, 0, 90, 30);
+        translate(-37,37);
+        rect(5, -7, 70, 70);
+        popMatrix();
+    } 
+    resetMatrix();
+};
+var drawGears=function(n){
+    noStroke();
+    drawGear(width/2,height/2,10,n); 
+    drawGear(379,301,10,-n);
+    drawGear(19,100,10,-n);
+    drawGear(353,59,10,-n);
+    drawGear(100,379,10,-n);
+};
+var grid = function(){ // Game background
+    for(var i = 0; i < 20; i++){
+        stroke(0, 0, 0, 40);
+        strokeWeight(1);
+        line(gridS*i,0,gridS*i,398);
+        line(0,gridS*i,398,gridS*i);
+    }
+};
+var arrow = function(xtra, ytra, r){
+    translate(xtra, ytra);
+    rotate(r);
+    rectMode(CENTER); //Arrow
+    noStroke();
+    fill(209, 209, 209);
+    ellipse(0, 0, 35, 50);
+    fill(0, 0, 0);
+    rect(0, 2, 20, 20);
+    triangle(17, 2, 7, -18, 7, 22);
+    fill(255, 0, 0, 200);
+    rect(-3, 0, 20, 20);
+    triangle(15, 0, 5, -20, 5, 20);
+    rectMode(LEFT); //Arrow end
+    resetMatrix();
+};
+/*var greensShot = function(x, y, sz){ // The Greens
+    scale(sz,sz);
+    translate(-x, -y);
+    noStroke();
+    fill(194, 194, 194, transp);
+    rect(24, 74, 120, 120);
+    stroke(0, 0, 0, transp);
+    fill(255, 255, 255, transp);
+    rect(20, 70, 120, 120);
+    fill(0, 153, 255, transp);
+    noStroke();
+    rect(24, 74, 114, 114);
+    fill(0, 255, 0, transp);
+    rect(24, 158, 114, 30);
+    rect(24, 148, 14, 30);
+    rect(88, 148, 50, 14);
+    rect(98, 138, 40, 14);
+    rect(108, 128, 30, 14);
+    fill(184, 184, 13, transp);
+    ellipse(50, 110, 30, 30);
+    fill(214, 214, 73, transp);
+    ellipse(50, 110, 25, 25);
+    fill(255, 255, 0, transp);
+    ellipse(50, 110, 20, 20);
+    fill(0, 0, 0, transp);
+    textFont(DEFAULT_FONT);
+    textSize(13);
+    text("The Greens", 80, 175);
+    resetMatrix();
+};
+var chillvilleShot = function(x, y, sz){ // Chillville
+    scale(sz, sz);
+    translate(-x, -y);
+    noStroke();
+    fill(194, 194, 194, transp);
+    rect(24, 74, 120, 120);
+    stroke(0, 0, 0, transp);
+    fill(255, 255, 255, transp);
+    rect(20, 70, 120, 120);
+    fill(0, 225, 255, transp);
+    noStroke();
+    fill(48, 241, 255, transp);
+    rect(24, 74, 114, 114);
+    fill(255, 255, 255, transp);
+    rect(24, 160, 114, 30);
+    fill(217, 217, 217, transp);
+    triangle(24, 160, 138, 160, 78, 100);
+    fill(255, 255, 255, transp);
+    ellipse(100, 156, 20, 20);
+    ellipse(100, 143, 15, 15);
+    ellipse(100, 132, 10, 10);
+    rect(24, 150, 30, 10);
+    rect(24, 140, 20, 30);
+    //fill(184, 184, 13);
+    //ellipse(80, 110, 30, 30);
+    //fill(214, 214, 73);
+    //ellipse(80, 110, 25, 25);
+    //fill(255, 255, 0);
+    //ellipse(80, 110, 20, 20);
+    fill(0, 0, 0);
+    textFont(DEFAULT_FONT);
+    textSize(13);
+    text("Chillville", 80, 175);
+    resetMatrix();
+}; */
+var notebook = function(x, y){
+    fill(0, 0, 0, 100);
+    rect(x, y, 30, 35);
+    textFont(DEFAULT_FONT);
+    stroke(255, 255, 255, 100);
+    line(x + 5, y, x + 5, y + 34);
+    fill(255, 255, 255, 100);
+    textSize(7);
+    text("INFO", x + 18, y + 15);
+    if(mouseX > x && mouseX < x + 30 && mouseY > y && mouseY < y + 35){
+        noFill();
+        stroke(255, 255, 255);
+        rect(x - 3, y - 3, 35, 40);
+        if(mouseIsPressed){
+            info = true;
+        }
+    }
+    if(info === true){
+        rectMode(CENTER);
+        fill(255, 255, 255);
+        rect(200, 200, 250, 300);
+        for(var i = 60; i < 350; i += 20){
+            stroke(184, 184, 184);
+            line(75, i, 325, i);
+        }
+        textFont(DEFAULT_FONT);
+        textSize(20);
+        fill(0, 0, 0);
+        text("-INFO JOURNAL-", 200, 70);
+        textSize(10);
+        text("Mission: Collect 100 computer chips", 185, 110);
+        text("Coins collected: " + coins, 140, 130);
+        text("Chips collected: " + chips, 140, 150);
+        text("Where you are: " + mode, 155, 170);
+        text("Do you have an ax?  " + axeIsHeld, 160, 190);
+        fill(0, 0, 0);
+        noStroke();
+        ellipse(325, 50, 20, 20);
+        fill(255, 255, 255);
+        textSize(15);
+        text("✖", 325, 49);
+        rectMode(LEFT);
+        if(mouseX > 315 && mouseX < 335 && mouseY > 45 && mouseY < 63 && mouseIsPressed){
+            info = false;
+        }
+    }
+};
+var settings = function(x, y){
+    translate(100, 100);
+    rotate(13);
+    fill(148, 148, 148, 150);
+    noStroke();
+    rect(x + 280, y + 220, 10, 30, 10);
+    arc(x + 285, y + 220, 20, 20, -45, 225);
+    resetMatrix();
+    if(mouseX > x + 310 && mouseX < x + 340 && mouseY > y + 370 && mouseY <  y + 400){
+        noFill();
+        stroke(255, 255, 255);
+        ellipse(x + 327, y + 390, 30, 60);
+    }
+    if(mouseX > x + 310 && mouseX < x + 340 && mouseY > y + 370 && mouseY < y + 400 && mouseIsPressed){
+        help = 10;
+    }
+    if(help === 10){
+        setStuff = true;
+    }
+    if(setStuff === true){
+        fill(110, 110, 110, 200);
+        rect(25, 25, 350, 350, 20);
+        fill(255, 255, 255);
+        textFont(createFont("Courier"));
+        textSize(40);
+        text("SETTINGS", 200, 70);
+        textFont(DEFAULT_FONT);
+        textSize(13);
+        text("Tutorial Mode:", 90, 120);
+        fill(0, 255, 0);
+        rect(140, 114, 30, 15, 10);
+        fill(255, 255, 255);
+        text("On  Off", 170, 120);
+        text("Press T to turn Tutorial Mode off.", 170, 160);
+        noStroke();
+    }
+    noStroke();
+};
+var coin = function(x, y, w, mover, mover2){
+        fill(255, 255, 0);
+        stroke(0, 0, 0);
+        ellipse(x, y, coinWidth, 30);
+        coinWidth -= turnSpeed;
+        if(coinWidth < -30){
+            turnSpeed = -1;
+        }
+        if(coinWidth > 30){
+            turnSpeed = +1;
+        }
+    if (mover >= x - 45 && mover <= x + 15 && mover2 >= y - 45 && mover2 <= y + 15){
+        coinXs[w] = 400;
+        coins++;
+    }
+};
+var player = function(moveX, moveY){
+    fill(0, 102, 255);
+    rect(moveX, moveY, 30, 30);
+    noStroke();
+    fill(0, 142, 250);
+    triangle(moveX, moveY, moveX, moveY + 30, moveX + 30, moveY);
+    fill(0, 0, 0);
+    rect(moveX + 5, moveY + 7, 7, 7);
+    rect(moveX + 20, moveY + 7, 7, 7);
+    rect(moveX + 7.5, moveY + 24, 16, 3);
+    rect(moveX + 6, moveY + 20, 3, 7);
+    rect(moveX + 22, moveY + 20, 3, 7);
+    if(keys[RIGHT]){
+        moveX += 3;
+    } if(keys[LEFT]){
+        moveX -= 3;
+    } if(keys[UP]){
+        moveY -= 3;
+    } if(keys[DOWN]){
+        moveY += 3;
+    }
+};
+textAlign(CENTER, CENTER);
+var drawLetter = function(letter, x, y, size) {
+    letter = letter.toUpperCase();
+    
+    pushMatrix();
+    translate(x, y);
+    scale(size, size);
+    translate(-x, -y);
+    
+    noStroke();
+    switch(letter) {
+        case "B":
+            rect(x, y, 2, 15);
+            rect(x, y, 6, 2);
+            rect(x, y + 6, 6, 2);
+            rect(x, y + 13, 8, 2);
+            rect(x + 6, y, 2, 8);
+            rect(x + 7, y + 6, 2, 9);
+            rect(x + 1, y + 6, 2, 9);
+            break;
+        case "C":
+            rect(x, y, 2, 15);
+            rect(x + 2, y, 6, 2);
+            rect(x + 2, y + 13, 6, 2);
+            triangle(x, y, x + 3.2, y + 10, x, y + 10);
+            rect(x + 1, y + 9, 2, 6);
+            break;
+        case "E":
+            rect(x, y, 2, 15);
+            rect(x + 2, y, 6, 2);
+            rect(x + 2, y + 6, 4, 2);
+            rect(x + 2, y + 13, 6, 2);
+            triangle(x+2, y + 4, x + 4, y + 7, x + 2, y + 7);
+            rect(x + 0.5, y + 7, 2, 6);
+            break;
+        case "R":
+            rect(x, y, 2, 15);
+            rect(x+2, y, 7, 2);
+            rect(x + 7, y, 2, 9);
+            rect(x, y + 7, 8, 2);
+            stroke(0, 255, 0);
+            strokeCap(SQUARE);
+            strokeWeight(2);
+            line(x + 5, y + 8, x + 8, y + 15);
+            noStroke();
+            triangle(x, y, x + 3.3, y + 9, x, y + 9);
+            rect(x+1, y + 9, 2, 6);
+            break;
+        case "Y":
+            rect(x, y, 2, 8);
+            rect(x, y + 6, 9, 2);
+            rect(x + 7, y, 2, 8);
+            rect(x + 7, y + 8, 2, 7);
+            rect(x, y + 13, 9, 2);
+            triangle(x+ 7, y+ 4, x + 7, y + 6, x + 6, y + 6);
+            rect(x + 5.5, y + 8, 2, 7);
+            break;
+    }
+    popMatrix();
+};
+var logo = function(x, y, sz){
+translate(x, y);scale(sz, sz);strokeWeight(1);stroke(0, 0, 0);rectMode(CENTER);noFill();fill(224, 224, 224);rect(0, 0, 100, 100);noStroke();fill(204, 204, 204);triangle(50, 50, -50, 50, 50, -50);stroke(0, 0, 0);strokeWeight(3);arc(0, -20, 80, 20, 90, 270);arc(0, 10, 60, 20, -90, 82);arc(0, 30, 70, 20, -90, 90);line(0, 0, 0, 38);fill(122, 235, 255);noStroke();arc(37, -20, 142, 15, 91, 270);fill(213, 87, 255);rect(-26, 20, 35, 40);fill(255, 0, 0);arc(5, 10, 40, 10, -90, 90);fill(0, 166, 255);arc(5, 30, 50, 10, -90, 90);resetMatrix();
+}; // Chester Banks logo - Condensed
+
+if(keys[84]){
+    tutorial = false;
+}
+
+var draw = function() {
+    if(mode === "Load"){
+        background(41, 41, 41);
+        textSize(10);
+        fill(0, 255, 0);
+        textAlign(LEFT, LEFT);
+        introText = fullIntro.substring(0, introText.length);
+        text(introText, 0, 0, 410, 400);
+        frameRate(100);
+        introText+=frameRate / 10;
+        textAlign(CENTER, CENTER);
+        frameRate(10);
+        fill(56, 56, 56);
+        rect(50, 270, 300, 100, 10);
+        /*fill(46, 46, 46);
+        var tn=random(-1,1);
+        drawGears(tn+n);
+        if(frameCount%t===0){
+            n+=5;
+        }*/
+        fill(0, 255, 0);
+        text(loadingStuff[round(random(0, loadingStuff.length))] + "...", 200, 300);
+        textFont(DEFAULT_FONT, 18);
+        frameRate(30);
+        fill(255, 255, 255);
+        text("Cyber Trek made by", 200, 40);
+        text("Chester Banks", 200, 280);
+        fill(130, 130, 130);
+        text("Enjoy the game!", 200, 350);
+        logo(200, 160, 2);
+        noFill();
+        rectMode(CENTER);
+        strokeWeight(1);
+        stroke(0, 0, 0);
+        rect(200, 320, 300, 20);
+        rectMode(LEFT);
+        fill(0, 255, 0);
+        noStroke();
+        rect(55, 315, ant, 10);
+        if(ant < 290){
+            ant += 0.5;
+        }
+        if(ant > 289){
+            mode = "Start";
+        }
+    }
+    if(mode === "Start"){
+        background(0, 0, 0);
+        stroke(0, 255, 0);
+        strokeWeight(1);
+        line(0, 50, 250, 50);
+        line(0, 75, 250, 75);
+        line(0, 100, 250, 100);
+        line(250, 50, 300, 75);
+        line(250, 75, 300, 100);
+        line(250, 100, 300, 125);
+        fill(0, 0, 0);
+        ellipse(300, 75, 10, 10);
+        ellipse(300, 100, 10, 10);
+        ellipse(300, 125, 10, 10);
+        fill(0, 204, 255);
+        drawLetter("C", cyberX + 153, 153, cyberSz);
+        drawLetter("Y", cyberX + 193, 153, cyberSz);
+        drawLetter("B", cyberX + 230, 153, cyberSz);
+        drawLetter("E", cyberX + 270, 153, cyberSz);
+        drawLetter("R", cyberX + 310, 153, cyberSz);
+        fill(0, 255, 0);
+        drawLetter("C", cyberX + 150, 150, cyberSz);
+        drawLetter("Y", cyberX + 190, 150, cyberSz);
+        drawLetter("B", cyberX + 230, 150, cyberSz);
+        drawLetter("E", cyberX + 270, 150, cyberSz);
+        drawLetter("R", cyberX + 310, 150, cyberSz);
+        textFont(createFont("Courier New"));
+        textSize(40);
+        fill(0, 204, 255);
+        text("TREK", 201, 241);
+        fill(0, 255, 0);
+        text("TREK", 200, 240);
+        stroke(0, 255, 0);
+        line(0, 370, 130, 370);
+        line(270, 370, 400, 370);
+        fill(0, 0, 0);
+        rect(130, 350, 140, 40, 10);
+        ellipse(130, 370, 10, 10);
+        ellipse(270, 370, 10, 10);
+        fill(0, 255, 0);
+        textFont(DEFAULT_FONT);
+        textSize(12);
+        text("Chester Banks | July - September 2014 | Version 1.0", 200, 270);
+        textSize(25);
+        text("START", 200, 370);
+        cyberX += cyberSpeed;
+        if(cyberX > -41){
+            cyberSpeed = -2;
+        }
+        if(cyberX < -44){
+            cyberSpeed = +2;
+        }
+        if(mouseX > 130 && mouseX < 270 && mouseY > 350 && mouseY < 390){
+            fill(0, 255, 0);
+            rect(130, 350, 140, 40, 10);
+            fill(0, 0, 0);
+            text("START", 200, 370);
+        }
+        if(mouseX > 130 && mouseX < 270 && mouseY > 350 && mouseY < 390 && mouseIsPressed){
+            mode = "Intro";
+        }
+    }
+    if(mode === "Intro"){
+        background(0, 0, 0);
+        fill(0, 255, 0);
+        textSize(14);
+        textFont(createFont("Monaco"));
+        text("You were happily playing a video game on your laptop when suddenly there was a strange buzzing noise. You felt yourself shrinking smaller. Then you were zipping fast down an electric wire! When you opened your eyes, you were  inside the video game you were playing! Now you are a square in a digital world. The only way to get out is to collect 100 computer chips. Have fun!", 0, scrollY, 400, 400);
+        fill(255, 255, 255);
+        text("Press space to skip", 300, 370);
+        scrollY -= 1;
+        if(scrollY < -280){
+            mode = "Lands";
+        }
+        if(keys[32]){
+            mode = "Lands";
+        }
+    }
+    if(mode === "Lands"){
+        noStroke();
+        fill(255, 255, 255, transp);
+        rect(0, 0, 400, 400);
+        grid();
+        textFont(DEFAULT_FONT);
+        textSize(40);
+        fill(0, 0, 0, transp);
+        text("L   A   N   D   S", 200, 30);
+        //greensShot(-20, 0, 1);
+        //chillvilleShot(-216, 1, 1);
+        transp += 4;
+        //if(mouseX > 40 && mouseX < 160 && mouseIsPressed){
+            //greensInfo = true;
+        //}
+        strokeWeight(3);
+        stroke(0, 255, 0, transp);
+        line(175, 175, 225, 225);
+        stroke(255, 0, 0, transp);
+        line(225, 225, 275, 175);
+        line(275, 173, 275, 125);
+        stroke(255, 153, 0, transp);
+        line(225, 225, 175, 275);
+        line(175, 275, 75, 275);
+        stroke(0, 153, 255, transp);
+        line(225, 225, 225, 275);
+        line(225, 275, 275, 325);
+        line(275, 325, 325, 325);
+        fill(255, 255, 0, transp);
+        stroke(0, 0, 0, transp);
+        strokeWeight(0.5);
+        ellipse(225, 225, 30, 30);
+        fill(207, 207, 0, transp);
+        textSize(20);
+        text("★", 225, 225);
+        noStroke();
+        fill(0, 255, 0, transp);
+        ellipse(175, 175, TG, TG);
+        fill(255, 153, 0, transp);
+        ellipse(75, 275, FV, FV);
+        fill(0, 166, 255, transp);
+        ellipse(325, 325, CV, CV);
+        fill(255, 0, 0, transp);
+        ellipse(275, 125, B, B);
+        textFont(DEFAULT_FONT);
+        fill(0, 0, 0, transp);
+        textSize(12);
+        text("You are here\n↵", 280, 225);
+        text("Chillville", 360, 325);
+        text("Fire Valley", 80, 255);
+        text("The Greens", 175, 155);
+        text("Bizzopolis", 275, 105);
+        text("The Greens: Free\nBizzopolis: 5 coins\nFire Valley: 10 coins\nChillville: 5 coins", 75, 125);
+        textSize(20);
+        fill(0, 0, 0, 100);
+        triangle(0, 320, 0, 400, 80, 400);
+        fill(0, 0, 0, transp);
+        text("Ticket Prices", 75, 80);
+        text("$ " + coins, 25, 375);
+        if(mouseX>65&&mouseX<85&&mouseY>265&& mouseY < 285){
+            FV = 25;
+            if(mouseIsPressed){ fireInfo = true; }
+        } else {
+            FV = 20;
+        }
+        if(mouseX>160&&mouseX<190&&mouseY>160&& mouseY < 190){
+            TG = 25;
+            if(mouseIsPressed){ greensInfo = true; }
+        } else {
+            TG = 20;
+        }
+        if(mouseX>265&&mouseX<285&&mouseY>115&& mouseY < 135){
+            B = 25;
+            if(mouseIsPressed){ bizzInfo = true; }
+        } else {
+            B = 20;
+        }
+        if(mouseX>315&&mouseX<335&&mouseY>315&& mouseY < 335){
+            CV = 25;
+            if(mouseIsPressed){ chillInfo = true; }
+        } else {
+            CV = 20;
+        }
+        if(greensInfo === true){fill(199, 199, 199);stroke(0, 0, 0);rect(40, 150, 320, 200, 10);fill(84, 84, 84);noStroke();rect(100, 160, 200, 40, 10);textSize(20);textFont(createFont("Avenir Bold"));fill(0, 0, 0);text("T h e   G r e e n s", 201, 181);fill(59, 237, 0);text("T h e   G r e e n s", 200, 180);textFont(DEFAULT_FONT);textSize(10);fill(0, 0, 0);text("Info: The Greens is a land that is always in spring.\nBursting with bushes, flowers, rivers, etc,this is\na nice place to go.\n\nTicket price: Free\nPress Shift to go back.", 200, 250);fill(0, 255, 0);rect(125, 309, 150, 30, 10);textSize(20);fill(0, 0, 0);text("BUY TICKET", 200, 324);if(greensInfo === true && mouseX > 125 && mouseX < 275 && mouseY < 340 && mouseY > 310 && mouseIsPressed){mode = "Greens1";}if(greensInfo === true && keys[SHIFT]){ greensInfo = false; }
+        }
+        if(fireInfo === true){fill(199, 199, 199);stroke(0, 0, 0);rect(40, 150, 320, 200, 10);fill(84, 84, 84);noStroke();rect(100, 160, 200, 40, 10);textSize(20);textFont(createFont("Avenir Bold"));fill(0, 0, 0);text("F i r e  V a l l e y", 201, 181);fill(255, 183, 0);text("F i r e  V a l l e y", 200, 180);textFont(DEFAULT_FONT);textSize(10);fill(0, 0, 0);text("Info: Fire Valley is a stretch of land below a fiery volcano\non the verge of erupting. Be warned: this is not the\nsafest of places.\n\nTicket price: 10 coins\nPress Shift to go back.", 200, 250);fill(255, 183, 0);rect(125, 309, 150, 30, 10);textSize(20);fill(0, 0, 0);text("BUY TICKET", 200, 324);if(fireInfo === true && mouseX > 125 && mouseX < 275 && mouseY < 340 && mouseY > 310 && mouseIsPressed){mode = "FireValley1";}if(fireInfo === true && keys[SHIFT]){ fireInfo = false; }
+        }
+        if(bizzInfo === true){fill(199, 199, 199);stroke(0, 0, 0);rect(40, 150, 320, 200, 10);fill(84, 84, 84);noStroke();rect(100, 160, 200, 40, 10);textSize(20);textFont(createFont("Avenir Bold"));fill(0, 0, 0);text("B i z z o p o l i s", 201, 181);fill(255, 0, 0);text("B i z z o p o l i s", 200, 180);textFont(DEFAULT_FONT);textSize(10);fill(0, 0, 0);text("Info: Bizzolopis is a city smack dab in the middle of\nDigitaland. There are skyscrapers all about. If you\nare a tourist, this is the place to go.\n\nTicket price: 5 coins\nPress Shift to go back.", 200, 250);fill(255, 0, 0);rect(125, 309, 150, 30, 10);textSize(20);fill(0, 0, 0);text("BUY TICKET", 200, 324);if(bizzInfo === true && mouseX > 125 && mouseX < 275 && mouseY < 340 && mouseY > 310 && mouseIsPressed){mode = "Bizzopolis1";}if(bizzInfo === true && keys[SHIFT]){ bizzInfo = false; }
+        }
+        if(chillInfo === true){fill(199, 199, 199);stroke(0, 0, 0);rect(40, 150, 320, 200, 10);fill(84, 84, 84);noStroke();rect(100, 160, 200, 40, 10);textSize(20);textFont(createFont("Avenir Bold"));fill(0, 0, 0);text("C h i l l v i l l e", 201, 181);fill(10, 174, 250);text("C h i l l v i l l e", 200, 180);textFont(DEFAULT_FONT);textSize(10);fill(0, 0, 0);text("Info: Chillville is a land that is VERY cold always. It is\npretty much the opposite of The Greens, but it\nis still full of friendly people.\n\nTicket price: 5 coins\nPress Shift to go back.", 200, 250);fill(0, 174, 255);rect(125, 309, 150, 30, 10);textSize(20);fill(0, 0, 0);text("BUY TICKET", 200, 324);if(chillInfo === true && mouseX > 125 && mouseX < 275 && mouseY < 340 && mouseY > 310 && mouseIsPressed){mode = "Chillville1";}if(chillInfo === true && keys[SHIFT]){ chillInfo = false; }
+        }
+    }
+    if(mode === "Greens1"){
+        background(0, 255, 102);
+        grid();
+        coin(75 + coinXs[0], 375, 0, playerX, playerY);
+        coin(125 + coinXs[1], 375, 1, playerX, playerY);
+        coin(175 + coinXs[2], 375, 2, playerX, playerY);
+        fill(209, 25, 25);
+        noStroke();
+        ellipse(275, 325, 30, 30);
+        fill(255, 0, 0);
+        ellipse(275, 325, 24, 30);
+        fill(0, 0, 0);
+        ellipse(270, 325, 5, 5);
+        ellipse(280, 325, 5, 5);
+        if(playerX > 225 && playerX < 300 && playerY > 280 && playerY < 340){
+            fill(0, 0, 0);
+            rect(300, 250, 80, 50, 10);
+            triangle(310, 300, 295, 317, 320, 300);
+            fill(255, 255, 255);
+            textFont(DEFAULT_FONT);
+            textSize(10);
+            text("Hello there!\nWelcome to\nDigitaland!", 340,275);
+        }
+    if(keys[RIGHT]){
+        playerX += 3;
+    }
+    if(keys[LEFT]){
+        playerX -= 3;
+    }
+    if(keys[UP]){
+        playerY -= 3;
+    }
+    if(keys[DOWN]){
+        playerY += 3;
+    }
+        fill(0, 102, 255);
+        rect(playerX, playerY, 30, 30);
+        noStroke();
+        fill(0, 142, 250);
+        triangle(playerX, playerY, playerX, playerY + 30, playerX + 30, playerY);
+        fill(0, 0, 0);
+        rect(playerX + 5, playerY + 7, 7, 7);
+        rect(playerX + 20, playerY + 7, 7, 7);
+        rect(playerX + 7.5, playerY + 24, 16, 3);
+        rect(playerX + 6, playerY + 20, 3, 7);
+        rect(playerX + 22, playerY + 20, 3, 7);
+        if(playerX > 400){
+            mode = "Greens2";
+        }
+        if(playerY > 400){
+            mode = "Greens4";
+        }
+            settings(0, 0);
+            rectMode(CENTER); //Arrow
+            fill(209, 209, 209);
+            ellipse(376, 200, 35, 50);
+            fill(0, 0, 0);
+            rect(374, 202, 20, 20);
+            triangle(392, 202, 382, 182, 382, 222);
+            fill(255, 0, 0, 200);
+            rect(372, 200, 20, 20);
+            triangle(390, 200, 380, 180, 380, 220);
+            rectMode(LEFT); //Arrow end
+            if(tutorial === true){
+                fill(0, 0, 0);
+                textSize(10);
+                textFont(DEFAULT_FONT);
+                textSize(11);
+                //textSize(10);
+                text("These are coins.\nYou can buy things with them.", 125, 340);
+                text("This is a computer chip.\nRemember, your goal is to\ncollect them all.", 80, 140);
+                text("This is a CPU player.\nTalk to them to see\nwhat they want.", 280, 280);
+                textSize(10);
+            }
+            fill(84, 84, 84);
+            ellipse(25, 175, 30, 30);
+            fill(0, 0, 0);
+            arc(25, 175, 30, 30, -90, 90);
+            ellipse(25, 175, 18, 30);
+            notebook(360, 370);
+    }
+    if(mode === "Greens2"){
+        background(0, 255, 102);
+        grid();
+        arrow(380, 200, 0);
+        arrow(200, 380, 90);
+        arrow(20, 200, 180);
+        if(keys[RIGHT]){
+            playerX2 += 3;
+        }
+        if(keys[LEFT]){
+            playerX2 -= 3;
+        }
+        if(keys[UP]){
+            playerY2 -= 3;
+        }
+        if(keys[DOWN]){
+            playerY2 += 3;
+        }
+        coin(25, 375, 2, playerX2, playerY2);
+        fill(0, 102, 255);
+        rect(playerX2, playerY2, 30, 30);
+        noStroke();
+        fill(0, 142, 250);
+        triangle(playerX2, playerY2, playerX2, playerY2 + 30, playerX2 + 30, playerY2);
+        fill(0, 0, 0);
+        rect(playerX2 + 5, playerY2 + 7, 7, 7);
+        rect(playerX2 + 20, playerY2 + 7, 7, 7);
+        rect(playerX2 + 7.5, playerY2 + 24, 16, 3);
+        rect(playerX2 + 6, playerY2 + 20, 3, 7);
+        rect(playerX2 + 22, playerY2 + 20, 3, 7);
+        noStroke();
+        fill(102, 82, 4);
+        rect(115, 280, 20, 100);
+        fill(122, 122, 122);
+        quad(114, 380, 130, 380, 200, 400, 160, 400);
+        fill(71, 57, 0);
+        ellipse(125, 380, 20, 10);
+        fill(0, 163, 52);
+        rect(75, 190, 100, 100, 10);
+        rect(60, 210, 50, 60, 10);
+        rect(140, 210, 50, 60, 10);
+        if(playerX2 < 0){
+            mode = "Greens1";
+        }
+        if(playerX2 > 400){
+            mode = "Greens3";
+        }
+        if(playerY2 > 400){
+            mode = "Greens5";
+        }
+        settings(0, 0);
+        notebook(360, 370);
+    }
+    if(mode === "Greens3"){
+        background(0, 255, 102);
+        grid();
+        notebook(360, 370);
+        player(playerX3, playerY3);
+        if(keys[RIGHT]){
+            playerX3 += 3;
+        }
+        if(keys[LEFT]){
+            playerX3 -= 3;
+        }
+        if(keys[UP]){
+            playerY3 -= 3;
+        }
+        if(keys[DOWN]){
+            playerY3 += 3;
+        }
+        if(playerX3 < 0){
+            mode = "Greens2";
+        }
+        if(playerY3 > 400){
+            mode = "Greens6";
+        }
+        settings(0, 0);
+        //First tree
+        noStroke();
+        fill(102, 82, 4);
+        rect(115, 80, 20, 100);
+        fill(71, 57, 0);
+        ellipse(125, 180, 20, 10);
+        fill(0, 163, 52);
+        rect(75, -10, 100, 100, 10);
+        rect(60, 10, 50, 60, 10);
+        rect(140, 10, 50, 60, 10);
+        //Second Tree
+        noStroke();
+        fill(102, 82, 4);
+        rect(315, 80, 20, 100);
+        fill(71, 57, 0);
+        ellipse(325, 180, 20, 10);
+        fill(0, 163, 52);
+        rect(275, -10, 100, 100, 10);
+        rect(260, 10, 50, 60, 10);
+        rect(340, 10, 50, 60, 10);
+        //Third Tree
+        fill(102, 82, 4);
+        rect(215, 80, 20, 100);
+        fill(71, 57, 0);
+        ellipse(225, 180, 20, 10);
+        fill(0, 133, 42);
+        rect(175, -10, 100, 100, 10);
+        rect(160, 10, 50, 60, 10);
+        rect(240, 10, 50, 60, 10);
+        //Ax
+        fill(0, 0, 0);
+        rect(axeX + 300, axeY + 300, 5, 45);
+        fill(181, 181, 181);
+        rect(axeX + 303, axeY + 300, 20, 15);
+        ellipse(axeX + 320, axeY + 308, 10, 19);
+        fill(255, 255, 255);
+        triangle(axeX + 313, axeY + 300, axeX + 317, axeY + 300, axeX + 315, axeY + 305);
+        if(playerX3 > 300 && playerX3 < 325 && playerY3 > 300 && playerY3 < 345){
+            axeIsHeld = true;
+        }
+        if(axeIsHeld === true){
+            axeX = playerX3 - 265 && playerX - 265 && playerX4 - 265 && playerX5 - 265;
+            axeY = playerY3 - 314 && playerY - 314 && playerY4 - 314 && playerY5 - 314;
+        }
+    }
+    if(mode === "Greens4"){
+        background(0, 255, 102);
+        grid();
+        if(keys[RIGHT]){
+            playerX4 += 3;
+        }
+        if(keys[LEFT]){
+            playerX4 -= 3;
+        }
+        if(keys[UP]){
+            playerY4 -= 3;
+        }
+        if(keys[DOWN]){
+            playerY4 += 3;
+        }
+        fill(0, 102, 255);
+        rect(playerX4, playerY4, 30, 30);
+        noStroke();
+        fill(0, 142, 250);
+        triangle(playerX4, playerY4, playerX4, playerY4 + 30, playerX4 + 30, playerY4);
+        fill(0, 0, 0);
+        rect(playerX4 + 5, playerY4 + 7, 7, 7);
+        rect(playerX4 + 20, playerY4 + 7, 7, 7);
+        rect(playerX4 + 7.5, playerY4 + 24, 16, 3);
+        rect(playerX4 + 6, playerY4 + 20, 3, 7);
+        rect(playerX4 + 22, playerY4 + 20, 3, 7);
+        if(playerY4 < 0){
+            mode = "Greens1";
+        }
+        fill(230, 230, 230);
+        triangle(15, 370, 50, 370, 32.5, 340);
+        fill(255, 255, 255);
+        triangle(38, 370, 45, 370, 32.5, 340);
+        fill(0, 0, 0);
+        ellipse(28, 358, 3, 3);
+        ellipse(35, 358, 3, 3);
+        if(playerX4 < 50 && playerY4 > 300 && playerY4 < 370){
+            fill(214, 214, 214);
+            rect(43, 344, 100, 14);
+            fill(255, 255, 255);
+            rect(30, 300, 125, 45, 50);
+            fill(0, 0, 0);
+            text("Hey, if you answer\nmy question, I'll give\nyou three coins.", 90, 322);
+            text("OK!   No thx.", 94, 352);
+        }
+        notebook(360, 370);
+        settings(0, 0);
+    }
+    if(mode === "Greens5"){
+        background(0, 255, 102);
+        grid();
+        player(playerX5, playerY5);
+        if(keys[RIGHT]){
+            playerX5 += 3;
+        }
+        if(keys[LEFT]){
+            playerX5 -= 3;
+        }
+        if(keys[UP]){
+            playerY5 -= 3;
+        }
+        if(keys[DOWN]){
+            playerY5 += 3;
+        }
+        if(playerX5 < 0){
+            mode = "Greens4";
+        }
+        notebook(360, 370);
+        settings(0, 0);
+    }
+    if(mode === "Greens6"){
+        background(0, 255, 102);
+        grid();
+        player(playerX6, playerY6);
+        if(keys[RIGHT]){
+            playerX6 += 3;
+        }
+        if(keys[LEFT]){
+            playerX6 -= 3;
+        }
+        if(keys[UP]){
+            playerY6 -= 3;
+        }
+        if(keys[DOWN]){
+            playerY6 += 3;
+        }
+        if(playerX6 < 0){
+            mode = "Greens5";
+        }
+        if(playerY6 < 0){
+            mode = "Greens3";
+        }
+        notebook(360, 370);
+        settings(0, 0);
+    }
+};
