@@ -1,0 +1,141 @@
+/** Press It! v1.0
+ * 
+ * By Chester Banks
+ * September 9 2015
+ * 
+ * Took a while to write a comment on every single line of code xD
+ * Background is based off of Geometry Dash!
+*/
+
+var x1 = 30; // x position of ball 1
+var x2 = 370; // x position of ball 2
+
+var speed = 3; // speed of both balls
+var xSp1 = +speed; // x speed of ball 1
+var xSp2 = -speed; // x speed of ball 2
+
+var score = 0; // your score is zero :( so sad...
+var page = "Menu"; // you haven't lost :) oh the joy
+
+var clickTimer = 0; // makes it so you don't skip the instructions.
+
+textFont(createFont("Impact")); // Great game font, just ask Bryce!
+textAlign(CENTER, CENTER);  // center all below text
+
+var bg = function(color){ // ooh a cool background! b = back | g = ground
+    background(color);          // background color
+    noStroke();                 // makes all the difference
+    rectMode(CENTER);           // center the plethora of rectangles below
+    fill(0, 0, 0,10);           // slightly darker than the background
+    rect(175, 390, 150, 150);   // rectangle #1
+    rect(390, 280, 150, 150);   // rectangle #2
+    rect(283, 333, 40, 40);     // rectangle #3
+    rect(283, 386, 40, 40);     // rectangle #4
+    rect(200, 200, 200, 200);   // rectangle #5
+    rect(415, 465, 200, 200);   // rectangle #6
+    rect(10, 350, 150, 150);    // rectangle #7
+    rect(50, 225, 70, 70);      // rectangle #8
+    rect(50, 136, 70, 70);      // rectangle #9
+    rect(80, -40, 200, 250);    // rectangle #10
+    rect(235, 45, 80, 80);      // rectangle #11
+    rect(295, 10, 30, 30);      // rectangle #12
+    rect(295, 45, 30, 30);      // rectangle #13
+    rect(295, 80, 30, 30);      // rectangle #14
+    rect(415, 90, 200, 200);    // rectangle #15
+    for(var i = 400; i > 0; i--){           // for loop jumble
+        strokeWeight(1);                    // thin stroke weight
+        stroke(0, 0, 0, i/2);               // transparency
+        line(0, -i + 300, 400, -i + 300);   // top lines
+        line(0, i + 200, 400, i + 200);     // bottom lines
+    }
+};
+
+var watermark = function(x, y, sz){pushMatrix();rectMode(LEFT);translate(x, y);scale(sz);stroke(255, 255, 255, 100);strokeWeight(3);fill(0, 102, 191);rect(0, 0, 50, 50);pushMatrix();rotate(0);noFill();strokeCap(SQUARE);stroke(255, 255, 255);strokeWeight(sin(frameCount * 15) + 4);arc(25, 20, 20, 20, -180, 0);arc(25, 30, 20, 20, 0, 180);line(15, 21, 15, 30);popMatrix();rectMode(CENTER);popMatrix();};                    // watermark mumbo jumbo
+
+var draw = function() {             // call the draw function
+    if(page === "Menu"){            // if you're menuing
+        bg(color(0, 186, 102));     // nice green background
+        fill(245);                  // nice white color
+        textSize(100);              // nice textSize
+        text("Press It!", 200, 200);// nice title text
+        textSize(21);               // not quite 25
+        text("CHESTER BANKS | SEPTEMBER 2015 | v1.0", 200, 259); // ok, enough of this nice thing
+        fill(245, 245, 245, 200);
+        textSize(29);               // not quite 30
+        text("CLICK TO BEGIN", 200, 330); // too lazy to make a button. :P
+        watermark(340, 340, 1.0);   // the watermark
+    }                               // end brace (or is it a bracket?)
+    if(page === "How"){             // if you're how-to-ing
+        bg(color(153, 0, 255));     // a purple background, "since violet is for losers"
+        textSize(28);               // not quite 30
+        fill(235);                  // not quite white
+        textFont(createFont("Century Gothic"));   // so the how to is easier to read
+        text("Press space while the\ntwo circles are together,\nget a point.\n\nPress space while the\ntwo circles are apart,\nlose the game.", 200, 200); // the instructions
+        textSize(24);               // not quite 25
+        textFont(createFont("Impact")); // switch the font back
+        text(">>>>>>>>>> Double click to play <<<<<<<<<<", 200, 375); // that is a lot of arrows
+    }
+    if(page === "Play"){            // if you're playing run the code below
+        colorMode(HSB);             // hue, saturation, brightness
+        bg(color((score * 20 % 255), 255, 255)); // ze backgroundo
+        colorMode(RGB);             // switch it back to red, green, blue
+        strokeWeight(3);            // makes all the difference in the world
+        fill(255, 255, 255);        // white for the first ball
+        stroke(232, 232, 232);      // slightly darker than that ^
+        ellipse(x1, 200, 50, 50);   // create the white ball
+        fill(38, 38, 38);           // black for the second ball
+        stroke(0, 0, 0);            // slightly darker than that ^
+        ellipse(x2, 200, 50, 50);   // create the black ball
+        x1 += xSp1;                 // make the white ball move right (if xSp1 is +3)
+        x2 += xSp2;                 // make the black ball move left (if xSp2 is -3)
+        if(x1 > 370){               // if the white ball is too much that way -->
+            xSp1 = -speed;          // turn it around.
+        }                           // end of if statement.
+        if(x1 < 30){                // if the white ball too much that way <--
+            xSp1 = +speed;          // turn it around.
+        }                           // ta da! the ball bounces back and forth
+        if(x2 > 370){               // now let's do it again! if the red ball is too much that way -->
+            xSp2 = -speed;          // turn it around.
+        }                           // end of if statement.
+        if(x2 < 30){                // if the black ball too much that way <--
+            xSp2 = +speed;          // turn it around.
+        }                           // ta da! the ball bounces back and forth
+        fill(245);                  // a very very dark gray
+        text("Score: " + score, 200, 23); // your score!
+        speed += 0.01;             // so it slowly gets faster
+    }
+    if(page === "Lose"){            // if you lost
+        bg(color(89, 89, 89));      // make a gray background
+        fill(224, 0, 0);            // with red text
+        textSize(99);               // not quite 100
+        text("LOSER", 200, 200);    // :(
+        fill(0, 174, 255);          // cyan
+        textSize(39);               // not quite 40
+        text("SCORE:" + score, 200, 271); // your final score
+    }
+};
+
+var mouseClicked = function(){
+    if(page === "Menu"){ page = "How"; } // doesn't look the best since i condensed it
+    if(page === "How" && clickTimer > 1){ page = "Play"; } // you still reading these?
+    clickTimer++; // add the click timer!
+};
+var keyPressed = function(){    // call the keyPressed function
+    if(page === "Play" && key.toString() === " "){ // if you're playing and you're pressing SPACE
+        if(dist(x1, 200, x2, 200) > 50){ // if the balls aren't touching yet you press a key
+            page = "Lose";      // you lose :( so sad...
+        }
+        if(dist(x1, 200, x2, 200) > 30 && dist(x1, 200, x2, 200) < 50){ // if they're touching the outside layer,
+            score++;            // you get a point! oh the joy
+        }
+        if(dist(x1, 200, x2, 200) > 20 && dist(x1, 200, x2, 200) < 30){ // if they're touching the next to outside layer,
+            score+=2;            // you get 2 points! oh the joy
+        }
+        if(dist(x1, 200, x2, 200) > 10 && dist(x1, 200, x2, 200) < 20){ // if they're touching the next to inside layer,
+            score+=5;            // you get 5 point! oh the joy
+        }
+        if(dist(x1, 200, x2, 200) > 0 && dist(x1, 200, x2, 200) < 10){ // if they're touching the inside layer,
+            score+=10;          // you get 10 points! oh the joy
+        }                       // end brace
+    }                           // yet another end brace
+}; // so many comments...
