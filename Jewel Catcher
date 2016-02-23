@@ -1,0 +1,554 @@
+/**
+ * JEWEL CATCHER v1.1
+ * Chester Banks
+ * July 2015
+*/
+
+/** Version 1.1:
+ * Added Mr. Jewel
+ * Added Gem Crazy Mode
+*/
+
+// The logo at the beginning is my new logo!
+
+/** Like the font? Ask to use it here: https://www.khanacademy.org/computer-programming/jewel-catcher-font/4653259450089472 */
+
+// Press restart if an error shows up.
+
+/** I took out High Scores to avoid getting a zillion notifs. :P */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+frameRate(60);
+textFont(createFont("Trebuchet MS"));
+textAlign(CENTER, CENTER);
+
+var page = "Menu";
+var a = 1;
+
+var mode = "";
+
+var keys = [];
+var keyPressed = function(){keys[keyCode] = true;};
+var keyReleased = function(){keys[keyCode] = false;};
+
+var basketX = 200;
+
+var points = 0;
+var baskets = 0;
+
+var helper = 0;
+var time = 50;
+
+var awesomeText = function(x, y, size, word, color){
+    textSize(size);
+    fill(color);
+    text(word, x + size/24, y);
+    text(word, x - size/24, y);
+    text(word, x, y - size/24);
+    text(word, x, y + size/24);
+};
+var button = function(x, y, w, h, txt, n, txtSize){
+    rectMode(LEFT);
+    noStroke();
+    fill(230, 0, 0);
+    rect(x-2, y+2, w, h, 15);
+    stroke(230, 0, 0);
+    strokeWeight(1);
+    fill(196, 196, 196);
+    if(mouseX > x && mouseX < x+w && mouseY > y && mouseY < y+h){
+        fill(232, 0, 19);
+        rect(x-2, y+2, w, h, 15);
+        textSize(txtSize);
+        fill(189, 189, 189);
+        text(txt, x+(w/2)-2, y+(h/2)+2);
+        if(mouseIsPressed){
+            page = n;
+        }
+    } else {
+        rect(x, y, w, h, 15);
+        textSize(txtSize);
+        fill(1212, 0, 0);
+        text(txt, x+(w/2)-2, y+(h/2)+2);
+    }
+    rectMode(CENTER);
+};
+var circleButton = function(x, y, sz, txt, n, txtSize, modey){ // x, y, size, text, next page
+    if(dist(mouseX, mouseY, x, y) <= (sz/2)){
+            fill(245);
+            if(mouseIsPressed){
+                page = n;
+                mode = modey;
+            }
+    } else {
+        fill(245,245, 245, 200);
+    }
+    ellipse(x, y, sz, sz);
+    fill(41, 41, 41);
+    textSize(sz/4);
+    if(page === "Choose"){textSize(sz/8);}
+    text(txt, x, y);
+};
+var button2 = function(x, y, sz, txt){ // x, y, size, text
+    if(dist(mouseX, mouseY, x, y) <= (sz/2)){
+            fill(245);
+            if(mouseIsPressed){
+                points = 0;
+                baskets++;
+            }
+    } else {
+        fill(245,245, 245, 200);
+    }
+    ellipse(x, y, sz, sz);
+    fill(41, 41, 41);
+    textSize(sz / 5);
+    if(sz === 90){textSize(sz/4);}
+    text(txt, x, y);
+};
+var candyBackground = function(){
+    rectMode(CENTER);
+    background(255);
+    noStroke();
+    for(var i = -207; i < 400; i += 26){
+        for(var j = -7; j < 400; j += 69){
+            fill(255, 0, 0);
+            rect(i + sin(-frameCount * 12) + 200, j + i%a, 25, 10);
+            fill(255, 183, 0);
+            rect(i + sin(frameCount * 12) +200, j + 12 + i%a, 25, 10);
+            fill(255, 255, 0);
+            rect(i + sin(-frameCount * 12) +200, j + 24 + i%a, 25, 10);
+            fill(85, 255, 0);
+            rect(i + sin(frameCount * 12) +200, j + 35 + i%a, 25, 10);
+            fill(0, 145, 255);
+            rect(i + sin(-frameCount * 12) +200, j + 46 + i%a, 25, 10);
+            fill(191, 0, 255);
+            rect(i + sin(frameCount * 12) +200, j + 58 + i%a, 25, 10);
+        }
+    }
+    fill(0, 0, 0,100);
+    rect(200, 200, 400, 400);
+};
+
+var basket = function(x, y){
+    pushMatrix();
+    scale(0.6);
+    noStroke();
+    fill(209, 209, 209);
+    rect(x, y+19, 50, 37);
+    ellipse(x, y+36, 50, 28);
+    fill(255, 255, 255);
+    ellipse(x, y, 50, 20);
+    fill(235, 0, 0);
+    ellipse(x, y+26, 25, 25);
+    fill(207, 207, 207);
+    textSize(24);
+    text("10", x, y+26);
+    
+    pushMatrix();
+    translate(x-7, y-3);
+    rotate(45);
+    strokeWeight(5);
+    stroke(0, 191, 57);
+    fill(0, 255, 60);
+    ellipse(3, -6, 25, 25);
+    popMatrix();
+    
+    pushMatrix();
+    translate(x, y);
+    rotate(45);
+    strokeWeight(5);
+    stroke(222, 0, 0);
+    fill(255, 0, 0);
+    rect(3, -6, 10, 10);
+    popMatrix();
+    
+    pushMatrix();
+    translate(x-15, y);
+    rotate(45);
+    strokeWeight(5);
+    stroke(0, 37, 222);
+    fill(0, 64, 255);
+    rect(3, -6, 10, 10);
+    popMatrix();
+    
+    noFill();
+    strokeWeight(8);
+    stroke(235);
+    arc(x, y, 42, 12, 0, 180);
+    popMatrix();
+};
+
+var Candy = function(x, y, speed){
+    this.x = x;
+    this.y = y;
+    this.speed = speed;
+    this.deleteMe = false;
+    this.type = round(random(0, 2));
+};
+
+var Candies = [];
+
+Candy.prototype.draw = function() {
+    if(!this.deleteMe){
+        if(this.type === 0){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(45);
+            strokeWeight(5);
+            stroke(222, 0, 0);
+            fill(255, 0, 0);
+            rect(0, 0, sin(frameCount * 1) + 20, sin(frameCount * 1) + 20);
+            popMatrix();
+        }
+        if(this.type === 1){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(45);
+            strokeWeight(5);
+            stroke(0, 0, 222);
+            fill(0, 72, 255);
+            rect(0, 0, sin(frameCount * 1) + 20, sin(frameCount * 1) + 20);
+            popMatrix();
+        }
+        if(this.type === 2){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(0);
+            strokeWeight(5);
+            stroke(0, 133, 24);
+            fill(0, 199, 30);
+            ellipse(0, 0, sin(frameCount * 1) + 25, sin(frameCount * 1) + 25);
+            popMatrix();
+        }
+    }
+};
+Candy.prototype.move = function() {
+    if(!this.deleteMe){
+        this.y += this.speed;
+    }
+    
+};
+Candy.prototype.catchIt = function(){
+    if(!this.deleteMe){
+        if(this.y > 295 && this.y < 305 && this.x > basketX - 25 && this.x < basketX + 25){
+            this.deleteMe = true;
+            if(points < 10){
+                points++;
+            }
+        }
+        if(this.y > 430){
+            this.deleteMe = true;
+        }
+    }
+};
+
+var mr_jewel_phrases = ["We've got 195 votes! Yay!", "Like the font? Go to Chester's spin-off to try it out!", "Have you tried Gem Crazy?", "Got a suggestion? Just tell Chester!"];
+var which_phrase = round(random(0, mr_jewel_phrases.length-1));
+var mr_jewel = function(){
+    fill(31, 229, 255);
+    noStroke();
+    triangle(5, 375, 40, 375, 22.5, 395);
+    quad(5, 375, 40, 375, 35, 370, 10, 370);
+    fill(0, 0, 0, 30);
+    triangle(12, 375, 40, 375, 22.5, 395);
+    quad(12, 375, 40, 375, 36, 370, 15, 370);
+    fill(0, 0, 0);
+    ellipse(17, 377, 5, 5);
+    ellipse(27, 377, 5, 5);
+    fill(245, 245, 245, 150);
+    rect(220, 380, 340, 23, 6);
+    triangle(50, 375, 50, 388, 39, 382);
+    fill(45);
+    textSize(11);
+    text(mr_jewel_phrases[which_phrase], 220, 380);
+};
+
+var bubble = function(txt){
+    fill(245, 245, 245, 150);
+    rect(220, 380, 340, 23, 6);
+    triangle(50, 375, 50, 388, 39, 382);
+    fill(45);
+    textSize(11);
+    text(txt, 220, 380);
+};
+
+var mr_jewel2_phrases = [""];
+var mr_jewel2 = function(){
+    fill(31, 229, 255);
+    noStroke();
+    triangle(5, 375, 40, 375, 22.5, 395);
+    quad(5, 375, 40, 375, 35, 370, 10, 370);
+    fill(0, 0, 0, 30);
+    triangle(12, 375, 40, 375, 22.5, 395);
+    quad(12, 375, 40, 375, 36, 370, 15, 370);
+    fill(0, 0, 0);
+    ellipse(17, 377, 5, 5);
+    ellipse(27, 377, 5, 5);
+    if(points === 1 && baskets === 0){
+        bubble("Nice! First catch!");
+    }
+    if(baskets === 0 && points === 10){
+        bubble("Quickly! Click the button!");
+    }
+    if(points === 6){
+        bubble("You're on a roll!");
+    }
+    if(points === 3){
+        bubble("Great job!");
+    }
+    if(points === 5){
+        bubble("That's five, and we're still alive!");
+    }
+    if(time === 10){
+        bubble("Yikes! Ten seconds left!");
+    }
+    if(baskets > 0 && points === 0){
+       bubble("Nice! Another basket!"); 
+    }
+    if(baskets === 3 && points === 1){
+        bubble("Now you've got the hang of this!");
+    }
+};
+
+var draw = function() {
+    if(page === "Menu"){
+        candyBackground();
+        awesomeText(205, 105, 121, "JEWEL", color(0, 0, 0, 30));
+        awesomeText(205, 195, 84, "CATCHER", color(0, 0, 0, 30));
+        awesomeText(200, 100, 121, "JEWEL", color(255, 0, 0));
+        awesomeText(200, 190, 84, "CATCHER", color(255, 255, 255));
+        awesomeText(200, 100, 121, "JEWEL", color(0, 0, 0, 10));
+        awesomeText(200, 190, 84, "CATCHER", color(0, 0, 0, 10));
+        /*awesomeText(205, 251, 26, "CHESTER BANKS", color(0, 0, 0, 30));
+        awesomeText(200, 248, 26, "CHESTER BANKS", color(0, 255, 9));
+        awesomeText(200, 248, 26, "CHESTER BANKS", color(0, 0, 0, 10));*/
+        circleButton(140, 290, 100, "PLAY", "Choose");
+        circleButton(260, 290, 100, "HOW TO", "How");
+        //circleButton(100, 290, 70, "HIGH\nSCORES", "High");fill(31, 229, 255);
+        mr_jewel();
+    }
+    if(page === "Choose"){
+        candyBackground();
+        awesomeText(205, 65, 55, "WHICH MODE?", color(0, 0, 0, 30));
+        awesomeText(200, 65, 55, "WHICH MODE?", color(255, 0, 0));
+        awesomeText(200, 65, 55, "WHICH MODE?", color(0, 0, 0, 10));
+        circleButton(100, 200, 100, "Classic", "Play", "Classic Mode");
+       // circleButton(150, 180, 100, "Challenge", "Play", "Challenge Mode");
+        circleButton(300, 200, 100, "GEM CRAZY\n(Bonus)", "Play (bonus)", "Gem Crazy Mode");
+       // circleButton(350, 180, 100, "2 Player", "Play (multi)", "2 Player Mode");
+    }
+    if(page === "How"){
+        candyBackground();
+        awesomeText(205, 65, 55, "instructions", color(0, 0, 0, 30));
+        awesomeText(200, 65, 55, "instructions", color(255, 0, 0));
+        awesomeText(200, 65, 55, "instructions", color(0, 0, 0, 10));
+        fill(0, 0, 0,50);
+        textSize(18);
+        text("1. Move your jewel basket right\nand left with the arrow keys.\n\n2. Fill up your basket with jewels.\n\n3. Once your basket is full, click\non the button in the top-right corner\nto turn in your basket.\n\n4. Get as many baskets as you can\nbefore time runs out!", 202, 221);
+        fill(255, 255, 255);
+        text("1. Move your jewel basket right\nand left with the arrow keys.\n\n2. Fill up your basket with jewels.\n\n3. Once your basket is full, click\non the button in the top-right corner\nto turn in your basket.\n\n4. Get as many baskets as you can\nbefore time runs out!", 200, 219);
+        circleButton(41, 358, 70, "BACK", "Menu");
+    }
+    
+    if(page === "Play"){
+        candyBackground();
+        fill(255, 255, 255);
+        ellipse(basketX, 300, 49, 18);
+        noFill();
+        strokeWeight(5);
+        stroke(235);
+        arc(basketX, 299, 37, 12, 4, 391);
+        Candies.push(new Candy(random(0, 400), random(-100, -400), random(2, 5)));
+        for(var i = 0; i < Candies.length / 40; i++){
+            Candies[i].draw();
+            Candies[i].move();
+            Candies[i].catchIt();
+        }
+        noStroke();
+        fill(209, 209, 209);
+        rect(basketX, 319, 50, 37);
+        ellipse(basketX, 336, 50, 28);
+        fill(235, 0, 0);
+        ellipse(basketX, 326, 25, 25);
+        fill(207, 207, 207);
+        textSize(24);
+        text(points, basketX, 326);
+        noFill();
+        strokeWeight(8);
+        stroke(235);
+        arc(basketX, 300, 42, 12, 0, 180);
+        if(keys[RIGHT]){
+            basketX+=5;
+        }
+        if(keys[LEFT]){
+            basketX-=5;
+        }
+        if(points === 10){
+            noStroke();
+            button2(350, 50, 88, "Basket\n+1");
+        }
+        
+        if(baskets >= 1){
+            basket(77, 50);
+        }
+        if(baskets >= 2){
+            basket(140, 50);
+        }
+        if(baskets >= 3){
+            basket(202, 50);
+        }
+        if(baskets >= 4){
+            basket(262, 50);
+        }
+        if(baskets >= 5){
+            basket(323, 50);
+        }
+        if(baskets >= 6){
+            basket(386, 50);
+        }
+        
+        helper++;
+        if(helper > 60){
+            helper = 0;
+            time--;
+        }
+        
+        if(time < 0){
+            page = "Game Over";
+        }
+        
+        awesomeText(205, 65, 55, time, color(0, 0, 0, 30));
+        awesomeText(200, 65, 55, time, color(255, 0, 0));
+        awesomeText(200, 65, 55, time, color(0, 0, 0, 10));
+        mr_jewel2();
+    }
+    if(page === "Play (bonus)"){
+        candyBackground();
+        fill(255, 255, 255);
+        ellipse(basketX, 300, 49, 18);
+        noFill();
+        strokeWeight(5);
+        stroke(235);
+        arc(basketX, 299, 37, 12, 4, 391);
+        Candies.push(new Candy(random(0, 400), random(-100, -400), random(2, 5)));
+        for(var i = 0; i < Candies.length / 4; i++){
+            Candies[i].draw();
+            Candies[i].move();
+            Candies[i].catchIt();
+        }
+        noStroke();
+        fill(209, 209, 209);
+        rect(basketX, 319, 50, 37);
+        ellipse(basketX, 336, 50, 28);
+        fill(235, 0, 0);
+        ellipse(basketX, 326, 25, 25);
+        fill(207, 207, 207);
+        textSize(24);
+        text(points, basketX, 326);
+        noFill();
+        strokeWeight(8);
+        stroke(235);
+        arc(basketX, 300, 42, 12, 0, 180);
+        if(keys[RIGHT]){
+            basketX+=5;
+        }
+        if(keys[LEFT]){
+            basketX-=5;
+        }
+        if(points === 10){
+            noStroke();
+            button2(350, 50, 88, "Basket\n+1");
+        }
+        
+        if(baskets >= 1){
+            basket(77, 50);
+        }
+        if(baskets >= 2){
+            basket(140, 50);
+        }
+        if(baskets >= 3){
+            basket(202, 50);
+        }
+        if(baskets >= 4){
+            basket(262, 50);
+        }
+        if(baskets >= 5){
+            basket(323, 50);
+        }
+        if(baskets >= 6){
+            basket(386, 50);
+        }
+        
+        helper++;
+        if(helper > 60){
+            helper = 0;
+            time--;
+        }
+        
+        if(time < 0){
+            page = "Game Over2";
+        }
+        
+        awesomeText(205, 65, 55, time, color(0, 0, 0, 30));
+        awesomeText(200, 65, 55, time, color(255, 0, 0));
+        awesomeText(200, 65, 55, time, color(0, 0, 0, 10));
+        mr_jewel2();
+    }
+    if(page === "Game Over"){
+        var words = "TIME'S UP!\nYOU ENDED\nWITH " + baskets + "." + points + "\nBASKETS!";
+        var finalscore = baskets + (points * 0.1);
+        background(168, 168, 168);
+        awesomeText(205, 54, 30, mode, color(0, 0, 0, 30));
+        awesomeText(200, 50, 30, mode, color(0, 255, 0));
+        awesomeText(200, 50, 30, mode, color(0, 0, 0, 10));
+        awesomeText(205, 204, 55, words, color(0, 0, 0, 30));
+        awesomeText(200, 200, 55, words, color(255, 0, 0));
+        awesomeText(200, 200, 55, words, color(0, 0, 0, 10));
+        textSize(11);
+        fill(0, 0, 0);
+        if(mouseIsPressed){
+            points = 0;
+            baskets = 0;
+            time = 50;
+            page = "Play";
+        }
+    }
+    if(page === "Game Over2"){
+        var words = "TIME'S UP!\nYOU ENDED\nWITH " + baskets + "." + points + "\nBASKETS!";
+        var finalscore = baskets + (points * 0.1);
+        background(168, 168, 168);
+        awesomeText(205, 54, 30, "Gem Crazy", color(0, 0, 0, 30));
+        awesomeText(200, 50, 30, "Gem Crazy", color(0, 255, 0));
+        awesomeText(200, 50, 30, "Gem Crazy", color(0, 0, 0, 10));
+        awesomeText(205, 204, 55, words, color(0, 0, 0, 30));
+        awesomeText(200, 200, 55, words, color(255, 0, 0));
+        awesomeText(200, 200, 55, words, color(0, 0, 0, 10));
+        textSize(11);
+        fill(0, 0, 0);
+        text("Play again by pressing the mouse!", 200, 364);
+        if(mouseIsPressed){
+            points = 0;
+            baskets = 0;
+            time = 50;
+            page = "Play (bonus)";
+        }
+    }
+};
