@@ -1,0 +1,584 @@
+/** Ascent
+ * Climb the mountain!
+ * 
+ * Credit to Ben Burrill to fixing the bug!!
+ * 
+ * NOTE: There is only Mt. Gerrard currently. I hope we don't get as many disapproving comments as Cyber Trek! :P
+*/
+
+/* Vote count
+    11/16/14: 303 votes
+    11/14/14: 240 votes 
+    11/12/14: 54 votes
+*/
+
+/** Updates
+ * 11/12/14: Created, version 1.0
+ * 
+ */
+ 
+var secret = true;
+var state = "home";
+var X = 0;
+var Xspeed = +2;
+var trans = 0;
+var trans2 = 0;
+var trans3 = 0;
+var trans4 = 0;
+var paused = false;
+var helpy = 9;
+var lives = 3;
+
+var whitleyLocked = true;
+
+var finishLine = function(finishX, finishY){
+    pushMatrix();
+    translate(finishX, finishY);
+    for(var i = 0; i < 400; i += 20){
+        for(var j = 192; j < 223; j += 20){
+        fill(0);
+        noStroke();
+        rect(i, j, 10, 10);
+        }
+    }
+    for(var i = 10; i < 400; i += 20){
+        rect(i, 202, 10, 10);
+    }
+    popMatrix();
+};
+
+var cloudX = random(0, 400);
+var cloudX2 = random(0, 400);
+var cloudX3 = random(0, 400);
+var cloudY = random(20, 75);
+var cloudY2 = random(10, 40);
+var cloudY3 = random(20, 75);
+frameRate(30);
+
+var chevron = function(x, y){
+    strokeWeight(10);
+    stroke(255, 255, 255, trans);
+    strokeCap(SQUARE);
+    line(x + 0, y + -3, x - 20, y + 20);
+    line(x + 0, y + 3, x - 20, y - 20);
+};
+var levelScreen = function(x, y, title){
+    noStroke();
+    fill(105, 105, 105, trans2);
+    rect(x - 122, y - 68, 100, 100, 10);
+    textSize(15);
+    fill(255, 255, 255, trans2);
+    rect(x - 120, y - 70, 100, 100, 10);
+    fill(0, 0, 0, trans2);
+    textSize(13);
+    text(title, x - 120, y - 30);
+    stroke(0, 0, 0, trans2);
+    line(x - 73, y - 40, x - 170, y - 40);
+};
+var mount = function(x, y, mt_R, mt_G, mt_B, top_R, top_G, top_B){
+    fill(0, 153, 255, trans2);
+    noStroke();
+    rect(x + 80, y + 85, 100, 50, 10);
+    rect(x + 80, y + 115, 100, 50);
+    fill(mt_R, mt_G, mt_B, trans2);
+    noStroke();
+    triangle(x + 40, y + 140, x + 120, y + 140, x + 80,  y+75);
+    fill(top_R, top_G, top_B, trans2);
+    triangle(x+65, y+100, x+95, y+100, x+80, y+75); 
+    fill(255, 255, 255, trans2);
+    rect(x + 60, y + 100, 20, 10, 50);
+    rect(x + 50, y + 95, 20, 10, 50);
+    arc(x + 130, y + 100, 20, 10, 90, 270);
+};
+var locked = function(x, y){
+    translate(x, y);
+    fill(0, 0, 0, trans4);
+    rect(0, 0, 100, 100, 10);
+    fill(204, 194, 0, trans2);
+    rotate(-45);
+    textSize(25);
+    text("LOCKED", 0, 0);
+    resetMatrix();
+};
+
+var button2 = function(x, y, w, h, txt, n, txtSize){
+    rectMode(LEFT);
+    noStroke();
+    fill(255, 255, 255);
+    rect(x-2, y+2, w, h, 15);
+    stroke(255, 255, 255);
+    strokeWeight(1);
+    fill(168, 168, 168);
+    if(mouseX > x && mouseX < x+w && mouseY > y && mouseY < y+h){
+        fill(158, 158, 158);
+        rect(x-2, y+2, w, h, 15);
+        //textFont(createFont("Impact"));
+        textSize(txtSize);
+        fill(0, 0, 0);
+        text(txt, (x + (w/2)) - 2, (y + (h/2)) + 2);
+        if(mouseIsPressed){
+            state = n;
+        }
+    } else {
+        rect(x, y, w, h, 15);
+        //textFont(createFont("Impact"));
+        textSize(txtSize);
+        fill(0, 0, 0);
+        text(txt, x + (w/2), y + (h/2));
+    }
+    rectMode(CENTER);
+};
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+
+var keys = [];
+
+var keyPressed = function() {
+    keys[keyCode] = true;
+};
+var keyReleased = function() {
+    keys[keyCode] = false;
+};
+
+frameRate(30);
+var transy3 = 0;
+var levelsX = 70;
+var levelsY = 360;
+var startX = 200;
+var startY = 360;
+var whatPowerUp = "nothing";
+var uR = 0;
+var uS = 3;
+var uX = 0;
+var count = 0;
+var sec = 0;
+var howX = 330;
+var howY = 360;
+var helper = 9;
+var go = "yes";
+var btnPushed1 = false;
+var n = 231;
+var r = 0;
+var l = 0;
+var powerUp = false;
+var hSpeed = 2;
+var hR = 0;
+var life = getImage("cute/Heart");
+var f = -1900;
+var z = -1900;
+var b = -1900;
+var j = -1900;
+var hS = 0;
+var rockStuff = getImage("cute/DirtBlock");
+var wall = getImage("cute/DirtBlock");
+var boulder = getImage("cute/Rock");
+var upgrade = getImage("cute/Star");
+var upgrade2 = getImage("avatars/questionmark");
+var speed = 1;
+var lSpeed = 0;
+var x = 0;
+var y = 0;
+var watermark = function(x, y, sz){pushMatrix();rectMode(LEFT);translate(x, y);scale(sz);mouseClicked = function(){if(mouseX > x && mouseX < x+(sz*50) && mouseY > y && mouseY < y+(sz*50)){println("CHESTER BANKS' PROFILE\nkhanacademy.org/profile/chesterbanks");}};stroke(255, 255, 255, 100);strokeWeight(3);fill(0, 102, 191);rect(0, 0, 50, 50);pushMatrix();rotate(0);noFill();strokeCap(SQUARE);stroke(255, 255, 255);strokeWeight(sin(frameCount * 15) + 4);arc(25, 20, 20, 20, -180, 0);arc(25, 30, 20, 20, 0, 180);line(15, 21, 15, 30);popMatrix();rectMode(CENTER);popMatrix();};
+    
+var draw = function() {
+    if(state === "home"){
+        background(0, 153, 255);
+        for(var k = 0; k < 400; k++){
+            stroke(0, k/2, k);
+            line(0, k, 400, k);
+        }
+        fill(255);
+        textSize(9);
+        //text("If you are using Firefox, please use a different browser. This game does not work on Firefox.", 200, 15);
+        lives = 3;
+        noStroke();
+        fill(255, 255, 255, 150);
+        rect(cloudX, cloudY, 100, 50, 30);
+        rect(cloudX, cloudY, 90, 50, 30);
+        rect(cloudX, cloudY - 10, 90, 50, 30);
+        rect(cloudX2, cloudY2, 100, 50, 30);
+        rect(cloudX2, cloudY2, 90, 50, 30);
+        rect(cloudX2, cloudY2 - 10, 90, 50, 30);
+        rect(cloudX3, cloudY3, 100, 50, 30);
+        rect(cloudX3, cloudY3, 90, 50, 30);
+        rect(cloudX3, cloudY3 - 10, 90, 50, 30);
+        cloudX -= 2;
+        cloudX2 -= 2.5;
+        cloudX3 -= 3;
+        if(cloudX < -60){
+            cloudX = 450;
+            cloudY = random(20, 100);
+        }
+        if(cloudX2 < -60){
+            cloudX2 = 450;
+            cloudY2 = random(20, 100);
+        }
+        if(cloudX3 < -60){
+            cloudX3 = 450;
+            cloudY3 = random(20, 100);
+        }
+        stroke(23, 23, 23);
+        strokeWeight(2);
+        noFill();
+        triangle(x + 190, 110, x + 210, 110, x + 200, 83);
+        line(x + 200, 83, x + 200, 76);
+        line(x+ 200, 76, x + 210, 66);
+        line(x + 200, 76, x + 190, 66);
+        line(x + 200, 76, x + 200, 64);
+        ellipse(x + 200, 56, 15, 15);
+        stroke(153, 105, 9);
+        line(x + 210, 66, x + 230, 58);
+        noStroke();
+        fill(255, 0, 0);
+        triangle(x + 230, 58, x + 220, 63, x + 233, 77);
+        fill(156, 156, 156);
+        stroke(0, 0, 0);
+        triangle(x - 50, 400, x + 450, 400, x + 200, 100);
+        noStroke();
+        fill(199, 199, 199);
+        triangle(x + 100, 395, x + 450, 400, x + 200, 100);
+        textFont(createFont("Century Gothic Bold"));
+        for(var i = 92; i > 0; i -= 2){
+            textSize(i);
+        fill(i, i, i);
+        text("ASCENT", x + 200, 200);
+        }
+        textSize(95);
+        fill(255, 0, 0);
+        text("ASCENT", x + 200, 200);
+        textSize(12);
+        fill(255, 255, 255);
+        textFont(createFont("Century Gothic"));
+        text("Chester Banks + Greg Doodles | July - November 2014 | Version 1.0", x + 200, 260);
+        button2(150, 300, 100, 35, "Play", "play", 20);
+        watermark(350, 350, 0.8);
+    }
+    if(state === "play"){
+        background(148, 106, 43);
+                if(f > 600){
+                    state = "home";
+                    whitleyLocked = false;
+                }
+        stroke(23,23,23);
+        noFill();
+        var g = f;
+        while (g < 400) {
+        image(rockStuff, 0, g);
+        g += 85;
+        }
+        var q = z;
+        while (q < 400){
+            image(wall, 100, q);
+            q += 85;
+        } 
+        var c = b;
+        while (c < 400) {
+        image(rockStuff, 200, c);
+        c += 85;
+        }
+        var k = j;
+        while (k < 400){
+            image(wall, 300, k);
+            k += 85;
+        }
+        image(boulder, 150, f + 1700, 90, 120);
+        image(boulder, 42, f + 1555, 90, 120);
+        image(boulder, 261, f + 1555, 90, 120);
+        image(boulder, 150, f + 1400, 90, 120);
+        image(boulder, 11, f + 1400, 90, 120);
+        image(boulder, 298, f + 1400, 90, 120);
+        
+        image(boulder, 100, f + 1200, 75, 100);
+        image(boulder, 150, f + 1200, 75, 100);
+        image(boulder, 200, f + 1200, 75, 100);
+        image(boulder, 250, f + 1200, 75, 100);
+        image(boulder, 300, f + 1200, 75, 100);
+        image(boulder, 350, f + 1200, 75, 100);
+        
+        image(boulder, -90, f + 1000, 75, 100);
+        image(boulder, -40, f + 1000, 75, 100);
+        image(boulder, 10, f + 1000, 75, 100);
+        image(boulder, 60, f + 1000, 75, 100);
+        image(boulder, 110, f + 1000, 75, 100);
+        //1 diagonal
+        image(boulder, 330, f + 1000, 75, 100);
+        image(boulder, 280, f + 950, 75, 100);
+        image(boulder, 230, f + 900, 75, 100);
+        image(boulder, 180, f + 850, 75, 100);
+        image(boulder, 130, f + 800, 75, 100);
+        
+        //2 diagonal
+        image(boulder, -25, f + 750, 75, 100);
+        image(boulder, 25, f + 700, 75, 100);
+        image(boulder, 75, f + 650, 75, 100);
+        image(boulder, 125, f + 600, 75, 100);
+        image(boulder, 175, f + 550, 75, 100);
+        
+        //after power up
+        image(boulder, -25, f + 100, 75, 100);
+        image(boulder, 25, f + 100, 75, 100);
+        image(boulder, 75, f + 100, 75, 100);
+        image(boulder, 125, f + 100, 75, 100);
+        image(boulder, 175, f + 100, 75, 100);
+        image(boulder, 225, f + 100, 75, 100);
+        image(boulder, 275, f + 100, 75, 100);
+        image(boulder, 325, f + 100, 75, 100);
+        image(boulder, 375, f + 100, 75, 100);
+        
+        //trap mab
+        image(boulder, 272, f + -216, 75, 100);
+        image(boulder, 272, f + -263, 75, 100);
+        image(boulder, 272, f + -310, 75, 100);
+        image(boulder, 272, f + -357, 75, 100);
+        //
+        image(boulder, 206, f + -357, 75, 100);
+        image(boulder, 139, f + -357, 75, 100);
+        image(boulder, 72, f + -357, 75, 100);
+        image(boulder, 4, f + -357, 75, 100);
+        
+        finishLine(0, f + -420);
+        
+        uR -= uS;
+        imageMode(CENTER);
+        pushMatrix();
+        translate(uX +180, f + 419);
+        scale(sin(frameCount*2),1);
+        image(upgrade, 0, 0, 60, 93);
+        popMatrix();
+        imageMode(CORNER);
+        if (uR <= -110){
+            uS = -5;
+        }
+        if (uR >= 0){
+            uS = 5;
+        }
+        if (f >= -175 && f<= -85 && x >= -55 && x <= 15){
+        powerUp = true;
+        whatPowerUp = "invincible";
+        }
+        
+        //image(boulder, 200, f + 1000, 75, 100);
+        //get bigger and smaller maybe
+        image(life, 10, f + 1367, hR+40, 64);
+        //hR += hSpeed; 
+        //if (hR <= -64){
+            //hSpeed = 2;
+        //}
+        //if (hR >= 10){
+            //hSpeed = -2;
+        //}
+        stroke(0, 0, 0);
+        if (whatPowerUp === "invincible"){
+            stroke(random(1,255), random(1,255), random(1, 255));
+            fill(random(1,255), random(1,255), random(1, 255));
+            textSize(38);
+            text("Invincible!", 200, 173);
+            uX = 262;
+            count += 1;
+            if (count === 30){
+                sec += 1;
+                count = 0;
+            }
+        }
+        if (sec >= 3){
+            whatPowerUp = "nothing";
+        }
+        noFill();
+        line(x+200, n+86, x+200, n+76);
+        line(x+200, n+76, x+210, n+66+r);
+        line(x+200, n+75, x+190, n+66+l);
+        line(x+200, n+76, x+200, n+64);
+        ellipse(x+200, 287, 15, 15);
+        line(x+200, n+86, x+190, n+100+r);
+        line(x+200, n+86, x+210, n+100+l);
+        
+        r -= speed;
+        l -= lSpeed;
+        if (r <= -12){
+            speed = -1.7;
+            lSpeed = 1.7;
+        }
+        if (l <= -12){
+            speed = 1.7;
+            lSpeed = -1.7;
+        }
+        if (keys[RIGHT] && paused === false){
+            x += 5;
+        } 
+        if (keys[LEFT] && paused === false){
+            x -= 5;
+        }
+        if (keys[UP] && paused !== true){
+            f += 5;
+            z += 5;
+            b += 5;
+            j += 5;
+            
+        }
+        text(f, 20, 20);
+        text(x, 20, 50);
+        fill(0, 0, 0);
+        textFont(createFont("Century Gothic"));
+        if (f >= -1530 && f <= -1430 && x > -50 && x < 50){
+            helper = 300;
+        }
+        if (f >= -1385 && f <= -1285 && x > -160 && x < -60){
+            helper = 300;
+        }
+        if (f >= -1385 && f <= -1285 && x > 60 && x < 160){
+            helper = 300;
+        }
+        if (f >= -1230 && f <= -1130 && x >= -50 && x <= 40){
+            helper = 300;
+        }
+        if (f >= -1230 && f <= -1130 && x >= -190 && x <= -100){
+            helper = 300;
+        }
+        if (f >= -1230 && f <= -1130 && x >= 100 && x <= 190){
+            helper = 300;
+        }
+        if (f >= -1010 && f <= -920 && x >= -105){
+            helper = 300;
+        }
+        if (f >= -810 && f <= -720 && x <= -25){
+           helper = 300;
+        }
+        //1
+        if (f >= -810 && f <= -720 && x >= 130){
+            helper = 300;
+        }
+        //2
+        if (f >= -760 && f <= -670 && x >= 80){
+            helper = 300;
+        }
+        //3
+        if (f >= -710 && f <=-620 && x >= 30){
+            helper = 300;
+        }
+        //4
+        if (f >= -660 && f <= -570 && x >= -20){
+            helper = 300;
+        }
+        //5
+        if (f >= -610 && f <= -520 && x >= -70){
+            helper = 300;
+        }
+        
+        if (f >= -560 && f <= -470 && x <= -150){
+            helper = 300;
+        }
+        if (f >= -510 && f <= -420 && x <= -100){
+            helper = 300;
+        }
+        if (f >= -460 && f <= -370 && x <= -50){
+            helper = 300;
+        }
+        if (f >= -410 && f <= -320 && x <= 0){
+            helper = 300;
+        }
+        if (f >= -360 && f <= -270 && x <= 50){
+            helper = 300;
+        }
+        if (f >= 90 && f <= 180 && whatPowerUp !== "invincible"){
+            helper = 300;
+        }
+        if (x >= 66 && x<= 156 && f >= 400 && f <= 630){
+            helper = 300;
+        }
+        if (x <= 156 && f >= 540 && f<= 635){
+            helper = 300;
+        }
+        
+        
+        //if (){
+            
+        //}
+        if (x <= -190){
+            x = -189;
+        }
+        if (x >= 190){
+            x = 189;
+        }
+        if (helper === 300 && whatPowerUp !== "invincible"){
+            fill(255, 0, 0);
+            textSize(50);
+            text("You got hit!", 200, 150);
+            transy3 += 3;
+            transy3 += 3;
+        }
+        if (transy3 >= 255){
+            background(255, 0, 0);
+            transy3 = 0;
+            helper = 200;
+            f = -1900;
+            j = -1900;
+            b = -1900;
+            z = -1900;
+            x = 0;
+            uX = 0;
+            lives -= 1;
+            sec = 0;
+        }
+        if (lives === 3){
+            image(life, 241, -12, 50, 75);
+        }
+        if (lives >= 2){
+            image(life, 289, -12, 50, 75);
+        }
+        if (lives >= 1){
+            image(life, 337, -12, 50, 75);
+        }
+        if (lives === 0){
+            state = "home";
+        }
+        text(lives, 24, 70);
+        textSize(15);
+        fill(255, 255, 255, transy3);
+        noStroke();
+        rect(200, 200, 400, 400);
+        if (go === "yes" && helper !== 300 && paused === false){
+            f += 5;
+            z += 5;
+           b += 5;
+            j += 5;
+        }
+        fill(0, 0, 0);
+        rect(353, 380, 85, 30, 10);
+        stroke(255, 255, 255);
+        noFill();
+        rect(380, 380, 20, 20, 5);
+        fill(255, 255, 255);
+        rect(382, 380, 1, 10, 5);
+        rect(376, 380, 1, 10, 5);
+        
+        //play
+        stroke(255, 255, 255);
+        noFill();
+        rect(353, 380, 20, 20, 5);
+        fill(255, 255, 255);
+        triangle(350, 386, 358, 380, 350, 375);
+        
+        //replay
+        noFill();
+        rect(325, 380, 20, 20, 5);
+        arc(325, 380, 12, 12, 13, 320);
+        line(327, 381, 331, 380);
+        line(331, 380, 333, 383);
+        if(mouseX > 370 && mouseX < 390 && mouseY > 370 && mouseY < 390 && mouseIsPressed){
+            paused = true;
+        }
+        if (mouseX > 345 && mouseX < 365 && mouseY > 370 && mouseY < 390 && mouseIsPressed){
+            paused = false;
+        }
+        if(mouseX > 320 && mouseX < 340 && mouseY > 370 && mouseY < 390 && mouseIsPressed){
+        f = -1900;
+        z = -1900;
+        b = -1900;
+        j = -1900;
+        x = 0;
+        lives = 3;
+        }
+    text(sec, 20, 70);
+    }
+};
