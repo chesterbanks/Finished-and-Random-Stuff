@@ -1,0 +1,519 @@
+/** River Raid
+ * Chester Banks
+ * January 2016
+ * 
+ * Created for Contest: Retro Game
+ * 
+ * BASED ON: "River Raid"
+ * More info here: https://en.wikipedia.org/wiki/River_Raid
+ * 
+ * MODIFICATIONS: I made my own menu, how to screen, etc. The actual playing I tried to make look like it did when I researched it.
+ * 
+ * Instructions:
+    Arrow keys to move left & right.
+    Mouse to shoot bullets.
+    
+    Shoot down these:
+        Helicopters
+        Jets
+        Hot air balloons
+    Touch these:
+        Fuel depots
+        Ammo pack
+        Shield
+    Avoid these:
+        The edge of the river
+        Enemy craft
+        Enemy fire
+    The bridge signals the end of the level.
+    
+    @TODO 
+    Add: 
+        Jets [Graphics done]
+        Hot air balloons [Graphics done]
+        Fuel depots [Graphics done]
+        Ammo packs 
+        Shields
+        Tanks (that shoot at you from the land)
+        Bridge (that ends the level) [Graphics done]
+        Mobile settings
+        Sound
+        Changing river width ??
+        Pixel font ??
+        Upgrades & currency system ??
+        Sergeant graphics ??
+        You (commander) graphics ??
+*/
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+textFont(createFont("Consolas Bold"));
+
+var sound = false;
+var mobile = false;
+var scrollSpeed = 1.5;
+
+var score = 0;
+var ammo = 20;
+
+var playerX = 250;
+var scene = "Home";
+
+var powerUp = function(x, y, type){
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.deleteMe = false;
+};
+var PowerUps = [];
+powerUp.prototype.draw = function() {
+    if(!this.deleteMe){
+        if(this.type === 0){
+            fill(222, 31, 31);
+            rect(this.x, this.y-15, 20, 10);
+            rect(this.x, this.y+5, 20, 10);
+            arc(this.x, this.y-20, 20, 8, -180, 0);
+            fill(227, 227, 227);
+            rect(this.x, this.y-5, 20, 10);
+            rect(this.x, this.y+15, 20, 10);
+            arc(this.x, this.y+20, 20, 8, 0, 180);
+            textSize(15);
+            text("F", this.x, this.y-15);
+            text("E", this.x, this.y+5);
+            fill(222, 31, 31);
+            text("U", this.x, this.y-5);
+            text("L", this.x, this.y+15);
+            
+            this.y += (scrollSpeed-1);
+        } // Fuel depot
+        if(this.type === 1){
+            
+        } // Ammo pack
+        if(this.type === 2){
+            
+        } // Shield
+    }
+};
+
+var enemy = function(x, y, type){
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.xSpeed = +3;
+    this.deleteMe = false;
+};
+var Enemies = [];
+enemy.prototype.draw = function() {
+    if(!this.deleteMe){
+        if(this.type === 0){ // Copter
+            // Copter
+            fill(214, 54, 54);
+            rect(this.x, this.y, 20, 20);
+            rect(this.x, this.y, 30, 14);
+            rect(this.x-15, this.y, 30, 6);
+            rect(this.x-30, this.y, 6, 10);
+            rect(this.x, this.y, 6, 30);
+            rect(this.x, this.y+13, 25, 3);
+            if(frameCount%10 < 5){
+                rect(this.x-7, this.y-14, 20, 3);
+                rect(this.x+7, this.y-17, 20, 3);
+            } else {
+                rect(this.x+7, this.y-14, 20, 3);
+                rect(this.x-7, this.y-17, 20, 3);
+            }
+            this.y += scrollSpeed-1;
+            this.x += this.xSpeed;
+            
+            if(this.x > 350){
+                this.xSpeed = -3;
+            }
+            if(this.x < 150){
+                this.xSpeed = +3;
+            }
+            if(this.x < playerX+57 && this.x > playerX-40 && this.y < 390 && this.y > 310){
+                scene = "Lose";
+            }
+        }
+    }
+};
+
+var bullet = function(x){
+    this.x = x;
+    this.y = 350;
+    this.deleteMe = false;
+};
+var bullets = [];
+bullet.prototype.draw = function() {
+    if(!this.deleteMe){
+        noStroke();
+        fill(255, 255, 0);
+        rect(this.x, this.y, 5, 5);
+        this.y -= 5;
+        if(this.y < -20){
+            this.deleteMe = true;
+        }
+        for(var i in Enemies){
+            if(this.x < Enemies[i].x+25 && this.x > Enemies[i].x-25 && this.y > Enemies[i].y-15 && this.y < Enemies[i].y+15 && Enemies[i].deleteMe === false){
+                score++;
+                Enemies.splice(i, 1);
+            }
+        }
+    }
+};
+
+var spaceTimer = 0;
+var keys = [];
+var keyPressed = function(){
+    keys[keyCode] = true;
+    if(key.toString() === " " && scene === "Play" && spaceTimer === 0 && ammo > 0){
+        bullets.push(new bullet(playerX - 21));
+        bullets.push(new bullet(playerX + 21));
+        ammo -= 2;
+        spaceTimer ++;
+    }
+};
+var keyReleased = function(){
+    keys[keyCode] = false;
+    if(key.toString() === " "){
+        spaceTimer = 0;
+    }
+};
+
+var textureRects = [];
+for(var i = 5; i < width; i += 20){
+    for(var j = -20; j < height+20; j += 20){
+        textureRects.push({x: i, y: j, br: random(0, 10)});
+    }
+}
+
+var menuPlane = function(x, y, colo, rot){
+    pushMatrix();
+    translate(x, y);
+    scale(3.0);
+    rotate(rot);
+    // Plane
+    fill(colo);
+    stroke(colo);
+    strokeWeight(1);
+    rect(0, 0, 11, 50); // Body
+    rect(0, -5, 24, 20); // Wings
+    rect(-15, 0, 6, 20);
+    rect(15, 0, 6, 20);
+    rect(-21, 5, 6, 20);
+    rect(21, 5, 6, 20);
+    rect(0, 20, 30, 6);
+    rect(-15, 22, 6, 6); // Tail
+    rect(15, 22, 6, 6);
+    popMatrix();
+};
+var txtButton = function(x, y, w, h, txt, next){
+    if(mouseX > x-(w/2) && mouseX < x+(w/2) && mouseY > y-(h/2) && mouseY < y+(h/2)){
+        fill(0, 0, 0);
+        if(mouseIsPressed){
+            if(next === "Play"){
+                score = 0;
+                playerX = 250;
+                bullets = [];
+                Enemies = [];
+                ammo = 20;
+            }
+            scene = next;
+        }
+    } else {
+        fill(255);
+    }
+    text(txt, x, y);
+};
+
+var BG = function(colo){
+    background(colo);
+    for(var i in textureRects){
+        noStroke();
+        fill(0, 0, 0, textureRects[i].br*2);
+        rect(textureRects[i].x, textureRects[i].y, 20, 20);
+    }
+};
+
+var draw = function() {
+    if(scene === "Home"){
+        BG(color(20, 103, 166));
+        menuPlane(60, 240, color(201, 201, 32), 35);
+        menuPlane(440, 240, color(201, 38, 38), -35);
+        
+        fill(0, 0, 0);
+        textSize(100);
+        text("RIVER", 248, 110);
+        text("RAID", 248, 180);
+        text("RIVER", 252, 110);
+        text("RAID", 252, 180);
+        text("RIVER", 250, 108);
+        text("RAID", 250, 178);
+        text("RIVER", 252, 115);
+        text("RAID", 253, 185);
+        fill(255, 255, 255);
+        text("RIVER", 250, 110);
+        text("RAID", 250, 180);
+        
+        textSize(30);
+        fill(255);
+        txtButton(250, 250, 80, 20, "START", "Play");
+        txtButton(250, 280, 200, 20, "INSTRUCTIONS", "How");
+        txtButton(250, 310, 130, 20, "SETTINGS", "Settings");
+        txtButton(250, 340, 120, 20, "MISSION", "Mission");
+    }
+    if(scene === "How"){
+        BG(color(6, 148, 39));
+        
+        fill(0, 0, 0, 30);
+        textSize(30);
+        text("I N S T R U C T I O N S", 250, 55);
+        fill(255);
+        textSize(30);
+        text("I N S T R U C T I O N S", 250, 50);
+        textSize(20);
+        txtButton(50, 375, 50, 20, "BACK", "Home");
+        
+        fill(255);
+        textSize(25);
+        text("AVOID", 250, 100);
+        text("GET", 250, 200);
+        text("SHOOT", 250, 300);
+        fill(230, 230, 230);
+        textSize(15);
+        text("Use the LEFT and\nRIGHT arrow keys\nto move.", 100, 230);
+        text("A BRIDGE signals\nthe end of a game\nlevel.", 400, 230);
+        fill(0);
+        textSize(15);
+        text("The edge of the river\nEnemy airplanes\nEnemy fire", 250, 140);
+        text("Fuel depots\nAmmo packs\nShield", 250, 240);
+        text("Helicopters\nJets\nHot air balloons", 250, 340);
+    }
+    if(scene === "Settings"){
+        BG(color(82, 82, 82));
+        noStroke();
+        for(var i in textureRects){
+            fill(0, 0, 0, textureRects[i].br*2);
+            rect(textureRects[i].x, textureRects[i].y, 20, 20);
+        }
+        fill(0, 0, 0, 30);
+        textSize(30);
+        text("S E T T I N G S", 250, 55);
+        fill(255);
+        textSize(30);
+        text("S E T T I N G S", 250, 50);
+        textSize(20);
+        txtButton(50, 375, 50, 20, "BACK", "Home");
+        
+        fill(255);
+        textSize(20);
+        text("Mobile", 220, 150);
+        text("Sound", 225, 200);
+        
+        if(!mobile){
+            fill(212, 49, 49);
+            rect(300, 150, 60, 30, 20);
+            fill(255);
+            rect(285, 150, 25, 25, 20);
+        } else {
+            fill(35, 209, 87);
+            rect(300, 150, 60, 30, 20);
+            fill(255);
+            rect(315, 150, 25, 25, 20);
+        }
+        
+        if(!sound){
+            fill(212, 49, 49);
+            rect(300, 200, 60, 30, 20);
+            fill(255);
+            rect(285, 200, 25, 25, 20);
+        } else {
+            fill(35, 209, 87);
+            rect(300, 200, 60, 30, 20);
+            fill(255);
+            rect(315, 200, 25, 25, 20);
+        }
+    }
+    if(scene === "Mission"){
+        BG(color(186, 39, 39));
+        noStroke();
+        for(var i in textureRects){
+            fill(0, 0, 0, textureRects[i].br*2);
+            rect(textureRects[i].x, textureRects[i].y, 20, 20);
+        }
+        fill(0, 0, 0, 30);
+        textSize(30);
+        text("M I S S I O N", 250, 55);
+        fill(255);
+        textSize(30);
+        text("M I S S I O N", 250, 50);
+        textSize(20);
+        txtButton(50, 375, 50, 20, "BACK", "Home");
+        
+        fill(255);
+        textSize(17);
+        text("Greetings Commander.\n\nYou have a mission: To fly over the \nRiver of No Return, which is over\nenemy lines, and steal the enemy's\nwar plans. This is a dangerous mission,\nbut we expect that you will do\nyour very best.\n\nGood luck, Commander. You'll need it.", 250, 215);
+    }
+    
+    if(scene === "Play"){
+        noStroke();
+        background(20, 158, 53);
+        fill(25, 118, 179);
+        rect(250, 200, 320, 400);
+        
+        for(var i in textureRects){
+            fill(0, 0, 0, textureRects[i].br);
+            rect(textureRects[i].x, textureRects[i].y, 20, 20);
+            textureRects[i].y += scrollSpeed;
+            if(textureRects[i].y > height){
+                textureRects[i].y -= height;
+            }
+        }
+        
+        for(var i = 40; i < 90; i++){
+            strokeWeight(1);
+            stroke(0, 0, 0, -70 + i*1.5);
+            line(i, 0, i, height);
+            stroke(0, 0, 0, 130-i*1.5);
+            line(i+370, 0, i+370, height);
+        }
+        
+        noStroke();
+        // Plane shadow
+        fill(0, 0, 0, 20);
+        rect(playerX, 340, 11, 50); // Body
+        rect(playerX, 335, 24, 20); // Wings
+        rect(playerX-15, 340, 6, 20);
+        rect(playerX+15, 340, 6, 20);
+        rect(playerX-21, 345, 6, 20);
+        rect(playerX+21, 345, 6, 20);
+        rect(playerX, 360, 30, 6);
+        rect(playerX-15, 362, 6, 6); // Tail
+        rect(playerX+15, 362, 6, 6);
+        
+        // Plane
+        fill(255, 255, 0);
+        rect(playerX, 350, 11, 50); // Body
+        rect(playerX, 345, 24, 20); // Wings
+        rect(playerX-15, 350, 6, 20);
+        rect(playerX+15, 350, 6, 20);
+        rect(playerX-21, 355, 6, 20);
+        rect(playerX+21, 355, 6, 20);
+        rect(playerX, 370, 30, 6);
+        rect(playerX-15, 372, 6, 6); // Tail
+        rect(playerX+15, 372, 6, 6);
+        
+        /*// Bridge
+        stroke(194, 129, 75);
+        strokeWeight(3);
+        line(85, 190, 416, 190);
+        line(85, 210, 416, 210);
+        fill(240, 161, 91);
+        for(var i = 85; i < 416; i += 15){
+            strokeWeight(2);
+            noStroke();
+            rect(i, 200, 10, 30);
+            stroke(194, 129, 75);
+            line(i, 190, i, 183);
+            line(i, 210, i, 206);
+        }
+        strokeWeight(3);
+        line(83, 183, 418, 183);
+        line(83, 206, 418, 206);*/ // BRIDGE
+        /*// Hot air balloon
+        noStroke();
+        fill(255, 255, 255);
+        rect(250, 200, 26, 20);
+        rect(250, 200, 20, 26);
+        rect(250, 200, 10, 32);
+        rect(250, 220, 10, 5);
+        strokeWeight(1);
+        stroke(255, 255, 255);
+        line(246, 220, 240, 212);
+        line(255, 220, 259, 212);*/ //HOT AIR BALLOON
+            
+        noStroke();
+        if(keys[RIGHT]){
+            playerX += 3;
+        }
+        if(keys[LEFT]){
+            playerX -= 3;
+        }
+        if(keys[UP]){
+            scrollSpeed = 5;
+        } else {
+            scrollSpeed = 1.5;
+        }
+        
+        if(playerX >= 385 || playerX <= 115){
+            scene = "Lose";
+        }
+        
+        for(var i in bullets){
+            bullets[i].draw();
+        }
+        if(scrollSpeed === 1.5){
+            if(frameCount%200 === 100){
+                Enemies.push(new enemy(random(150, 350), random(0, -200), 0));
+            }
+            if(frameCount%800 === 400){
+                PowerUps.push(new powerUp(random(150, 350), random(0, -200), 0));
+            }
+        } else {
+            if(frameCount%50 === 25){
+                Enemies.push(new enemy(random(150, 350), random(0, -200), 0));
+            }
+            if(frameCount%200 === 100){
+                PowerUps.push(new powerUp(random(150, 350), random(0, -200), 0));
+            }
+        }
+        
+        for(var i in Enemies){
+            Enemies[i].draw();
+        }
+        for(var i in PowerUps){
+            PowerUps[i].draw();
+        }
+        
+        textSize(13);
+        fill(245);
+        text("Score: " + score, 40, 15);
+        text("Ammo: " + ammo, 40, 30);
+        text("Enemies: " + Enemies.length, 40, 45);
+        
+        if(frameCount%60 === 30){
+            score++;
+        }
+    }
+    if(scene === "Lose"){
+        BG(color(204, 29, 29));
+        
+        fill(255);
+        textSize(90);
+        text("MAYDAY,\nMAYDAY!", 250, 150);
+        textSize(30);
+        text("You failed, Commander...", 250, 265);
+        textSize(15);
+        text("You have been demoted to a plane repairman.", 250, 290);
+        textSize(25);
+        txtButton(250, 370, 140, 20, "Try again?", "Play");
+    }
+};
+
+var mouseClicked = function(){
+    if(scene === "Settings"){
+        if(mouseX > 270 && mouseX < 330 && mouseY > 135 && mouseY < 165){
+            if(!mobile){
+                mobile = true;
+            } else {
+                mobile = false;
+            }
+        }
+        if(mouseX > 270 && mouseX < 330 && mouseY > 185 && mouseY < 215){
+            if(!sound){
+                sound = true;
+            } else {
+                sound = false;
+            }
+        }
+    }
+};
