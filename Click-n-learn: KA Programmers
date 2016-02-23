@@ -1,0 +1,287 @@
+// I've been programming 1-2 years, and I have learned 100% of Intro to JS.
+
+var pg = "Enter";
+
+var h = 44;
+var x = [h*0, h*1, h*2, h*3, h*4, h*5, h*6, h*7, h*8];
+
+textFont(createFont("Trebuchet MS"));
+textAlign(CENTER, CENTER);
+imageMode(CENTER);
+
+var names = ["Chester Banks","Infiltration","The #1 Base 12 Proponent","Splo","Kevin23","Swax97","BenR","SportsBoss314", "Loki","The Chosen One","DY","EpicDan","Peter Collingridge","Pamela","Ben Rowan","Infinity Runner","Isaac Emerald","Functionized","Brian P. Duckworth","Supernova","DigitalDragon","Greg Doodles","Radioactive"];
+
+var button = function(x, y, w, h, txt, n, txtSize, c){
+    rectMode(LEFT);
+    noStroke();
+    fill(255, 255, 255);
+    rect(x-2, y+2, w, h, 2);
+    stroke(255, 255, 255);
+    strokeWeight(1);
+    fill(c);
+    if(mouseX > x && mouseX < x+w && mouseY > y && mouseY < y+h){
+        fill(c);
+        rect(x-2, y+2, w, h, 2);
+        //textFont(createFont("Impact"));
+        textSize(txtSize);
+        fill(255, 255, 255);
+        text(txt, (x + (w/2)) - 2, (y + (h/2)) + 2);
+        if(mouseIsPressed){
+            pg = n;
+        }
+    } else {
+        rect(x, y, w, h, 2);
+        //textFont(createFont("Impact"));
+        textSize(txtSize);
+        fill(255, 255, 255);
+        text(txt, x + (w/2), y + (h/2));
+    }
+    rectMode(CENTER);
+};
+var b = function(x, y, txt, n, c){
+    textFont(createFont("Trebuchet MS"));
+    if(txt === "Pamela"){
+        button(x, y, txt.length*13, h*2, txt, n, 18, c);
+    } else {
+        button(x, y, txt.length*8, h, txt, n, 15, c);  
+    }
+    resetMatrix();
+};
+var circleButton = function(x, y, sz, txt, n, txtSize){ // x, y, size, text, next page
+    if(dist(mouseX, mouseY, x, y) <= (sz/2)){
+            fill(245);
+            if(mouseIsPressed){
+                pg = n;
+            }
+    } else {
+        fill(245,245, 245, 100);
+    }
+    ellipse(x, y, tan(frameCount * 28) + sz, tan(frameCount * 28) + sz);
+    fill(41, 41, 41);
+    textSize(txtSize);
+    text(txt, x, y);
+};
+
+var page = function(name, colo, avatar, topPrograms, nn, username, textSz){
+    background(colo);
+    rectMode(CENTER);
+    noStroke();
+    fill(0, 0, 0, 50);
+    rect(200, 75, 400, 100);
+    fill(255, 255, 255, 150);
+    textSize(15);
+    text(nn, 200, 13);
+    textSize(textSz);
+    fill(0, 0, 0, 100);
+    text(name, 205, 77);
+    fill(245, 245, 245);
+    text(name, 200, 75);
+    textSize(12);
+    text("@" + username, 200, 110);
+    textSize(20);
+    text("TOP PROGRAMS", 248, 200);
+    textSize(15);
+    textAlign(LEFT, TOP);
+    text("1. " + topPrograms[0] + "\n2. " + topPrograms[1] + "\n3. " + topPrograms[2], 180, 215);
+    textAlign(CENTER, CENTER);
+    image(avatar, 90, 250);
+    button(10, 365, 60, 30, "  Back  ", "Home", 17, colo);
+};
+
+var draw = function() {
+    if(pg === "Enter"){
+        fill(0, 0, 0, 5);
+        rect(0, 0, 500, 500);
+        fill(random(0, 255), random(0, 255), random(0, 255));
+        textSize(random(10, 24));
+        text(names[frameCount % names.length], random(0, 400), random(0, 400));
+        pushMatrix();
+        translate(200, 200);
+        rotate(sin(frameCount * 5));
+        textSize(45);
+        fill(0, 128, 255);
+        text("KA PROGRAMMERS", 0, 0);
+        textSize(44);
+        fill(255, 255, 255);
+        text("KA PROGRAMMERS", 0, 0);
+        popMatrix();
+        textSize(20);
+        text("Click-n-learn:", 200, 167);
+        stroke(255);
+        strokeWeight(5);
+        circleButton(200, 300, 100, "ENTER", "Home", 20);
+    }
+    if(pg === "Home"){
+        background(212, 212, 212);
+        for(var i = 21; i < 400; i += 70){
+            for(var j = 27; j < 400; j += 45){
+                textFont(createFont("Consolas"));
+                textSize(30);
+                fill(0, 0, 0, 20);
+                text("1 0", i, j);
+            }
+        }
+        b(107, x[0], "Infiltration", "Infil", color(212, 212, 0));
+        b(0, x[0], "Chester Banks", "CB", color(0, 138, 212));
+        b(205, x[0], "The #1 Base 12 Proponent", "B12", color(112, 112, 112));
+        
+        b(0, x[1], " Splo ", "Splo", color(255, 0, 0));
+        b(51, x[1], " Kevin23 ", "K23", color(24, 163, 0));
+        b(126,x[1], " Swax97", "S97", color(255, 140, 0));
+        b(185, x[1], " BenR ", "BenR", color(0, 48, 143));
+        b(235, x[1], "SportsBoss314", "SB314", color(0, 13, 255));
+        b(343, x[1], " Loki ", "Loki", color(0, 224, 15));
+        
+        b(0, x[2], " The Chosen One ", "TCO", color(0, 0, 0));
+        b(131, x[2], "  DY  ", "DY", color(0, 225, 255));
+        b(182, x[2], " Epic Dan ", "ED", color(219, 0, 0));
+        b(264, x[2], "Peter Collingridge", "PC", color(96, 255, 82));
+        
+        b(0, x[3], "Pamela", "Pamela", color(255, 127, 240));
+        b(80, x[3], " Ben Rowan ", "BR", color(255, 0, 0));
+        b(171, x[3], "Infinity Runner", "IR", color(0, 187, 255));
+        b(294, x[3], "Isaac Emerald", "IE", color(255, 111, 0));
+        
+        b(80, x[4], "Functionized", "Function", color(0, 79, 140));
+        b(179, x[4], "Brian P. Duckworth", "BPD", color(163, 163, 163));
+        b(325, x[4], "Supernova", "S_nova", color(255, 162, 0));
+        
+        b(0, x[5], "Radioactive", "Radio", color(64, 64, 64));
+        b(91, x[5], " WarDraco ", "WD", color(204, 0, 119));
+        b(174, x[5], " Natth4545 ", "4545", color(148, 81, 0));
+        b(265, x[5], " Jacob ", "Jacob", color(0, 89, 140));
+        b(323, x[5], " Bennimus ", "Benn", color(59, 59, 59));
+        
+        b(0, x[6], "Picklestuff", "PS", color(0, 227, 45));
+        b(91, x[6], " Element118 ", "118", color(222, 0, 0));
+        b(190, x[6], "Light Runner", "LR", color(222, 222, 0));
+        b(289, x[6], " awk888 ", "888", color(255, 145, 0));
+        b(356, x[6], " VMC ", "VMC", color(11, 128, 0));
+        
+        b(0, x[7], " Dalendrion ", "D-", color(0, 174, 255));
+        b(100, x[7], " Aidabaida ", "Aida", color(0, 184, 12));
+        b(191, x[7], " Ryan Kee ", "RK", color(255, 162, 0));
+        b(275, x[7], " Gigabyte Giant", "GG", color(106, 0, 255));
+        
+        b(0, x[8], "Dip Mahato", "DM", color(255, 51, 51));
+        b(83, x[8], " phil ", "Phil", color(0, 59, 130));
+        b(134, x[8], " Benjamin ", "Ben", color(105, 105, 105));
+        b(217, x[8], " Jake ", "Jake", color(0, 123, 255));
+        b(268, x[8], " Michael Da Boss", "Jake", color(161, 0, 0));
+    }
+    if(pg === "CB"){
+        page("Chester Banks", color(0, 138, 212), getImage("avatars/robot_male_2"), ["Let it Code!", "Ascent", "Create a Character"], "", "chesterbanks", 57);
+    }
+    if(pg === "Infil"){
+        page("Infiltration", color(212, 212, 0), getImage("creatures/Hopper-Cool"), ["Crate Ninja", "Don't Touch The Spikes!", "Escape!"], "One Of The Best", "Qwerty314", 64);
+    }
+    if(pg === "B12"){
+        page("The #1 Base 12 Proponent", color(112), getImage("avatars/leafers-ultimate"), ["The Ultimate TD", "The Ultimate TD 2", "Dodge-block v1.0"], "Top of the Top List", "mathdude314", 33);
+    }
+    if(pg === "Splo"){
+        page("Splo", color(230, 0, 0), getImage("avatars/robot_male_2"), ["DO NOT PRESS!", "Flashback (My First Game!)", "Apple vs. Windows"], "Mr. Teeny", "Splo", 64);
+    }
+    if(pg === "K23"){
+        page("Kevin23", color(24, 163, 0), getImage("avatars/robot_male_2"), ["Duck Life", "Flappy Bird", "Geometry Dash"], "", "kevin2339", 64);
+    }
+    if(pg === "S97"){
+        page("Swax97", color(255, 140, 0), getImage("avatars/leaf-orange"), ["Lava, The Impossible Game.", "The World's Hardest Game", "Bug Run v4.2"], "Awesome Gamemaker", "swax97", 64);
+    }
+    if(pg === "SB314"){
+        page("SportsBoss314", color(0, 13, 255), getImage("avatars/piceratops-ultimate"), ["Asteroid Dodger", "Papi Bounce 2", "Can you resist the urge of\nmoney?"], "Dodger of Asteroids", "jainm31402", 50);
+    }
+    if(pg === "BenR"){
+        page("BenR", color(0, 54, 163), getImage("creatures/Hopper-Cool"), ["Mr. Cube", "Hailstorm: The Game", "Hailstorm 2"], "Creator of Mr. Cube", "ThePowerofBenary", 64);
+    }
+    if(pg === "Loki"){
+        page("Loki", color(0, 224, 15), getImage("creatures/Winston"), ["Minecraft KE! More noise!", "BETTER MOBILE CODING", "2P Tag 1.1"], "A Duck?", "Lokio27", 64);
+    }
+    if(pg === "TCO"){
+        page("The Chosen One", color(38, 38, 38), getImage("avatars/leafers-ultimate"), ["This is Winston Movie!", "Orbit: My First Game", "Golden Vortex Logo"], "Leafers Logoist", "kaid_114222762077139284352995", 50);
+    }
+    if(pg === "DY"){
+        page("DY", color(0, 198, 224), getImage("avatars/aqualine-tree"), ["Transcolors - Version 2.5.0", "Lazy Larry", "\"We're In A Comic!\""], "Awesome Designer", "darrylyeo", 64);
+    }
+    if(pg === "ED"){
+        page("☣-EPIC-DAN-☣", color(204, 0, 0), getImage("avatars/leafers-tree"), ["Speedy Cube 2", "Speedy Clicker", "Speedy's Quest"], "", "danielsong2972", 52);
+    }
+    if(pg === "PC"){
+        page("Peter Collingridge", color(54, 255, 81), getImage("avatars/leafers-sapling"), ["Challenge: Modeling\nAccretion Disks", "Mona Lisa", "Unbiased Estimate of\nPopulation Variance"], "Khan Exercise & Interactive Program Maker", "peterwcollingridge", 45);
+    }
+    if(pg === "BR"){
+        page("Ben Rowan", color(176, 0, 0), getImage("avatars/piceratops-ultimate"), ["Mini Stix", "KHAN ACADEMY!!", "Street Racing 2.0"], "Creator of Mini Stix", "rowandpq", 64);
+    }
+    if(pg === "IR"){
+        page("Infinity Runner", color(0, 187, 255), getImage("creatures/Hopper-Cool"), ["Block", "Someone is copying me!", "Domino Brainer"], "", "ohanessiand", 54);
+    }
+    if(pg === "IE"){
+        page("ISAAC EMERALD ♦○♦", color(222, 141, 0), getImage("avatars/robot_male_2"), ["Dimension - The Game", "Dimension 2 - The Game", "The worlds most stupid game"], "Dimension Master", "IsaacSub9", 36);
+    }
+    if(pg === "Function"){
+        page("Arvax", color(0, 79, 140), getImage("avatars/leaf-red"), ["iOS Mac", "Red & Blue", "Flappy Ball"], "AKA Functionized or Inception", "arvax", 64);
+    }
+    if(pg === "BPD"){
+        page("Brian P. Duckworth", color(179, 179, 179), getImage("avatars/robot_male_3"), ["Snake", "Yahtzee", "Head On"], "Great Helper", "brianduckworth", 42);
+    }
+    if(pg === "S_nova"){
+        page("Supernova", color(255, 140, 0), getImage("avatars/leaf-orange"), ["Sparky the Pitiful Puppy", "Earth Day Rap!", "Olaf break dancing!"], "", "collinMCA", 64);
+    }
+    if(pg === "Pamela"){
+        page("Pamela", color(255, 147, 240), getImage("creatures/Hopper-Jumping"), ["Challenge: Mickey Mouse Ears", "Cat got your tongue?", "Welcome to Summer of\nScripting"], "Awesome Teacher", "pamela", 64);
+    }
+    if(pg === "DD"){
+        page("DigitalDragon", color(135, 0, 0), getImage("avatars/leaf-red"), ["iPod 5 (simulation)", "iPod Touch Ad", "YouTube (WIP)"], "Dragon of Design", "DigitalDragon", 55);
+    }
+    if(pg === "AA"){
+        page("Δανιαλ Αημαδ", color(0, 158, 74), getImage("avatars/leafers-tree"), ["Paper! - The Game", "Paper 2! - The Game", "Paper 3! - The Game"], "Maker of the Paper Series", "Biome", 55);
+    }
+    if(pg === "GD"){
+        page("Greg Doodles", color(0, 102, 219), getImage("avatars/mr-pants"), ["More Cubix!", "Winston's Donut Dash", "Break-Out"], "Cool Gamemaker", "andrewbiblebee", 55);
+    }
+    if(pg === "Radio"){
+        page("Radioactive", color(64), getImage("avatars/leafers-tree"), ["Mario v.2", "A Game of Survival", "Khan Academy Chaos"], "Great Previous Programmer", "JesusIsAwesome37", 55);
+    }
+    if(pg === "WD"){
+        page("WarDraco", color(204, 0, 119), getImage("avatars/aqualine-ultimate"), ["Matrix Runner", "Mini-Games(5 Games!)", "Random Tree Generator"], "Quite a Few Games", "samwang3.14", 55);
+    }
+    if(pg === "4545"){
+        page("Natth4545", color(148, 81, 0), getImage("creatures/Winston"), ["Earth Generator!", "Fruit Ninja! Version(1.4.5)", "Memorize Pi!"], "Cool Gamemaker", "Natth4545", 55);
+    }
+    if(pg === "Jacob"){
+        page("Jacob", color(0, 89, 140), getImage("creatures/Hopper-Cool"), ["Escape Plan (New Version!)", "Escape Plan!", "Shooting Stars!"], "Great Programmer", "Jacob124", 64);
+    }
+    if(pg === "Benn"){
+        page("Bennimus", color(59), getImage("avatars/robot_male_2"), ["Minecraft", "Minecraft - Backup", "1.14 Pre-Release?!"], "Minecraft Maker", "bennimus", 64);
+    }
+    if(pg === "PS"){
+        page("Picklestuff", color(0, 227, 45), getImage("creatures/Winston"), ["Feed Me! Version 1.3", "Cray Button", "The Hutt Race"], "", "Picklestuff", 64);
+    }
+    if(pg === "118"){
+        page("Element118", color(196, 0, 0), getImage("avatars/leafers-ultimate"), ["Minecraft World V0","2048", "Rain"], "Answerer To Many Help Requests", "Element118", 64);
+    }
+    if(pg === "LR"){
+        page("Light Runner", color(207, 207, 0), getImage("avatars/leaf-yellow"), ["Jailer (Version 7.0)", "Snow Explorer! (NEW levels!)", "M_UP2"], "Maker of Candy Explorer", "CandyExplorer", 64);
+    }
+    if(pg === "888"){
+        page("awk888", color(255, 145, 0), getImage("creatures/Winston"), ["Block world™", "Ice world", "New Program W.I.P."], "Creator of Block World", "awk888", 64);
+    }
+    if(pg === "VMC"){
+        page("VMC", color(12, 128, 0), getImage("avatars/leaf-green"), ["Farming Game", "Circle Run", "Futuristic HD Customizable\nCar"], "Awesome Nerd", "VMC", 64);
+    } 
+    if(pg === "D-"){
+        page("Dalendrion", color(0, 103, 194), getImage("avatars/spunky-sam"), ["Two Magic Card Tricks", "Magnifying glass", "Image.blend()"], "Advanced Programmer", "Dalendrion", 64);
+    }
+    if(pg === "Aida"){
+        page("Aidabaida", color(0, 184, 12), getImage("avatars/leafers-ultimate"), ["Misty Woods", "Parallelia - The Game", "Parallelia 2 - The Battle\nBegins"], "Program Reviewer", "Aidabaida", 64);
+    }
+    if(pg === "RK"){
+        page("Ryan Kee", color(255, 162, 0), getImage("avatars/spunky-sam"), ["i saw her standing there.", "Cubix 2!", "It's a Big World"], "Creator of Cubix", "Paxixx", 64);
+    }
+    if(pg === "GG"){
+        page("Gigabyte Giant", color(106, 0, 255), getImage("avatars/purple-pi"), ["Extreme Pong (v3.0 Snapshot)", "Oklahoma Storms", "Retro Platformer [WIP]"], "", "GigabyteGiant", 50);
+    }
+    if(pg === "DM"){
+        page("Dip Mahato", color(227, 36, 36), getImage("avatars/aqualine-ultimate"), ["Five Nights at Freddy's", "A Game of Basketball", "Five Nights at Freddy's 3"], "Creators of FNAF", "spm01", 64);
+    }
+    // page("", color(148, 81, 0), getImage("creatures/Winston"), ["", "", ""], "", "", 64);
+};
