@@ -1,0 +1,233 @@
+// Credit to Thomas :) for the background + leaves + fireworks
+/**
+ * KHANTOBER 2015
+ * 
+ * Click!
+ * Challenging you to The Month of Khantober: 31 Days of Smashing Programming!
+ * Let's get a whole bunch of programmers releasing a quality program every day of October!
+ * 
+ * Challengers:
+ * Each of you will make a great (original) program every *week* of October.
+ * You'll work on your program during six days of the week, and then release it on the day of which group you're in (for instance, if you're in Group Tuesday, you work on your program Wed-Mon, then release it on Tuesday).
+ * You will get to post your program that you made every day on the "Sharing Posts"!
+ * Get encouragement and feedback from other challengers!
+ * Let's flood the Hot List with awesome programs! :D
+ * 
+ * Join in the tips and thanks. If you can't be on a certain day, please say so - otherwise, I'll decide which group you're in.
+ */
+
+var program = {
+    title: "Galaga",
+    author: "Mithreindeir",
+    link: "https://www.khanacademy.org/cs/galaga/5136727539318784"
+};
+
+var X = 0;
+var Y = 0;
+
+var settings=false;
+var a =0;
+var noiseScale=0.01;
+var y=0;
+var x=0;
+var s=5;
+var leaf=[];
+var w=0;
+var par=[];
+
+var whichLeaf = 0;
+
+var leaves = [getImage("avatars/leaf-grey")];
+
+
+noStroke();
+
+{
+    var keys= [];
+    var keyPressed = function(){
+        keys[keyCode] = true;
+    };
+    var keyReleased = function(){
+        keys[keyCode] = false;
+    };
+}
+var makePar=function(x,y,a){
+    var dot={
+        y:y,
+        add:a,
+        grav:random(0.3,0.6),
+        x:x,
+        xs:random(-5,5)
+    };
+    
+    par.push(dot);
+};
+var updatePar=function(){
+        if (par.length > 100) {
+        par.shift();
+    }
+    for (var j = 0; j < par.length; j += 1) {
+    fill(199, 199, 199);
+    ellipse(par[j].x,par[j].y,6,6);
+    par[j].y+=par[j].add;
+    par[j].add+=par[j].grav;
+    par[j].x+=par[j].xs;
+   }
+};
+var makeLeaf=function(){
+    leaf.push({
+        x:random(20,350),
+        y:-60,
+        xs:random(-2,2),
+        add:0,
+        r:random(0,360),
+        rs:random(-10,10)
+    });
+};
+var updateLeaves=function(){
+    for (var i = 0; i < leaf.length; i += 1){
+        translate(leaf[i].x,leaf[i].y);
+        rotate(leaf[i].r);
+        
+        image(leaves[0],-33,-25,70,70);
+        
+        leaf[i].x+=(0)/40;
+        leaf[i].y+=leaf[i].add;
+        leaf[i].add+=0.35;
+        
+        leaf[i].r+=leaf[i].rs;
+        
+        if(leaf.length>10){
+            leaf.shift();
+            
+        }
+        resetMatrix();
+    }
+};
+var drawBackground=function(){
+    for(var i=0; i < 438; i+=1) {
+        var noiseVal = noise((a)*noiseScale,(y)*noiseScale,x*noiseScale);
+
+        color(0, 191, 255);
+        fill(0-(noiseVal*120), 191-(noiseVal*120), 255-(noiseVal*120));
+        rect(x,y,20,20);
+
+          x+=20;
+      if(x>400){
+          y+=20;
+          x=0;
+
+      }
+  }
+
+
+  y=0;
+  x=0;
+  a+=2;
+    
+};
+var terrafernBackground=function(){
+    drawBackground();
+    if(w>10){
+        makeLeaf();
+        w=0;
+    }
+     w+=random(0,2);
+    updateLeaves();
+    updatePar();
+    
+};
+
+var draw = function() {
+    terrafernBackground();
+    textFont(createFont("Arial Bold"));
+    textAlign(CENTER, CENTER);
+    fill(0, 0, 0, 100);
+    //text("KHANTOBER", X + 202, Y + 163);
+    for(var i = 60; i > 5; i-=2){
+        fill(0, 0, 0, i);
+        textSize(i);
+        text("KHANTOBER", X + 200, Y + 150);
+    }
+    textSize(61);
+    fill(255, 255, 255);
+    text("KHANTOBER", X + 200, Y + 150);
+    textSize(159);
+    fill(0, 0, 0, 30);
+    text("2015", X + 205, Y + 232);
+    text("2015", X + 195, Y + 232);
+    text("2015", X + 200, Y + 237);
+    text("2015", X + 200, Y + 227);
+    fill(255);
+    text("2015", X + 200, Y + 232);
+    fill(0, 0, 0);
+    textSize(30);
+    triangle(X, Y + 400, X, Y + 350, X + 50, Y + 400);
+    triangle(X + 400, Y, X + 350, Y, X + 400, Y + 50);
+    textSize(19);
+    fill(0, 0, 0);
+    text("31 DAYS OF SMASHING PROGRAMMING!", X + 200, Y + 311);
+    textSize(40);
+    fill(0, 0, 0);
+    textFont(createFont("Brush Script MT"));
+    text("Challengers", X + 600, Y + 36);
+    text("About", X + 200, Y - 370);
+    text("Credits", X + 200, Y + 520);
+    text("Challenging you to:", X + 200, Y + 82);
+    text("Featured Program:", X - 200, Y + 105);
+    textFont(createFont("Comic Sans ms"), 15);
+    fill(255, 255, 255);
+    text("Explore with the arrow keys!", X + 200, Y + 350);
+    textSize(11);
+    text("And then join and get programming!", X + 200, Y + 370);
+    text("By: " + program.author, X - 200, Y + 286);
+    fill(196, 196, 196);
+    stroke(255, 255, 255, 100);
+    strokeWeight(5);
+    rectMode(CENTER);
+    rect(X - 200, Y + 190, 100, 100);
+    image(getImage("avatars/purple-pi"), X - 242, Y + 145, 85, 85);
+    noStroke();
+    rectMode(CORNER);
+    fill(255, 255, 255);
+    textSize(11);
+    textAlign(LEFT, TOP);
+    text("01: Chester Banks\n02: Blayne the Sorcerer\n03: KCF\n04: Ben Obert\n05: Mwill351\n06: DigitalDragon\n07: Vladimirr\n08: VMC\n09: Eytukan (Txeptirea)\n10: conrad123 (Frog Rock)\n11: cheese33\n12: Jack P.\n13: SimplifiedBanana101\n14: AbananaK1\n15: Aqua Orchid\n16: The Chosen One\n17: Cadett\n18: IceSerpent\n19: AlexT\n20: Micaiah Soto\n21: Preston123", X + 424, Y + 66);
+    text("22: KingKhan007:\n23: T#1B12P\n24: Ridgetheninja\n25: BananaPeel\n26: ignatio01\n27: JavaLava\n28: God of War\n29: oriramikad\n30: Finn\n31: arenciel\n32: oʚəʅ ʎɹnʇuəɔ ʇᴤ12\n33: Conrad\n34: Patrick Z\n35: Programming Master\n36: Xynix\n37: happyturtle.MP\n38: Marcelo Pereira\n39: Yuvali\n40: tntgirl6\n41: Christopher D'lnzeo\n42: Arachnidjds", X + 564, Y + 66);
+    text("43: Philip Altmann\n44: Dark Runner\n45:CarsonRepins27\n46: Cherry\n47: Pancake Proponent\n48: Bruce\n49: Maxwell Myhre\n50: JoeE09\n51: emory.christensen\n52: Infiltration\n53: HTMLfan\n54: TheSockMaster\n55: penguin9541\n56: Sanskar Jain\n57: KingKaiser\n58: Miknc\n59: Ben the Program-\n   ming Genius\n60: Matt Programing\n61: pascal5", X + 697, Y + 66);
+    text("62: Zeemovieguy\n63: Infinity Runner\n64: Lsrwhyte\n65: oriramikad\n66: Zoe\n67: Creeper 3000\n68: Fow1\n69: swaglord\n70: Sbayley13\n71: Indie\n72: Walker Rollins\n73: Anamethats\n74: KonurPapa\n75: JonathanZ\n76: Quantum Ninja\n77: Xoom Studios\n78: Optimised Studios\n79: Andrew Prasetya\n80: Wgirl\n81: First Tiger Hobbes\n82: Savageookwolf", X + 825, Y + 66);
+    text("83: Irene Song\n84: JulianPenguin\n85: Juda Quirarte\n86: Lightningchess8000\n87: JesusLives\n88: Mr.JPrograms\n89: Sal Khan [not the real one]\n90: Aditi Abhilash\n91: Raegen Gonsalves\n92: Swax97\n93: 17mloges\n94: cellu$y\n95: iLive4God\n96: TheKidKing\n97: eleanor\n98: The #1 Base 16 Proponent\n99: vladimir1010\n100: The #1 Halo Proponent\n101: Cerise Hood\n102: Elite\n103: Legoprincess\n104: crabbygrindall90", X + 961, Y + 66);
+    textAlign(CENTER, CENTER);
+    text("More that way! >", X + 739, Y + 382);
+    
+    text("+ Challenging you to The Khantober 2015: 31 Days of Smashing Programming!\n\n+ If you accept, you will:\n\n+ Try to make a program every week of October (that isn't a button, pixelized image, joke book program, or a copy).\n\n+ You'll work on your program during six days of the week, and then release it on the day of which group you're in (for instance, if you're in Group Tuesday, you work on your program Wed-Mon, then release it on Tuesday).\n\n+ You will get to post your program that you made every day on the 'Share your Programs Here' post!\n\n- Get encouragement and feedback from other challengers!\n\n+ Let's flood the Hot List with great programs! :D", X + 10, Y - 390, 380, 400);
+    text("Background, leaves, and fireworks by Thomas :) at\nhttps://www.khanacademy.org/cs/terrafern-fireworks/2531417069\n\nCheck out his programs!", X+ 200, Y + 600);
+    textSize(12);
+    text("", X + 200, Y+ 374);
+    text("", X + 172, Y + 18);
+    textSize(20);
+    text(program.title, X - 200, Y + 260);
+    if(keys[RIGHT]){
+        X-=10;
+    }
+    if(keys[LEFT]){
+        X+=10;
+    }
+    if(keys[UP]){
+        Y+=10;
+    }
+    if(keys[DOWN]){
+        Y-=10;
+    }
+};
+
+var mouseClicked=function(){
+    for(var i=0; i<20; i+=1){
+            makePar(mouseX,mouseY,random(0,-10));
+        }
+};
+var mouseReleased = function(){
+    if(mouseX > (X - 250) && mouseX < (X - 150) && mouseY > (Y + 125) && mouseY < (Y + 250)){
+        println(program.link);
+    }
+};
