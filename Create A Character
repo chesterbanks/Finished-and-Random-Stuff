@@ -1,0 +1,510 @@
+// Spiky hair from Rys Lee
+
+var scene = "Home";
+
+
+
+var head = "Round"; // You can change this to Square.
+var skinColor = color(255, 221, 153);
+var hairColor = color(87, 62, 0);
+var hairType = 0;
+var facialHair = 0;
+var eyeType = 0;
+var mouthType = 0;
+
+var hairBtn = function(x, y, w, h, co){
+    rectMode(CORNER);
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+        noStroke();
+        fill(255, 255, 255, 150);
+        if(mouseIsPressed){
+            hairColor = co;
+            stroke(0, 0, 0, 100);
+            strokeWeight(5);
+        }
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(co);
+
+    ellipse(x + (w/2), y + (h/2), w / 1.5, h / 1.5);
+
+};
+var skinBtn = function(x, y, w, h, co){
+
+    rectMode(CORNER);
+
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+
+        noStroke();
+
+        fill(255, 255, 255, 150);
+
+        if(mouseIsPressed){
+
+            skinColor = co;
+
+            stroke(0, 0, 0, 100);
+
+            strokeWeight(5);
+
+        }
+
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(co);
+
+    ellipse(x + (w/2), y + (h/2), w / 1.5, h / 1.5);
+
+};
+var eyeTypeBtn = function(x, y, w, h, num){
+
+    rectMode(CORNER);
+
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+
+        noStroke();
+
+        fill(255, 255, 255, 150);
+
+        if(mouseIsPressed){
+
+            eyeType = num;
+
+            stroke(0, 0, 0, 100);
+
+            strokeWeight(5);
+
+        }
+
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(0);
+
+    text(num, x + (w/2), y + (h/2));
+
+};
+var hairTypeBtn = function(x, y, w, h, num){
+
+    rectMode(CORNER);
+
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+
+        noStroke();
+
+        fill(255, 255, 255, 150);
+
+        if(mouseIsPressed){
+
+            hairType = num;
+
+            stroke(0, 0, 0, 100);
+
+            strokeWeight(5);
+
+        }
+
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(0);
+
+    text(num, x + (w/2), y + (h/2));
+
+};
+var mouthBtn = function(x, y, w, h, num){
+
+    rectMode(CORNER);
+
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+
+        noStroke();
+
+        fill(255, 255, 255, 150);
+
+        if(mouseIsPressed){
+
+            mouthType = num;
+
+            stroke(0, 0, 0, 100);
+
+            strokeWeight(5);
+
+        }
+
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(0);
+
+    text(num, x + (w/2), y + (h/2));
+
+};
+var facialBtn = function(x, y, w, h, num){
+
+    rectMode(CORNER);
+
+    if(mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h){
+
+        noStroke();
+
+        fill(255, 255, 255, 150);
+
+        if(mouseIsPressed){
+
+            facialHair = num;
+
+            stroke(0, 0, 0, 100);
+
+            strokeWeight(5);
+
+        }
+
+    } else {
+
+        noStroke();
+
+        fill(255, 255, 255, 100);
+
+    }
+
+    rect(x, y, w, h, 10);
+
+    noStroke();
+
+    fill(0);
+
+    text(num, x + (w/2), y + (h/2));
+
+};
+
+var circleButton = function(x, y, sz, txt, n){// x, y, size, text, next page
+    stroke(245);
+    strokeWeight(5);
+    if(dist(mouseX, mouseY, x, y) <= (sz/2)){
+            fill(245);
+            if(mouseIsPressed){
+                scene = n;
+            }
+    } else {
+        fill(245,245, 245, 200);
+    }
+    ellipse(x, y, sz, sz);
+    fill(41, 41, 41);
+    textSize(sz / 5);
+    if(sz === 90){textSize(sz/4);}
+    text(txt, x, y);
+};
+
+var watermark = function(x, y, sz){pushMatrix();rectMode(LEFT);translate(x, y);scale(sz);mouseClicked = function(){if(mouseX > x && mouseX < x+(sz*50) && mouseY > y && mouseY < y+(sz*50)){println("CHESTER BANKS' PROFILE\nkhanacademy.org/profile/chesterbanks");}};stroke(255, 255, 255, 100);strokeWeight(3);fill(0, 102, 191);rect(0, 0, 50, 50);pushMatrix();rotate(0);noFill();strokeCap(SQUARE);stroke(255, 255, 255);strokeWeight(sin(frameCount * 15) + 4);arc(25, 20, 20, 20, -180, 0);arc(25, 30, 20, 20, 0, 180);line(15, 21, 15, 30);popMatrix();rectMode(CENTER);popMatrix();};
+
+var draw = function() {
+    if(scene === "Home"){
+        noStroke();
+        colorMode(HSB);
+        background((frameCount/2) % 255, 255, 255);
+        colorMode(RGB);
+        fill(0, 0, 0, 30);
+        rectMode(CENTER);
+        rect(200, 200, 300, 300, 10);
+        rect(200, 200, 200, 200, 10);
+        rect(200, 200, 100, 100, 10);
+        rectMode(CORNER);
+        noStroke();
+        textAlign(CENTER, CENTER);
+        textFont(createFont("Trebuchet MS Bold"), 70);
+        fill(0, 0, 0);
+        text("CHARACTER", 200, 200);
+        textSize(30);
+        text("CREATE A", 126, 163);
+        triangle(119, 178, 130, 210, 110, 209);
+        triangle(205, 178, 195, 210, 216, 209);
+        arc(373, 192, 20, 20, -90, 90);
+        rect(365, 182, 10, 20);
+        textFont(createFont(""));
+        circleButton(200, 340, 75, "Start", "Choose");
+        watermark(360, 360, 0.7);
+}
+    if(scene === "Choose"){
+        background(0, 166, 255);
+        fill(0, 0, 0);
+        textSize(15);
+        text("Hair Color", 103, 25);
+        text("Eye Type", 243, 60);
+        text("Hair Type", 138, 95);
+        hairBtn(360, 10, 30, 30, color(133, 86, 0));
+        hairBtn(325, 10, 30, 30, color(0, 0, 0));
+        hairBtn(290, 10, 30, 30, color(255, 255, 255));
+        hairBtn(255, 10, 30, 30, color(255, 0, 0));
+        hairBtn(220, 10, 30, 30, color(128, 128, 128));
+        hairBtn(185, 10, 30, 30, color(252, 255, 168));
+        hairBtn(150, 10, 30, 30, color(191, 0, 255));
+        eyeTypeBtn(360, 45, 30, 30, 2);
+        eyeTypeBtn(325, 45, 30, 30, 1);
+        eyeTypeBtn(290, 45, 30, 30, 0);
+        hairTypeBtn(360, 80, 30, 30, 5);
+        hairTypeBtn(325, 80, 30, 30, 4);
+        hairTypeBtn(290, 80, 30, 30, 3);
+        hairTypeBtn(255, 80, 30, 30, 2);
+        hairTypeBtn(220, 80, 30, 30, 1);
+        hairTypeBtn(185, 80, 30, 30, 0);
+        skinBtn(190, 355, 20, 20, color(255, 221, 153));
+        skinBtn(165, 355, 20, 20, color(253, 255, 196));
+        skinBtn(215, 355, 20, 20, color(107, 77, 0));
+        mouthBtn(10, 350, 30, 30, 0);
+        mouthBtn(45, 350, 30, 30, 1);
+        mouthBtn(80, 350, 30, 30, 2);
+        mouthBtn(115, 350, 30, 30, 3);
+        facialBtn(360, 350, 30, 30, 3);
+        facialBtn(325, 350, 30, 30, 2);
+        facialBtn(290, 350, 30, 30, 1);
+        facialBtn(255, 350, 30, 30, 0);
+        fill(0, 0, 0);
+        text("Skin Color", 200, 385);
+        text("Mouth", 78, 335);
+        text("Facial Hair", 320, 335);
+        rectMode(CENTER);
+        if(hairType === 4){
+            fill(hairColor);
+            arc(200, 328, 198, 389, -180, 0);
+        }
+        fill(skinColor);
+        if(head === "Round"){
+            ellipse(200, 250, 150, 200);
+        } else if (head === "Square"){
+            rect(200, 250, 150, 200, 50);
+        }
+        
+        ellipse(122, 251, 20, 50);
+        ellipse(278, 251, 20, 50);
+        if(eyeType === 0){
+    
+            fill(0, 0, 0);
+    
+            ellipse(180, 250, 20, 20);
+    
+            ellipse(220, 250, 20, 20);
+    
+            fill(255, 255, 255);
+    
+            ellipse(175, 248, 5, 5);
+    
+            ellipse(215, 248, 5, 5);
+    
+        } else if(eyeType === 1){
+    
+            noFill();
+    
+            stroke(0, 0, 0);
+    
+            strokeWeight(5);
+    
+            arc(180, 250, 20, 20, -180, 0);
+    
+            arc(220, 250, 20, 20, -180, 0);
+    
+            noStroke();
+    
+        } else if(eyeType === 2){
+    
+            fill(255, 255, 255);
+    
+            ellipse(180, 250, 30, 30);
+    
+            ellipse(220, 250, 30, 30);
+    
+            fill(0, 0, 0);
+    
+            ellipse(184, 246, 15, 15);
+    
+            ellipse(224, 246, 15, 15);
+    
+        }
+    
+        fill(hairColor);
+    
+        if(hairType === 0){
+    
+            ellipse(200, 172, 140, 50);
+    
+            ellipse(262, 205, 37, 76);
+    
+            ellipse(140, 205, 37, 76);
+    
+        } 
+    
+        if(hairType === 1){
+    
+            ellipse(127, 220, 20, 20);
+    
+            ellipse(270, 220, 20, 20);
+    
+            ellipse(135, 204, 20, 20);
+    
+            ellipse(146, 189, 20, 20);
+    
+            ellipse(157, 175, 20, 20);
+    
+            ellipse(169, 164, 20, 20);
+    
+            ellipse(185, 158, 20, 20);
+    
+            ellipse(200, 155, 20, 20);
+    
+            ellipse(264, 204, 20, 20);
+    
+            ellipse(254, 189, 20, 20);
+    
+            ellipse(242, 175, 20, 20);
+    
+            ellipse(215, 159, 20, 20);
+    
+            ellipse(230, 164, 20, 20);
+    
+        } 
+    
+        if(hairType === 2){}
+    
+        if(hairType === 3){
+    
+            ellipse(200, 162, 150, 150);
+    
+            ellipse(262, 205, 37, 76);
+    
+            ellipse(140, 205, 37, 76);
+    
+        }
+        if(hairType === 4){
+            ellipse(200, 187, 123, 85);
+        }
+        if(hairType === 5){
+            triangle(200, 149, 155, 134,200,188);
+            triangle(175, 156, 136, 158,187,190);
+            triangle(178, 196, 120, 182,156,170);
+            triangle(156, 203, 119, 210,142,186);
+            triangle(200, 149, 217, 134,200,188);
+            triangle(222, 188, 243, 146,206,152);
+            triangle(262, 195, 272, 179,232,161);
+            triangle(261, 184, 281, 210,269,211);
+            arc(200,211,140,110,181,360);
+        }
+    
+        fill(hairColor);
+    
+        if(facialHair === 0){
+    
+            
+    
+        }
+    
+        if(facialHair === 1 && hairType !== 4){
+    
+            ellipse(200, 312, 89, 60);
+    
+        }
+    
+        if(facialHair === 2 && hairType !== 4){
+    
+            arc(200, 307, 180, 50, -180, 0);
+    
+        }
+    
+        if(facialHair === 3 && hairType !== 4){
+    
+            triangle(170, 330, 230, 330, 200, 360);
+    
+        }
+    
+        if(mouthType === 0){
+    
+            fill(255, 255, 255);
+    
+            arc(200, 300, 50, 50, 0, 180);
+    
+        }
+    
+        if(mouthType === 1){
+    
+            fill(0, 0, 0);
+    
+            ellipse(205, 314, 30, 30);
+    
+        }
+    
+        if(mouthType === 2){
+    
+            noFill();
+    
+            stroke(0, 0, 0);
+    
+            arc(200, 300, 50, 20, -29, 138);
+    
+        }
+    
+        if(mouthType === 3){
+    
+            fill(255, 255, 255);
+    
+            noStroke();
+    
+            arc(200, 295, 100, 85, 0, 180);
+    
+        }
+    
+        noFill();
+    
+        stroke(0, 0, 0);
+    
+        strokeWeight(3);
+    
+        arc(200, 280, 35, 20, -270, -90);
+    
+}
+};
