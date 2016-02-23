@@ -1,0 +1,281 @@
+/** Polar Opposites
+ * By Chester Banks
+ * October 6 2015
+ * 
+ * #Khantober2015
+ * 
+ * Click to switch from the top and bottom!
+ * Avoid the spikes!
+ * 
+ * Thanks to Jake for the logo!
+ * 
+ * Check out these programs from the people that entered the best logos in my logo contest!
+ * A really cool game from Jake: https://www.khanacademy.org/computer-programming/swing-copters/5758511787671552
+ * Need a website? Check this out from awk888: https://www.khanacademy.org/cs/-/5120779793072128
+ */
+ 
+ // Top of the hot list! Yay!
+
+
+
+
+rectMode(CENTER);
+noStroke();
+
+{// Logo variables :
+var characters = "zABCDEFGHIJKLMNOPQRSTUVWXYZ"; //The string of characters that can be chosen from for the background characters. I could have written this as an array,but strings have similar syntax, and it was faster. :P
+var symbols = [["B", width/2, height - 80, -8, -2], ["A", width/2, height - 80, -8, -1], ["N", width/2, height - 80, -8, 0], ["K", width/2, height - 80, -8, 1], ["S", width/2, height - 80, -8, 2], ["C", width/2, height - 80, -6, -3], ["H", width/2, height - 80, -6, -2], ["E", width/2, height - 80, -6, -1], ["S", width/2, height - 80, -6, 0], ["T", width/2, height - 80, -6, 1], ["E", width/2, height - 80, -6, 2], ["R", width/2, height - 80, -6, 3]]; //Defining the array of letters that form the focal point of the logo
+
+//Pushing random characters to the array
+for(var i = 0; i < 300; i++) {
+    var index = floor(random(0, characters.length));
+    symbols.push([characters[index], width/2, height - 80, random(random(-5, -1), random(1, 5)), random(random(-3, -6), random(-10, -15)), random(8, 18)]);
+}
+
+//The fade-out variable for the end of the logo
+var transparency = 1;} // logo stuff
+
+var y = 275;
+var r = 0;
+
+var spikeSpeed = 3;
+
+var score = 0;
+var lives = 5;
+var pg = "Logo";
+
+var move = false;
+var bottom = true;
+
+var spike = function(x, top){
+    this.x = x;
+    this.top = top;
+    this.deleted = false;
+};
+
+var Spikes = [];
+
+spike.prototype.draw = function(){
+    if(!this.deleted){
+       if(this.top === 0){
+           fill(255);
+           triangle(this.x - 25, 300, this.x + 25, 300, this.x, 260);
+       } else {
+           fill(255);
+           triangle(this.x - 25, 100, this.x + 25, 100, this.x, 140);
+       }
+       this.x-=spikeSpeed;
+       if(this.x < -50){
+           this.deleted = true;
+           score++;
+       }
+    }
+};
+spike.prototype.collide = function(){
+    if(!this.deleted){
+        if(this.x < 100 && this.x > 25 && this.top === 0 && y === 275){
+            this.deleted = true;
+            lives--;
+        }
+        if(this.x < 100 && this.x > 25 && this.top === 1 && y === 125){
+            this.deleted = true;
+            lives--;
+        }
+    }
+};
+
+var button = function(x, y, w, h, txt, next){
+    fill(245);
+    rect(x, y, w, h);
+    if(mouseX > x-(w/2) && mouseX < x+(w/2) && mouseY > y-(h/2) && mouseY < y+(h/2)){
+        fill(255);
+        rect(x, y, w, h);
+        textSize(20);
+        fill(0, 214, 96);
+        text(txt, x, y);
+        if(mouseIsPressed){
+            pg = next;
+            
+        }
+    } else {
+        fill(255);
+        rect(x, y - 6, w, h);
+        textSize(20);
+        fill(0, 219, 99);
+        text(txt, x, y-6);
+    }
+};
+
+textAlign(CENTER, CENTER);
+textFont(createFont("Trebuchet MS Bold"));
+
+var bgThing = random(0, 255);
+var bgThing2 = 3;
+
+var bg = function(){
+    noStroke();
+        for(var i = 0; i < 400; i += 30){
+            for(var j =  0; j < 400; j += 30){
+                var n = map(noise(i/20/35, j/24/36,round(bgThing)+7), 0, 1, 0, 423);
+                fill(0-n/bgThing2, 255-n/bgThing2, 115-n/bgThing2);
+                rect(i, j, 30, 30);
+            }
+        }
+};
+
+var draw = function() {
+    if(pg === "Logo"){
+        background(0);
+        
+        fill(0, 224, 0);
+        
+        for(var i = 0; i < symbols.length; i++) {
+            //The small characters
+            if(i > 11) {
+                pushMatrix();
+                
+                translate(symbols[i][1], symbols[i][2]);
+                rotate(symbols[i][3] * dist(symbols[i][1], 0, width/2, 0));
+                
+                textSize(symbols[i][5]);
+                text(symbols[i][0], 0, 0);
+                
+                symbols[i][1] += symbols[i][3];
+                symbols[i][2] += symbols[i][4];
+                symbols[i][4] += 0.3;
+                
+                popMatrix();
+            }
+            //CHESTER BANKS letters
+            else {
+                pushMatrix();
+                
+                translate(symbols[i][1], symbols[i][2]);
+                
+                textSize(25);
+                text(symbols[i][0], 0, 0);
+                
+                symbols[i][1] += symbols[i][4];
+                symbols[i][2] += symbols[i][3];
+                symbols[i][4] *= 0.99;
+                
+                if(symbols[i][2] < 100 && i < 4) {
+                    symbols[i][3] += 0.3;
+                } else if(symbols[i][2] < 150) {
+                    symbols[i][3] += 0.3;
+                } else if(symbols[i][3] > 0) {
+                    symbols[i][3] *= 0.9;
+                    symbols[i][4] *= 0.9;
+                }
+                popMatrix();
+            }
+        }
+        
+        fill(0, 0, 0, transparency);
+        rect(200, 200, width, height);
+        
+        if(frameCount > 150) {
+            transparency *= 1.06;
+        }
+        if(frameCount > 300){
+            pg = "Home";
+        }
+        button(347, 370, 70, 30, "skip", "Home");
+    }
+    if(pg === "Home"){
+        bg();
+        pushMatrix();
+        translate(-24, -20);
+        noStroke();
+        rectMode(CENTER);
+        fill(224, 224, 224);
+        rect(275, 142, 40, 15);
+        fill(245, 245, 245);
+        rect(218, 170, 75, 40);
+        rect(217, 115, 75, 40);
+        triangle(295, 150, 255, 190, 255, 150);
+        triangle(295, 135, 255, 95, 255, 135);
+        fill(255, 255, 255);
+        rect(200, 200, 40, 100);
+        popMatrix();
+        textSize(30);
+        fill(255);
+        text("P   O   L   A   R", 200, 260);
+        textSize(18);
+        text("O  P  P  O  S  I  T  E  S", 200, 284);
+        button(200, 350, 110, 50, "start", "How");
+    }
+    if(pg === "How"){
+        bg();
+        fill(255);
+        textSize(45);
+        text("Instructions", 200, 60);
+        strokeWeight(1);
+        stroke(255);
+        line(5, 100, 395, 100);
+        textSize(15);
+        text("Click to switch from bottom to top.\n\nAvoid the spikes.\n\nYou have 5 lives. If you run out of lives,\nyou lose.\n\nHave fun!", 200, 235);
+        button(335, 362, 87, 35, "begin", "Play");
+    }
+    if(pg === "Play"){
+        bg();
+        noStroke();
+        fill(255);
+        rotate(0);
+        rect(200, 350, 400, 100);
+        rect(200, 50, 400, 100);
+        pushMatrix();
+        translate(50, y);
+        rotate(r);
+        rect(0, 0, 50, 50); // the player
+        popMatrix();
+        if(move === true){
+            if(bottom === true){
+                y -= 15;
+                r += 18;
+            } else {
+                y += 15;
+                r += 18;
+            }
+        }
+        if(y < 130){
+            move = false;
+            bottom = false;
+        }
+        if(y > 270){
+            move = false;
+            bottom = true;
+        }
+        Spikes.push(new spike(random(400, 500), round(random(0, 1))));
+        for(var i = 0; i < Spikes.length/70; i++){
+            Spikes[i].draw();
+            Spikes[i].collide();
+        }
+        fill(255, 255, 255, 50);
+        ellipse(200, 200, 100, 100);
+        fill(255, 255, 255);
+        textSize(40);
+        text(score, 200, 200);
+        fill(36, 214, 92);
+        text("Lives: " + lives, 200, 352);
+        if(lives < 0){
+            pg = "Lose";
+        }
+        spikeSpeed += 0.005;
+    }
+    if(pg === "Lose"){
+        bg();
+        fill(255);
+        textSize(15);
+        text("You lost! Your final score was:", 200, 170);
+        textSize(12);
+        text("Did you like this game?\nClick for more by Chester!\n\nThanks to Jake for the cool logo!", 200, 300);
+        textSize(35);
+        text(score, 200, 200);
+    }
+};
+
+var mouseClicked = function(){
+    move = true;
+    if(pg === "Lose"){println("http://khanacademy.org/profile/chesterbanks");}
+};
