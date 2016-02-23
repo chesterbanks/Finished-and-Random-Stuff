@@ -1,0 +1,490 @@
+//this is in progress right now! should be done by at most end of May.
+//Congrats to The Inventor for getting the 100th vote!
+
+textAlign(CENTER, CENTER);
+
+var purplePi = getImage("avatars/purple-pi");
+var mrPants = getImage("avatars/mr-pants");
+var winston = getImage("creatures/Winston");
+var sam = getImage("avatars/spunky-sam");
+var marcimus = getImage("avatars/marcimus");
+var hopper = getImage("creatures/Hopper-Happy");
+var oldSpice = getImage("avatars/old-spice-man");
+var ohNoes = getImage("creatures/OhNoes");
+var star = getImage("space/star");
+var mainFont = createFont("Arial");
+var stuff = 400;
+var stuff2 = 0;
+var stuff3 = 400;
+var ticks = 0;
+var move = true;
+var things = 0;
+var xPos = 100;
+var xPos2 = 60;
+var xPos3 = 20;
+var xPos4 = -10;
+var xPos5 = -50;
+var xPos6 = -90;
+var xPos7 = -130;
+var seconds = 0;
+var scene1 = true;
+textFont(mainFont);
+var winstonSporty = function(){
+    background(0, 0, 0);
+    image(winston, 100, 100, 200, 200);
+    fill(255, 0, 0);
+    ellipse(200, 80, 30, 30);
+    fill(0, 94, 235);
+    arc(200, 147, 192, 150, 176, 360);
+    fill(255, 0, 0);
+    arc(103, 153, 550, 60, 316, 360);
+    textSize(30);
+    text("Winston: \n Cool Cap!", 200, 350);
+};
+
+var hopperSporty = function(){
+    background(0, 255, 60);
+    image(hopper, 100, 100, 200, 200);
+    noFill();
+    stroke(51, 0, 255);
+    strokeCap(SQUARE);
+    strokeWeight(20);
+    arc(30, 116, 550, 60, 396, 432);
+    stroke(255, 0, 0);
+    strokeCap(SQUARE);
+    strokeWeight(10);
+    arc(30, 116, 550, 60, 395, 433);
+    textSize(30);
+    text("Hopper: \n Hopper's Headband!", 200, 350);
+
+};
+
+var spiceSporty = function(){
+    background(20, 120, 0);
+    image(oldSpice, 100, 100, 200, 200);
+    fill(255, 0, 0);
+    ellipse(138, 300, 55, 30);
+    ellipse(263, 300, 55, 30);
+    image(star, 134, 283, 30, 30);
+    image(star, 236, 283, 30, 30);
+    textSize(30);
+    text("Old Spice Man: \n Star Shoes!", 200, 350);
+};
+
+var marcimuSporty = function(){
+    background(102, 0, 255);
+    image(marcimus, 100, 100, 200, 200);
+    fill(0, 0, 0);
+    rect(154, 208, 25, 10);
+    rect(207, 208, 25, 10);
+    textSize(30);
+    text("Marcimus: \n Eye Paint!", 200, 350);
+};
+
+var pantsSporty = function(){
+    background(213, 255, 0);
+    image(mrPants, 100, 100, 200, 200);
+    fill(0, 0, 255);
+    arc(194, 244, 106, 102, 0, 180);
+    fill(0, 0, 0);
+    stroke(0, 0, 0);
+    strokeWeight(5);
+    line(198, 267, 200, 294);
+    textSize(30);
+    text("Mr Pants: \n Super Pants!", 200, 350);
+};
+
+var samSporty = function(){
+    background(138, 138, 138);
+    image(sam, 100, 100, 200, 200);
+    fill(255, 255, 255);
+    textSize(30);
+    text("Sam: \n Superior Swim Cap!", 200, 350);
+    fill(9, 0, 255);
+    arc(200, 193, 142, 152, 176, 360);
+    fill(255, 0, 0);
+    arc(200, 193, 92, 152, 177, 360);
+    fill(9, 0, 255);
+    arc(200, 193, 25, 152, 180, 360);
+};
+
+var piSporty = function(){
+    background(255, 0, 0);
+    image(purplePi, 100, 100, 200, 200);
+    fill(0, 0, 0);
+    textSize(30);
+    text("Purple Pi: \n Wonderful Wig!", 200, 350);
+    textSize(10);
+    text("More or less on the wonderful part...", 200, 390);
+    ellipse(180, 110, 50, 50);
+    ellipse(210, 110, 50, 50);
+    ellipse(240, 120, 50, 50);
+};
+
+var winstonSporty2 = function(){
+    image(winston, xPos, 330, 200/4, 200/4);
+    fill(255, 0, 0);
+    ellipse(xPos + 20, 325, 30/4, 30/4);
+    fill(0, 94, 235);
+    arc(xPos + 24, 343, 192/4, 150/4, 176, 360);
+    fill(255, 0, 0);
+    arc(xPos, 343, 550/4, 60/4, 316, 360);
+};
+
+var hopperSporty2 = function(){
+    image(hopper, xPos2, 330, 200/4, 200/4);
+    noFill();
+    stroke(51, 0, 255);
+    strokeCap(SQUARE);
+    strokeWeight(20/4);
+    arc(xPos2 - 17, 333, 550/4, 60/4, 396, 432);
+    stroke(255, 0, 0);
+    strokeCap(SQUARE);
+    strokeWeight(10/4);
+    arc(xPos2 - 17, 333, 550/4, 60/4, 395, 433);
+};
+
+var spiceSporty2 = function(){
+    image(oldSpice, xPos3, 327, 200/4, 200/4);
+    fill(255, 0, 0);
+    ellipse(xPos3 + 8, 375, 55/4, 30/4);
+    ellipse(xPos3 + 43, 375, 55/4, 30/4);
+    image(star, xPos3 + 8, 370, 30/4, 30/4);
+    image(star, xPos3 + 35, 370, 30/4, 30/4);
+};
+
+var marcimuSporty2 = function(){
+    image(marcimus, xPos4, 338, 200/4, 200/4);
+    stroke(0, 0, 0);
+    fill(0, 0, 0);
+    rect(xPos4 + 13, 364, 25/4, 10/4);
+    rect(xPos4 + 27, 364, 25/4, 10/4);
+};
+
+var pantsSporty2 = function(){
+    image(mrPants, xPos6, 330, 200/4, 200/4);
+    fill(0, 0, 255);
+    strokeWeight(5/4);
+    arc(xPos6 + 23, 364, 106/4, 102/4, 0, 180);
+    fill(0, 0, 0);
+    stroke(0, 0, 0);
+    strokeWeight(5/4);
+    line(xPos6 + 25, 369, xPos6 + 27, 375);
+};
+
+var samSporty2 = function(){
+    image(sam, xPos5, 330, 200/4, 200/4);
+    fill(9, 0, 255);
+    arc(xPos5 + 25, 350, 142/4, 152/4, 176, 360);
+    fill(255, 0, 0);
+    arc(xPos5 + 25, 350, 92/4, 152/4, 177, 360);
+    fill(9, 0, 255);
+    arc(xPos5 + 25, 350, 25/4, 152/4, 180, 360);
+};
+
+var piSporty2 = function(){
+    image(purplePi, xPos7, 330, 200/4, 200/4);
+    fill(0, 0, 0);
+    ellipse(xPos7 + 19, 333, 50/4, 50/4);
+    ellipse(xPos7 + 27, 332, 50/4, 50/4);
+    ellipse(xPos7 + 35, 335, 50/4, 50/4);
+};
+
+var draw = function() {
+    if(ticks === 30){
+        seconds += 1;
+        ticks = 0;
+    }
+if(scene1 === true){
+    background(255, 255, 255);
+    fill(163, 136, 0, 300);
+    rect(stuff2, 0, 400, 400);
+    fill(145, 242, 255);
+    rect(stuff2 + 250, 110, 75, 135);
+    rect(stuff2 + 60, 110, 75, 135);
+    fill(0, 0, 0);
+    rect(stuff2 + 93, 110, 10, 135);
+    rect(stuff2 + 283, 110, 10, 135);
+    rect(stuff2 + 60, 175, 75, 10);
+    rect(stuff2 + 250, 175, 75, 10);
+    fill(0, 255, 242);
+    rect(stuff3, 0, 400, 400);
+    ticks += 1;
+    fill(255, 255, 255);
+    textSize(10);
+    text("Seconds: " + seconds, 45, 20);
+    if(seconds === 3 || seconds > 3 && seconds < 6){
+        triangle(112, 285, 40, 321, 85, 281);
+        fill(255, 255, 255);
+        ellipse(104, 260, 135, 50);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Hey, Spunky Sam! \n What's up?'' ", 103, 265);
+    }
+    if(seconds === 6 || seconds > 6 && seconds < 9){
+        triangle(112, 285, 145, 321, 85, 281);
+        fill(255, 255, 255);
+        ellipse(100, 265, 164, 100);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Have you guys \n heard about \n the KA Olympics? \n Come to the track \n tomorrow!!'' ", 103, 265);
+    }
+    if(seconds === 10 || seconds > 10 && seconds < 13){
+        triangle(112, 281, 71, 321, 84, 280);
+        fill(255, 255, 255);
+        ellipse(100, 265, 112, 62);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Sounds cool! \n We'll be there!'' ", 103, 265);
+    }
+    if(seconds === 14 || seconds > 14 && seconds < 17){
+        triangle(112, 285, 145, 321, 85, 281);
+        fill(255, 255, 255);
+        ellipse(100, 261, 143, 80);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''OK, see you there! \n I'm going to get the \n others.'' ", 103, 265);
+    }
+    if(seconds === 18 || seconds > 18 && seconds < 20){
+        triangle(103, 278, 100, 304, 90, 275);
+        fill(255, 255, 255);
+        ellipse(100, 267, 66, 30);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Bye!'' ", 103, 265);
+    }
+    if(seconds === 27 || seconds > 27 && seconds < 31){
+        triangle(228, 278, 201, 308, 250, 278);
+        fill(255, 255, 255);
+        ellipse(240, 267, 85, 30);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Hi guys!'' ", 240, 265);
+    }
+    if(seconds === 31 || seconds > 31 && seconds < 35){
+        triangle(228, 276, 306, 308, 250, 278);
+        fill(255, 255, 255);
+        ellipse(240, 267, 95, 40);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Hey Sam!'' ", 240, 265);
+    }
+    if(seconds === 35 || seconds > 35 && seconds < 39){
+        triangle(228, 278, 200, 328, 280, 278);
+        fill(255, 255, 255);
+        ellipse(240, 267, 162, 96);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''I just told the \n other guys about the \n KA Olympics. \n Come to the track \n tomorrow!!'' ", 240, 265);
+    }
+    if(seconds === 39 || seconds > 39 && seconds < 43){
+        triangle(228, 278, 277, 324, 250, 278);
+        fill(255, 255, 255);
+        ellipse(240, 267, 125, 50);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Awesome! \n I think we'll go!'' ", 240, 265);
+    }
+    if(seconds === 43 || seconds > 43 && seconds < 46){
+        triangle(228, 278, 201, 308, 250, 278);
+        fill(255, 255, 255);
+        ellipse(240, 267, 101, 30);
+        fill(0, 0, 0);
+        textSize(14);
+        text(" ''Okay. Bye!'' ", 240, 265);
+    }
+    if(seconds > 20){
+        stuff2 = stuff2 - 3;
+        stuff3 = stuff3 - 3;
+        if(stuff3 < 0){
+            stuff3 = 0;
+        }
+    }
+    if(seconds > 50){
+        stuff = -200;
+        stuff2 = -440;
+        stuff3 = -400;
+    }
+    if(seconds === 51 || seconds > 51 && seconds < 53){
+        fill(0, 0, 0);
+        textSize(30);
+        text("The next day", 200, 200);
+    }
+    if(seconds === 53 || seconds > 53 && seconds < 56){
+        fill(0, 0, 0);
+        textSize(30);
+        text("They all geared up.", 200, 200);
+    }
+    if(seconds === 56 || seconds > 56 && seconds < 58){
+        winstonSporty();
+    }
+    if(seconds === 59 || seconds > 59 && seconds < 61){
+        hopperSporty();
+    }
+    
+    if(seconds === 62 || seconds > 62 && seconds < 65){
+        spiceSporty();
+    }
+    
+    if(seconds === 65 || seconds > 65 && seconds < 68){
+        marcimuSporty();
+    } 
+    
+    if(seconds === 68 || seconds > 68 && seconds < 70){
+        pantsSporty();
+    }
+    
+    if(seconds === 71 || seconds> 71 && seconds < 74){
+        samSporty();
+    }
+    
+    if(seconds === 75 || seconds> 75 && seconds < 77){
+        piSporty();
+    }
+    
+    if(seconds > 78 && seconds < 110){
+        fill(0, 153, 255);
+        rect(0, 0, 400, 400);
+        fill(0, 255, 0);
+        rect(0, 380, 400, 20);
+        fill(255, 255, 255);
+        ellipse(100, 100, 100, 100);
+        ellipse(50, 110, 100, 70);
+        ellipse(150, 100, 100, 70);
+    }
+    
+    if(seconds === 78 || seconds > 78 && seconds < 110){
+        if (move === true){
+        winstonSporty2(xPos = xPos + 1);
+        spiceSporty2(xPos3 = xPos3 + 1);
+        hopperSporty2(xPos2 = xPos2 + 1);
+        marcimuSporty2(xPos4 = xPos4 + 1);
+        samSporty2(xPos5 = xPos5 + 1);
+        pantsSporty2(xPos6 = xPos6 + 1);
+        piSporty2(xPos7 = xPos7 + 1);}
+            if(xPos === 350){
+                move = false;
+                winstonSporty2(350);
+                hopperSporty2(320);
+                spiceSporty2(290);
+                marcimuSporty2(160);
+                samSporty2(130);
+                pantsSporty2(100);
+                piSporty2(70);
+            }
+            if(seconds >= 85 && seconds < 89){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 277, 324, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 267, 125, 50);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''Now what?'' ", 240, 265);
+            }
+            if(seconds >= 92 && seconds < 94){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 226, 330, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 260, 150, 80);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''Our trainer said he'd \n be here at eleven \n o' clock.'' ", 240, 265);
+            }
+            if(seconds >= 94 && seconds < 97){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 354, 324, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 267, 140, 50);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''We have a trainer?'' ", 240, 265);
+            }
+            if(seconds >= 97 && seconds < 100){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 258, 324, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 260, 125, 60);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''What's his name, \n I wonder...'' ", 240, 265);
+            }
+            if(seconds >= 100 && seconds < 103){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 226, 324, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 260, 130, 60);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''He didn't say when \n he called me!'' ", 240, 265);
+            }
+            if(seconds >= 103 && seconds < 106){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(228, 278, 199, 324, 250, 278);
+                fill(255, 255, 255);
+                ellipse(240, 262, 148, 75);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''Guess we'll find out \n soon enough, \n gentlemen.'' ", 240, 265);
+            }
+            if(seconds >= 106 && seconds < 110){
+                noStroke();
+                fill(255, 255, 255);
+                triangle(32, 275, 7, 272, 32, 264);
+                fill(255, 255, 255);
+                ellipse(100, 267, 150, 50);
+                fill(0, 0, 0);
+                textSize(14);
+                text(" ''Greetings, everyone!'' ", 100, 265);
+            }
+    }
+    
+    if(seconds >= 110 && seconds < 115){
+        background(0, 153, 255);
+        fill(255, 255, 255);
+        triangle(121, 45, 125, 89, 109, 37);
+        fill(255, 255, 255);
+        ellipse(110, 30, 200, 50);
+        image(ohNoes, 50, 50, 300, 300);
+        fill(0, 255, 0);
+        rect(0, 200, 400, 200);
+        image(ohNoes, 50, 50, 300, 300);
+        fill(0, 0, 0);
+        textSize(14);
+        text("Let's get training, shall we?", 110, 30);
+    }
+    
+    if(seconds >= 115){
+        background(0, 0, 0);
+        var typer = createFont("Impact");
+        textFont(typer);
+        textSize(25);
+        text("What? OhNoes is the trainer? \n Will the gang of Avatars be able to \nwin the olympics? \n And will Purple Pi ever take off that \nhorrible wig?", 200, 100);
+        var type = createFont("Courier New");
+        textFont(type);
+        textSize(40);
+        text("You'll have to \n wait for  \nepisode 2 to \n find out!", 200, 300);
+    }
+    
+    noStroke();
+    fill(18, 0, 150);
+    rect(stuff2, 380, 400, 20);
+    image(purplePi, stuff2 + 65, 305, 75, 75);
+    image(mrPants, stuff2 + 25, 305, 75, 75);
+    image(winston, stuff2, 330, 50, 50);
+    image(sam, stuff, 305, 75, 75);
+    image(hopper, stuff3 + 300, 310, 70, 70);
+    image(marcimus, stuff3 + 250, 320, 70, 70);
+    image(oldSpice, stuff3 + 200, 310, 70, 70);
+    fill(0, 255, 60);
+    rect(stuff3, 380, 400, 20);
+    stuff = stuff - 5;
+    if (stuff < 130){
+        stuff = 130;
+}}
+};
