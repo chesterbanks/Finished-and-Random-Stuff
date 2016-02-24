@@ -1,0 +1,77 @@
+textFont(createFont("helveticaneue-light"));
+textAlign(CENTER, CENTER);
+
+var frontL = [
+    "Andrew",
+    "Griffin",
+    "Nolan",
+    "Clayton",
+];
+var frontR = [
+    "Isaac",
+    "Jonah",
+    "Grace",
+    "Gavin",
+];
+var center = [
+    "Anna",
+    "Kenna",
+    "Jackson",
+    "Hadassah",
+];
+var server = [
+    "Luke O",
+    "Luke A",
+    "Noah",
+    "Caden",
+];
+var backL = [
+    "Asher",
+    "Jacob",
+    "Leyla",
+    "Sarah",
+];
+var teamNames = [
+    "Raptors",
+    "Hedgehogs",
+    "Lightning",
+    "Speed Spikers",
+    "Champs",
+    "Strikers",
+    "Eagles",
+    "Lions",
+    "Winners",
+    "Power Spikers",
+    "Melonheads",
+    "Speed",
+    "Comets",
+    "Epicness",
+    "Blue Boots",
+    "Divers",
+    "Cookie Monsters",
+];
+
+var which = [
+    round(random(0, frontL.length-1)), 
+    round(random(0, frontR.length-1)), 
+    round(random(0, center.length-1)), 
+    round(random(0, server.length-1)), 
+    round(random(0, backL.length-1)),
+    round(random(0, teamNames.length-1))
+];
+
+colorMode(HSB);
+background(random(0, 255), 200, 130);
+
+fill(255);
+textSize(40);
+text("The " + teamNames[which[5]], 200, 50);
+strokeWeight(1);
+stroke(255);
+line(5, 85, 395, 85);
+textSize(30);
+text("Front left: " + frontL[which[0]] + "\nFront right: " + frontR[which[1]] + "\nCenter: " + center[which[2]] + "\nServer: " + server[which[3]] + "\nBack left: " + backL[which[4]], 200, 230);
+
+mouseClicked = function(){
+    Program.restart();
+};
