@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Programming a Game</title>
+    <link href='https://fonts.googleapis.com/css?family=Caesar+Dressing' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Raleway:400,300,700,800,900,600,500,200,100' rel='stylesheet' type='text/css'>
+    
+    <style>
+        body {
+            background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Abstract_blue_background7.jpg/800px-Abstract_blue_background7.jpg") fixed no-repeat center;
+            font-family: 'Raleway';
+            color: white;
+        }
+        .title {
+            font-family: "Caesar Dressing";
+            font-size: 40px;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h2 {
+            transition: all 1s;
+        }
+        h2:hover {
+            letter-spacing: 3px;
+            padding-left: 30px;
+        }
+        
+        h3 {
+            padding-left: 30px;
+            border-bottom: 1px rgba(255, 255, 255, 0.6) solid;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="title">A Guide to Making a Game</h1>
+    
+    <h2>1. Coming Up With The Idea</h2>
+    <h3>ORIGINAL IDEAS</h3>
+    <p>Original ideas are the hardest to come up with, but are usually the most satisfying. I can't really tell you how to come up with an original idea that well, because it usually just comes to you bit by bit after being inspired by other things.<br><br> Another thing you could do is what I call the <b>plus method</b>. Take two games (online, video, or real life) and see what they would be like together. So, like, what would Geometry Dash + Minecraft make? A geometry dash game with minecraft features, like building and destroying blocks? How about Hide and Seek + Plants vs Zombies? Would you have to find the zombies hiding in your house, and then destroy them with your plants?<br><br> You could also try the <b>setting switch</b>, where you take a game and think about what it would be like in another place/time period/style. Like Agar.io in the Star Wars universe, Duck Life in the Wild West, or Jetpack Joyride underwater.<br><br>Now, the plus method and the setting switch won't be completely original, but if you make it different enough from the original, it'll at least be a bit more yours than just a replication.</p>
+    <h3>VIDEO GAME REPLICATIONS</h3>
+    <p>Even though taking a popular game and recreating it on KA is usually much easier than trying to think of an original idea, it can still be a bit difficult to find a video game not way too hard to make, but still fun to play.<br><br>If I'm getting desperate and can't think of any ideas, some online places I go to find games to replicate or get inspired are Ketchapp (I love Ketchapp games), Coolmath/Coolified Games, Armor Games, or of course, the App Store (or Google Play).</p>
+    <h3>REAL LIFE REPLICATIONS</h3>
+    <p>Real life has plenty of game inspiration, from board games to card games to active games to word games to sports. You could recreate Battleship, Tic Tac Toe, hockey, capture the flag, Settlers of Catan, kick the can, foosball, Uno, hide and seek, bowling, Yahtzee, freeze tag, and the list could go on and on.<br><br>Even things that aren't games in real life can be turned into one with programming. You could turn playing a guitar, blowing bubbles, brushing your teeth, eating a taco, programming, writing a letter, roasting a marshmallow, school, washing dishes, earning money, or even getting sick into a game!</p>
+    
+    <h2>2. Pro Planning</h2>
+    <p></p>
+    <h2>3. Taking the Plunge</h2>
+    <h2>4. Going for the Gameplay</h2>
+    <h2>5. Adding Graphics</h2>
+    <h2>6. Staying Inspired</h2>
+    <h2>7. UI, GUI, and Pages</h2>
+    <h2>8. Comments</h2>
+    <h2>9. Feedback From Friends</h2>
+    <h2>10. Final Touches</h2>
+    <h2>11. The Release</h2>
+    <h2>12. Following the Release</h2>
+</body>
+</html>
