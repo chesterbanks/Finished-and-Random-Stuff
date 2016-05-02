@@ -1,7 +1,15 @@
 var vertices = [];
 
 var mouseClicked = function(){
-    vertices.push([mouseX, mouseY]);
+    if(mouseButton === RIGHT){
+        vertices.push([mouseX, mouseY]);
+    } else {
+        println("beginShape();");
+        for(var i in vertices){
+            println("vertex(" + vertices[i][0] + ", " + vertices[i][1] + ");");
+        }
+        println("endShape():");
+    }
 };
 
 var draw = function() {
