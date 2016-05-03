@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Entry #3</title>
+        <title>A Guide To Game Making</title>
         <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
         
@@ -28,11 +28,20 @@
                 margin-top: -40px;
             }
             
-            .post-content {
+            .post-content, ul {
                 padding-left: 35px;
                 font-weight: 300;
                 border-left: 5px rgb(103, 182, 191) solid;
                 margin-top: -30px;
+            }
+            ul { 
+                margin-top: 0px;
+                padding-left: 75px;
+                list-style-type: circle;
+                margin-bottom: 30px;
+            }
+            ul li {
+                padding-bottom: 10px;
             }
             .post-title {
                 color: rgb(222, 84, 84);
@@ -111,6 +120,13 @@
             .date {
                 font-size: 11px;
             }
+            pre {
+                background-color: rgb(245, 245, 245);
+                padding: 10px;
+                box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+                color: rgb(38, 179, 87);
+                border-radius: 10px;
+            }
         </style>
     </head>
     <body>
@@ -167,17 +183,43 @@
             
             <div class = "post">
                 <h2 id="3" class = "post-title">3 | Taking the Plunge</h2>
-                <p class = "post-content">Pencils create marks by physical abrasion, leaving behind a trail of solid core material that adheres to a sheet of paper or other surface. They are distinct from pens, which instead disperse a trail of liquid or gel ink that stains the light colour of the paper.</p>
+                <p class = "post-content">All right, now that you know what your game is going to be like, it's time to start programming! Go to the New Program button, play some inspiring soundtrack music, and grab a snack to eat while you work.</p>
             </div>
             
             <div class = "post">
                 <h2 id="4" class = "post-title">4 | Go For the Gameplay</h2>
-                <p class = "post-content">Pencils create marks by physical abrasion, leaving behind a trail of solid core material that adheres to a sheet of paper or other surface. They are distinct from pens, which instead disperse a trail of liquid or gel ink that stains the light colour of the paper.</p>
+                <p class = "post-content">The first thing I usually do when I have a game idea is to just try to get the gameplay working. For now, just avoid the graphics, and use squares for the characters, and a plain color as the background.<br><br>Right now just work on the scene of the game where you're playing (not the menu, etc). That'll come later, in step 7.<br><br>Here's a few tips for gameplay (I don't know what type of game you're making, but maybe a few of these will help):</p>
+                <ul>
+                    <li>If you have a bunch of almost-the-same things, such as falling rocks, enemies, bullets, etc, you should really use OOP (Object Oriented Programming). If you don't know how to use OOP, there's some tutorials by Pamela <a href="https://www.khanacademy.org/computing/computer-programming/programming/object-oriented/p/object-types">here</a>. If those don't help you understand how to use OOP in games (it didn't really help me too much), then I would suggest looking at a simpler game that does, such as Kevin23's <a href="https://www.khanacademy.org/computer-programming/penguin-shooter/6108821133066240">Penguin Shooter</a> game.</li>
+                    <li>If you have a game that includes key movement (as most games do), there is a better way to do it than just something like this: <pre>if(keyIsPressed && keyCode === UP){
+    playerY -= 5;                
+}</pre>Instead of the code above, which is glitchy and you can't press multiple keys at once, use this:<pre>var keys = [];
+var keyPressed = function(){ keys[keyCode] = true; };
+var keyReleased = function(){ keys[keyCode] = false; };
+    
+draw = function(){
+    if(keys[UP]){
+        playerY -= 5;
+    }
+};
+</pre>It makes it key movement so much smoother.</li>
+                    <li>Using PVectors is a bit more efficient than an x and y variable. PVectors a basically pre-defined objects with the first one as <code>x:</code> and the second one as <code>y:</code>. So, instead of this code:<pre>var playerX = 0;
+var playerY = 0;
+                    </pre>You would do this code:<pre>var player = new PVector(0, 0);</pre>To call the x position of the player, you would do <code>player.x</code>.</li>
+                </ul>
+                <p class = "post-content">If anyone else has things to add to this list, feel free to tell me in the Tips & Thanks!</p>
             </div>
             
             <div class = "post">
                 <h2 id="5" class = "post-title">5 | Adding Graphics</h2>
-                <p class = "post-content">Pencils create marks by physical abrasion, leaving behind a trail of solid core material that adheres to a sheet of paper or other surface. They are distinct from pens, which instead disperse a trail of liquid or gel ink that stains the light colour of the paper.</p>
+                <p class = "post-content">All right, now that you've got the basic gameplay down, it's time to add the graphics - a very important part of game making. People like games that look good much more than the same game with clashing colors, mismatched fonts, and lame player and character graphics.<br><br>The first thing you'll want to add is the background. Although a plain <code>background()</code> could be okay, a cool background is always a nice touch. You can make a background pretty cool with gradients using <code>lerpColor()</code>, like this:</p>
+                <pre>
+for(var i = 0; i &lt height; i += 5){
+    noStroke();
+    fill(lerpColor(color1, color2, i/height));
+    rect(0, i, width, 5);
+}
+                </pre>
             </div>
             
             <div class = "post">
