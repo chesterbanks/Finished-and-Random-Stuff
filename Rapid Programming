@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Rapid Programming</title>
+        <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        
+        <style>
+            body {
+                background: rgb(255, 255, 255);
+                font-family: Lato;
+            }
+            .title {
+                color: rgb(56, 56, 56);
+                box-shadow: 0px 8px 11px -7px rgba(0, 0, 0, 0.2);
+                margin: 10px;
+                padding: 15px;
+                padding-left: 30px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 30px;
+            }
+            .heading {
+                color: rgb(56, 56, 56);
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 15px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 20px;
+            }
+            .content, li {
+                font-weight: 300;
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 30px;
+            }
+            ul {
+                padding-left: 70px;
+            }
+            li {
+                list-style-type: circle;
+                padding-left: 0px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class = "title"><i class = "fa fa-send"></i> rapid programming</h1>
+        
+        <h3 class = "heading">project</h3>
+            <p class = "content">
+                Our current project is a game called <i>Planet Earth</i>. Lord Glogg from Solar System 44 has crash landed on a mysterious planet called Earth. His spaceship was shattered into eight parts and blew across the planet from the explosion. Glogg can only survive in this new atmosphere for 30 days. Can you help him find the eight parts of his spaceship and put them together before time is up?
+            </p>
+        
+        <h3 class = "heading">members</h3>
+            <p class = "content">
+                Currently we have 10 members. In alphabetical order:</p>
+                <ul>
+                    <li>Aidabaida</li>
+                    <li>AlexT</li>
+                    <li>Blaze</li>
+                    <li>Chester Banks</li>
+                    <li>Iron Man Mark 44</li>
+                    <li>Jake</li>
+                    <li>KingKhan007</li>
+                    <li>Lionofgd</li>
+                    <li>Stargazer</li>
+                    <li>TemporalFuzz</li>
+                </ul>
+        
+        <h3 class = "heading">joining</h3>
+            <p class = "content">
+                If you wish to join Rapid, there are two ways to make it into the team. The first is if you are invited by me (Chester Banks) on one of your programs. The second way is to apply in the Tips and Thanks by answering four questions:</p>
+            <ul>
+                <li>How would you help Rapid?</li>
+                <li>How much coding experience do you have?</li>
+                <li>What three programs do you think are your best?</li>
+                <li>How active are you?</li>
+            </ul>
+            <p class = "content">
+                If you get accepted, the first thing you need to do is create a post on the Tips & Thanks titled "Name Contact Post". Under that, put if you are available to be working on something for the team (either <i>Available</i> or <i>Busy</i>), and your specialties (so we know what to assign to you).
+            </p>
+            
+        <h3 class = "heading">team mechanics</h3>
+        <p class = "content">
+            This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than expected, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.
+        </p>
+    </body>
+</html>
