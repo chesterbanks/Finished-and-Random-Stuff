@@ -41,6 +41,23 @@
                 list-style-type: circle;
                 padding-left: 0px;
             }
+            footer {
+                margin: -10px;
+                background: rgb(245, 245, 245);
+                font-weight: 200;
+                font-size: 15px;
+                padding: 10px;
+                border-top: 5px rgb(56, 56, 56);
+            }
+            a {
+                text-decoration: none;
+                color: rgb(54, 133, 194);
+                border-bottom: 1px black dotted;
+                transition: all 0.2s;
+            }
+            a:visited {
+                color: rgb(20, 186, 81);
+            }
         </style>
     </head>
     <body>
@@ -48,23 +65,19 @@
         
         <h3 class = "heading">project</h3>
             <p class = "content">
-                Our current project is a game called <i>Planet Earth</i>. Lord Glogg from Solar System 44 has crash landed on a mysterious planet called Earth. His spaceship was shattered into eight parts and blew across the planet from the explosion. Glogg can only survive in this new atmosphere for 30 days. Can you help him find the eight parts of his spaceship and put them together before time is up?
+                Our current project is a game called <i>Mystery Voyage</i>. You are the captain of a pirate ship exploring the Seventh Sea. Landing on islands, fighting with other pirates, and defending yourself against sharks, this game should be pretty epic when finished. For a full outline of this game, go <a href="https://www.khanacademy.org/profile/chesterbanks">here</a>.
             </p>
         
         <h3 class = "heading">members</h3>
             <p class = "content">
-                Currently we have 10 members. In alphabetical order:</p>
+                Currently we have 6 experienced and dedicated members, specialties ranging from excellent gameplay to stunning graphics. In alphabetical order:</p>
                 <ul>
-                    <li>Aidabaida</li>
-                    <li>AlexT</li>
-                    <li>Blaze</li>
+                    <li>Member #1</li>
+                    <li>Member #2</li>
                     <li>Chester Banks</li>
-                    <li>Iron Man Mark 44</li>
-                    <li>Jake</li>
-                    <li>KingKhan007</li>
-                    <li>Lionofgd</li>
-                    <li>Stargazer</li>
-                    <li>TemporalFuzz</li>
+                    <li>Member #4</li>
+                    <li>Member #5</li>
+                    <li>Member #6</li>
                 </ul>
         
         <h3 class = "heading">joining</h3>
@@ -77,12 +90,14 @@
                 <li>How active are you?</li>
             </ul>
             <p class = "content">
-                If you get accepted, the first thing you need to do is create a post on the Tips & Thanks titled "Name Contact Post". Under that, put if you are available to be working on something for the team (either <i>Available</i> or <i>Busy</i>), and your specialties (so we know what to assign to you).
+                If you get accepted, the first thing you need to do is create a post on the Tips & Thanks titled "[name] Contact Post". Under that, put if you are available to be working on something for the team (either <i>Available</i> or <i>Busy</i>), and your specialties (so we know what to assign to you).
             </p>
             
         <h3 class = "heading">team mechanics</h3>
         <p class = "content">
-            This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than expected, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.
+            This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than expected, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.<br><br>The finished game will be released on an official Rapid account. Since there's not really a reason to give all members the password, I will keep it to myself (for now) unless someone has a good reason to get it.<br><br>Those who help the most will get the most credit, but everyone who helped will be listed in the credits or the code.
         </p>
+        
+        <footer>Website coded by Chester Banks | May 3 2016</footer>
     </body>
 </html>
