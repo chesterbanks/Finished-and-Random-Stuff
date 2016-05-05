@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Mystery Waters</title>
+        <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900|Trade+Winds' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        
+        <style>
+            body {
+                background: rgb(255, 255, 255);
+                font-family: Lato;
+            }
+            .title {
+                font-family: 'Trade Winds', serif;
+                color: rgb(56, 56, 56);
+                box-shadow: 0px 8px 11px -7px rgba(0, 0, 0, 0.2);
+                margin: 10px;
+                padding: 15px;
+                padding-left: 30px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 40px;
+            }
+            .heading {
+                color: rgb(56, 56, 56);
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 15px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 20px;
+            }
+            .big-heading {
+                margin-left: 20px;
+                font-size: 30px;
+            }
+            .heading-2 {
+                padding-left: 60px;
+                letter-spacing: 4px;
+                border-bottom: 1px gray solid;
+            }
+            .content, li {
+                font-weight: 300;
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 30px;
+            }
+            ul {
+                padding-left: 70px;
+            }
+            li {
+                list-style-type: circle;
+                padding-left: 0px;
+            }
+            footer {
+                margin: -10px;
+                background: rgb(245, 245, 245);
+                font-weight: 200;
+                font-size: 15px;
+                padding: 10px;
+                border-top: 5px rgb(56, 56, 56);
+            }
+            a {
+                text-decoration: none;
+                color: rgb(54, 133, 194);
+                border-bottom: 1px black dotted;
+                transition: all 0.2s;
+            }
+            a:visited {
+                color: rgb(20, 186, 81);
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class = "title"><i class = "fa fa-anchor"></i> Mystery Waters</h1>
+        
+        <h3 class = "heading-2">STORYLINE</h3>
+        
+        <h2 class = "heading big-heading">sailing mode</h2>
+        <p class = "content">You are the captain of a small ship exploring the Seventh Sea. There are a number of islands on the sea that you can explore. When you enter an island, you are in "Island Mode".
+Your "health" is how many crew members you have plus your ship strength.
+        </p>
+        
+        <h3 class = "heading">dangers of the sea</h3>
+            <p class = "content">
+                In the sea, there are dangers such as pirates, sharks, and storms. When you encounter a pirate ship or shark, there are two options - to Flee or Fight. When you encounter a storm, there is only one option - to Survive.
+            </p>
+        
+        <h3 class = "heading">benefits of the sea</h3>
+            <p class = "content">
+                Somewhere in the Sea of Mystery, there are three sunken treasure ships. There are enormous amounts of coins on these, but they are quite hard to find.
+        
+        <h3 class = "heading">pirates</h3>
+            <p class = "content">
+                Pirates attack you with cannons. You have to move your ship to avoid the cannonballs whilst shooting your own cannonballs to destroy the pirate ship. If you destroy the pirate ship, you get a lot of coins, the amount depending on the pirate (harder pirates get you more money).
+            </p>
+            
+        <h3 class = "heading">sharks</h3>
+        <p class = "content">
+            You can only see the sharks 15% of the time, else than that they are invisible. You have to guess where they are and shoot a harpoon at them. If when they appear they are on your ship, you lose 15% health, but the shark is killed in the attempt. If you defeat a shark with  a harpoon, you don't get any money.
+        </p>
+        
+        <h3 class = "heading">storms</h3>
+        <p class = "content">
+            Storms attack suddenly and powerfully. You have to balance your ship with the strong wind while at the same time emptying out the water that is getting into your boat. If you survive by the time the storm is over, you don't get any money.
+        </p>
+        
+        <h2 class = "heading big-heading">island mode</h2>
+        <p class = "content">There are about ten islands on the Seventh Sea. On an island, you can explore the island, talk to villagers, buy things from shops, and repair your ship. You can also hire new crew members.</p>
+        
+        <h3 class = "heading">exploring</h3>
+        <p class = "content">Each island varies in size, terrain, and people. When you are exploring an island, it is RPG-style - an overhead view of your player, movement with the arrow keys, etc. Sometimes you need certain items to enter places. For instance, you need the Lantern of Luma to enter some caves. On islands, there are usually shops, people, houses, and palm trees.</p>
+        
+        <h3 class = "heading">talking</h3>
+        <p class = "content">Across the islands, there are usually always inhabitants. To talk to them, you just move next to them, and press T. They will tell you something, and you choose what to reply, out of a number of reply choices. Then they will reply to <i>that</i>, and the cycle will begin again until the conversation is over. Sometimes, the people will offer to trade something with you in exchange for something you have, solving a riddle, or completing a mission for them (i.e. finding their stolen frying pan).</p>
+        
+        <h3 class = "heading">repairing</h3>
+        <p class = "content">Some islands have repair shops, where you  can increase your ship's strength for an amount of coins, or even buy a new ship.</p>
+        
+        <h3 class = "heading">hiring</h3>
+        <p class = "content">When talking to people on the island, you can sometimes find a few people looking for work on a ship's crew - you can hire them by adding them to your crew. It does not cost anything to you.</p>
+        
+        <h3 class = "heading">shopping</h3>
+        <p class = "content">On some islands there are shops, which can be full of useful items that you can buy with your coins, such as keys, swords, lanterns, harpoons, cannons, sails, potions, etc. Some shops have a trade section, where you have to trade your own stuff for what you want to buy, instead of using coins.</p>
+        
+        <h3 class = "heading-2">GRAPHICS DETAILS</h3>
+        
+        <h3 class = "heading">overall style</h3>
+        <p class = "content">In this game, I want pretty realistic graphics (not flat or minimalistc). The terrain (or ocean) blocks should have gradients, little details (blades of grass, waves of the ocean, rocky clefts), and possibly even a little animation.</p>
+        
+        <footer>Website coded by Chester Banks | May 3 2016</footer>
+    </body>
+</html>
