@@ -8,7 +8,7 @@ var mouseClicked = function(){
         for(var i in vertices){
             println("vertex(" + vertices[i][0] + ", " + vertices[i][1] + ");");
         }
-        println("endShape():");
+        println("endShape();");
     }
 };
 
