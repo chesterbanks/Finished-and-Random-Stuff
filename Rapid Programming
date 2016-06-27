@@ -98,6 +98,23 @@
             This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than expected, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.<br><br>The finished game will be released on an official Rapid account. Since there's not really a reason to give all members the password, I will keep it to myself (for now) unless someone has a good reason to get it.<br><br>Those who help the most will get the most credit, but everyone who helped will be listed in the credits or the code.
         </p>
         
+        <h3 class = "heading">life of a project</h3>
+        <p class = "content">
+            Each project will go through a number of steps, roughly following this outline:
+        </p>
+        <ol>
+            <li>Deciding the Project - first, we will decide what we will be making. Some ways to go about doing this is to ask the community for requests, look at our member's ideas, or look at other websites for remake ideas.</li>
+            <li>Brainstorming - In this step, we brainstorm the storyline, the title, the graphics style, the special features, and an outline and/or storyboard of the whole game.</li>
+            <li>Basic Gameplay - Here, we dive into the making of the game. Our gameplay people start out with the raw game code.</li>
+            <li>Basic Graphics - Fleshing it out a bit, the GDs add character art, backgrounds, and graphics. The menu can also be created in this stage.</li>
+            <li>Advanced Gameplay - If we want more gameplay added (i.e. more levels, enemies, characters, powers, worlds, weapons), then this is where we add it. The gameplay masters can go all out here with all their ideas.</li>
+            <li>Special Features and Pages - In this step, we make the menu (if it's not already made), the instructions, credits, high score, and win/lose pages, as well as the level select, logo, and achievements.</li>
+            <li>Final Graphics - The game may still need some graphics touch-ups. If so, we finish it off here. By now, the game should be completely finished.</li>
+            <li>Building Hype (optional) - If we want the community to get excited about our project before we release it, we could make a trailer, poster, and set a release date in this step. However, this step is very optional, and can be easily skipped.</li>
+            <li>The Release - All of our hard work pays off when we press "Save" on the New Program button on the Rapid account.</li>
+            <li>Following the Release - The community may have complaints, compliments, and suggestions for the game once we release it. We should fix the bugs and possibly add suggested features.</li>
+        </ol>
+        
         <footer>Website coded by Chester Banks | May 3 2016</footer>
     </body>
 </html>
