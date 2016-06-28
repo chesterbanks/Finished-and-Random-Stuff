@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Giant List of Game Ideas
+        
+    </title>
+    <link href='https://fonts.googleapis.com/css?family=Caesar+Dressing|Raleway:400,300,700,800,900,600,500,200,100|Poiret+One' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    
+    <style>
+        body {
+            background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Abstract_blue_background7.jpg/800px-Abstract_blue_background7.jpg") fixed no-repeat center;
+            font-family: 'Poiret One';
+            color: white;
+        }
+        .title {
+            font-size: 30px;
+            letter-spacing: 0px;
+            text-align: cEnTeR; /* Why not? */
+            margin: 0;
+            padding: 20px;
+            transition: all 0.5s;
+        }
+        .title:hover {
+            letter-spacing: 2px;
+        }
+        .big-title {
+            text-align: cEnTeR; /* Why not? */
+            margin: 0;
+            transition: all 0.5s;
+            font-size: 160px;
+            letter-spacing: -10px;
+            margin-bottom: -35px;
+            padding: 0px;
+        }
+        
+        .big-title:hover {
+            text-shadow: 0px 7px 5px rgba(0, 0, 0, 0.5), 0px 0px 20px rgb(255, 255, 255);
+        }
+        .idea {
+            padding: 15px;
+            margin: 10px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .idea-title {
+            text-align: center;
+            font-size: 40px;
+            border-bottom: 1px white solid;
+        }
+        
+        footer {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="big-title">GLOGI</h1>
+    <h1 class="title">GIANT LIST OF GAME IDEAS</h1>
+    
+    <div class = "idea">
+        <h1 class = "idea-title">SPEED UP</h1>
+        <p class = "idea-content">A game in which you play a character running down an endless hall with falling spikes and rising buzzsaws. The speed of the character is set, except when you press the mouse. If you press the mouse, the character's speed is doubled. Using this control, you try to avoid the dangerous spikes and buzzsaws. The view is from the side, with the background, spikes, and buzzsaws moving to the left (creating the illusion that the player is moving to the right).</p>
+    </div>
+    
+    <div class = "idea">
+        <h1 class = "idea-title">FAST FORWARD</h1>
+        <p class = "idea-content">A soccer game where you play as a forward. In the Game screen, you have to run past defenders who are trying to steal the ball and then kick the ball past the goalie into the goal. You can go to the Training screen to upgrade your speed, amount of allowed footwork moves, and stamina. You gain coins when you score a goal, with which you can buy more characters, cool soccer balls, etc.<br><br>The view for the Game screen is top-down, with the background, defenders (and eventually the goal & goalie) coming down from the top of the screen, creating the illusion that the player is moving up.</p>
+    </div>
+    
+    <footer>Have  a great game idea of your own? Just put it down in the Tips & Thanks, and I'll add your idea to this list, along with your name.</footer>
+</body>
+</html>
