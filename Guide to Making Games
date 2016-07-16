@@ -122,7 +122,7 @@
             }
             pre {
                 background-color: rgb(245, 245, 245);
-                padding: 10px;
+                padding: 5px;
                 box-shadow: inset 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
                 color: rgb(38, 179, 87);
                 border-radius: 10px;
@@ -173,11 +173,13 @@
             <!-- The second post -->
             <div class = "post">
                 <h2 id="2" class = "post-title">2 | Pro Planning</h2>
-                <p class = "post-content">Once you've settled on a game you're going to make (or at least have something that resembles an idea), you'll probably want to do a little planning. How much planning you do is up to you - for some people, plotting out your game could drain your inspiration, but for others it could make you even more excited to make it.<br><br>When I plan out my games, I usually do so on a Google Doc, Word document, Pages, etc. The first thing I write down is the name of my game. If you haven't decided on a name yet, you can just put "Untitled" or "Unnamed [game type] game". Next, put down a small description of your game - something like this would work - "A game in which you play a pirate ship, exploring an ocean from a bird's eye view, trying to brave storms, defeat other pirates, raid boats, and reach the Seven Keys of the Seven Seas - all while keeping your crew above 0".
+                <p class = "post-content">Once you've settled on a game you're going to make (or at least have something that resembles an idea), you'll probably want to do a little planning. How much planning you do is up to you - for some people, plotting out your game could drain your inspiration, but for others it could make you even more excited to make it.<br><br>When I plan out my games, I usually do so on a Google Doc, Word document, Pages, etc. The first thing I write down is the name of my game. If you haven't decided on a name yet, you can just put "Untitled" or "Unnamed [game type] game". Next, put down a small description of your game - something like this would work - "A game in which you play a curious child trying to find treasure in an old museum".
                     <br><br>
-                    Now that you've gotten the basics written down, try sketching out the [important] scenes down on paper. Just make a square for the canvas, and then draw what you imagine your game will look like.
+                    <b>Storyline:</b> I don't know about other people, but I really enjoy games with a storyline. I would rather play a game under the premesis "Erik has been captured by his family's long time enemy, the Based Whelves, and must find his way back home to warn his family of the treacherous spies within their castle" better than "You're the square, avoid spikes and lava". If you're a good storyteller, than write down the backstory for your main character, [optional] allies, enemies, setting, etc.
                     <br><br>
-                    Next, make a section on your document called "Ideas". This is where you'll write down every cool idea that comes to you for your game on a list. You probably won't be able to do all of them, but it helps get your creative juices flowing.
+                    <b>Storyboard: </b>Now that you've gotten the basics written down, try sketching out the [important] scenes down on paper. Just make a square for the canvas, and then draw what you imagine your game will look like.
+                    <br><br>
+                    <b>Idea list: </b>Next, make a section on your document called "Ideas". This is where you'll write down every cool idea that comes to you for your game on a list. You probably won't be able to implement all of them, but it helps get your creative juices flowing.
                 </p>
             </div>
             
@@ -212,7 +214,10 @@ var playerY = 0;
             
             <div class = "post">
                 <h2 id="5" class = "post-title">5 | Adding Graphics</h2>
-                <p class = "post-content">All right, now that you've got the basic gameplay down, it's time to add the graphics - a very important part of game making. People like games that look good much more than the same game with clashing colors, mismatched fonts, and lame player and character graphics.<br><br>The first thing you'll want to add is the background. Although a plain <code>background()</code> could be okay, a cool background is always a nice touch. You can make a background pretty cool with gradients using <code>lerpColor()</code>, like this:</p>
+                <p class = "post-content">All right, now that you've got the basic gameplay down, it's time to add the graphics - a very important part of game making. People like games that look good much more than the same game with clashing colors, mismatched fonts, and lame player and character graphics. Here's a few tips:</p>
+                <br><br>
+                <ul>
+                <li>The first thing you'll want to add is the background. Although a plain <code>background()</code> could be okay, but a cool background is always a nice touch. You can make a background pretty cool with gradients using <code>lerpColor()</code>, like this:</li>
                 <pre>
 for(var i = 0; i &lt height; i += 5){
     noStroke();
@@ -220,6 +225,8 @@ for(var i = 0; i &lt height; i += 5){
     rect(0, i, width, 5);
 }
                 </pre>
+                    
+                </ul>
             </div>
             
             <div class = "post">
