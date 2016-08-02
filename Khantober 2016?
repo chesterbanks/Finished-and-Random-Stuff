@@ -1,0 +1,89 @@
+// Credit to Thomas :) for the background + leaves + fireworks
+/**
+ * KHANTOBER 2015
+ * 
+ * Click!
+ * Challenging you to The Month of Khantober: 31 Days of Smashing Programming!
+ * Let's get a whole bunch of programmers releasing a quality program every day of October!
+ * 
+ * Challengers:
+ * Each of you will make a great (original) program every *week* of October.
+ * You'll work on your program during six days of the week, and then release it on the day of which group you're in (for instance, if you're in Group Tuesday, you work on your program Wed-Mon, then release it on Tuesday).
+ * You will get to post your program that you made every day on the "Sharing Posts"!
+ * Get encouragement and feedback from other challengers!
+ * Let's flood the Hot List with awesome programs! :D
+ * 
+ * Join in the tips and thanks. If you can't be on a certain day, please say so - otherwise, I'll decide which group you're in.
+ */
+
+textAlign(CENTER, CENTER);
+textFont(createFont('Avenir Bold'));
+imageMode(CENTER);
+
+var noiseScale = 0.01;
+var textureRects = [];
+for(var i = 0; i < width; i += 20){
+    for(var j = 0; j < height; j += 20){
+        textureRects.push({x: i, y: j, noiseVal: noise(0, i * noiseScale, j * noiseScale)});
+    }
+}
+
+var Leaf = function(){
+    this.x = random(width);
+    this.y = random(-150, -50);
+    this.sz = random(30, 50);
+    this.rot = random(10);
+};
+var Leaves = [];
+Leaf.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(frameCount * this.rot);
+    image(getImage("avatars/leaf-blue"), 0, 0, this.sz, this.sz);
+    popMatrix();
+    
+    this.y += this.sz / 5;
+};
+
+draw = function() {
+    if(frameCount % 10 === 0){
+        Leaves.push(new Leaf());
+    }
+    
+    background(255, 143, 31);
+    noStroke();
+    for(var i in textureRects){
+        fill(0, 0, 0, 50 + sin(frameCount+(textureRects[i].noiseVal)*255)*45);
+        rect(textureRects[i].x, textureRects[i].y, 20, 20);
+    }
+    
+    for(var i in Leaves){
+        Leaves[i].draw();
+        if(Leaves[i].y > 450){
+            Leaves.splice(i, 1);
+        }
+    }
+    
+    pushMatrix();
+    translate(width / 2, height / 2);
+    rotate(sin(frameCount*15)*3);
+    textSize(150);
+    fill(255, 255, 255, 10);
+    for(var i = 0.1; i < 1.0; i += 0.01){
+        pushMatrix();
+        scale(i);
+        text('2016', 0, sin(frameCount*5)*height / 20);
+        popMatrix();
+    }
+    fill(255, 255, 255);
+    textSize(150);
+    text('2016', 0, sin(frameCount*5)*height / 20);
+    fill(255, 255, 255);
+    textSize(40);
+    text('KHANTOBER', 0, (sin(frameCount*5)*height / 20) - 75);
+    popMatrix();
+    
+    fill(25);
+    textSize(17);
+    text('31 DAYS OF SMASHING PROGRAMMING!', 200, 300);
+};
