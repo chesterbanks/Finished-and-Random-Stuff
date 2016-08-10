@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Rapid Programming</title>
+        <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        
+        <style>
+            body {
+                background: rgb(255, 255, 255);
+                font-family: Lato;
+            }
+            .title {
+                color: rgb(51, 51, 51);
+                box-shadow: 0px 8px 11px -7px rgba(0, 0, 0, 0.2);
+                margin: 10px;
+                padding: 15px;
+                padding-left: 30px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 30px;
+            }
+            .heading {
+                color: rgb(56, 56, 56);
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 15px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 20px;
+            }
+            .content, li {
+                font-weight: 300;
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 30px;
+            }
+            ul {
+                padding-left: 70px;
+            }
+            li {
+                list-style-type: circle;
+                padding-left: 0px;
+            }
+            footer {
+                margin-left: -10px;
+                margin-right: -10px;
+                background: rgb(245, 245, 245);
+                font-weight: 200;
+                font-size: 15px;
+                padding: 10px;
+                border-top: 5px rgb(56, 56, 56);
+            }
+            a {
+                text-decoration: none;
+                color: rgb(54, 133, 194);
+                border-bottom: 1px black dotted;
+                transition: all 0.2s;
+            }
+            a:visited {
+                color: rgb(20, 186, 81);
+            }
+            button {
+                font-family: Lato;
+                background: rgb(255, 255, 255);
+                color: rgb(46, 46, 46);
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.3), 0px 5px rgb(56, 56, 56);
+                border: 2px rgb(46, 46, 46) solid;
+                
+                width: 400px;
+                margin-left: 100px;
+                margin-right: 100px;
+                transition: all 0.1s;
+            }
+            button:hover {
+                cursor: pointer;
+            }
+            button:active {
+                margin-top: 5px;
+                box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.3);
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class = "title"><i class = "fa fa-diamond"></i> making a game quickly</h1>
+        
+        <h1 class = "heading" id = 'make'><i class = "fa fa-sticky-note-o"></i> make the game idea</h1>
+        <p class = "content">
+            The first thing you need to do is come up with a game idea. Here's a few ways to chooose a game idea.
+        </p>
+        <ul>
+            <li>Choose an activity from real life, and turn it into a game, such as washing the dishes, planting a garden, playing soccer, a water gun fight, popping bubble wrap, playing hide and seek, or even eating food.</li>
+            <li>Consider remaking a game that already exists. I like looking on <a href = "http://www.ketchappstudio.com">Ketchapp</a>, Armor Games, or just googling "top simple ipad games".</li>
+            <li>Try making a cliché game with a twist. Some examples would be a 2 player dodge game where one person drops rocks on the second person or a platformer where you can change the gravity and destroy blocks.</li>
+            <li>If you still need an idea, here's an game idea generator:</li>
+        </ul>
+        <button id="clicker">Click to generate a game idea!</button>'
+        
+        <p class = 'content'>Stay tuned for Step 2: Code the Gameplay!</p>
+        
+        <footer>Website coded by Chester Banks | May 3 2016</footer>
+        
+        <script>
+            var gameType = ['platformer', 'adventure', 'RPG', 'point and click', 'interactive fiction', 'endless runner', 'dodge'];
+            var enemies = ['robots', 'lava', 'spikes', 'falling rocks', 'flying bullets'];
+            var collect = ['coins', 'newspapers', 'powers', 'coins', 'power-ups', 'bonus points'];
+            var world = ['the future', 'ancient Rome', 'New York City', 'a dungeon', 'a medieval kingdom', 'a world made of squares', 'the sky', 'a warehouse'];
+            var design = ['minimalistic', 'realistic', 'cartoon', 'comic', 'flat', 'material design', 'retro'];
+        
+            var clickerButton = document.getElementById("clicker");
+            var onButtonClick = function() {
+                clickerButton.textContent = 'A ' + gameType[Math.floor(Math.random()*gameType.length)] + ' game where you avoid ' + enemies[Math.floor(Math.random()*enemies.length)] + ' and collect ' + collect[Math.floor(Math.random()*collect.length)] + '. It is set in ' + world[Math.floor(Math.random()*world.length)] + ' and its graphics are ' + design[Math.floor(Math.random()*design.length)] + '.';
+            };
+            clickerButton.addEventListener("click", onButtonClick);
+            
+            
+        </script>
+    </body>
+</html>
