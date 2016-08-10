@@ -58,69 +58,125 @@
             a:visited {
                 color: rgb(20, 186, 81);
             }
+            
+            /* SPLASH PAGE */
+            .splash-bg {
+                position: absolute;
+                background: url("https://www.kasandbox.org/programming-images/landscapes/mountains-in-hawaii.png") fixed no-repeat;
+                background-size: cover;
+                height: 101%;
+                width: 725px;
+                margin-top: -100px;
+                margin-left: -10px;
+                -webkit-filter: contrast(60%) sepia(30%) blur(2px);
+                z-index: -1;
+            }
+            .splash-icon {
+                color: white;
+                text-align: CENter;
+                font-size: 140px;
+                margin-bottom: 20px;
+            }
+            button {
+                font-family: Lato;
+                background: rgba(255, 255, 255, 0.3);
+                color: rgb(246, 246, 246);
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.3), 0px 5px rgb(246, 246, 246);
+                border: 2px rgb(246, 246, 246) solid;
+                width: 200px;
+                margin-left: 250px;
+                transition: all 0.1s;
+                
+                font-size: 30px;
+                font-weight: 100;
+                letter-spacing: 10px;
+            }
+            button:hover {
+                cursor: pointer;
+            }
+            button:active {
+                margin-top: 5px;
+                box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.3);
+            }
         </style>
     </head>
     <body>
-        <h1 class = "title"><i class = "fa fa-send"></i> rapid programming</h1>
-        
-        <h3 class = "heading">project</h3>
-            <p class = "content">
-                Our current project is a game called <i>Mystery Voyage</i>. You are the captain of a pirate ship exploring the Seventh Sea. Landing on islands, fighting with other pirates, and defending yourself against sharks, this game should be pretty epic when finished. For a full outline of this game, go <a href="https://www.khanacademy.org/profile/chesterbanks">here</a>.
-            </p>
-        
-        <h3 class = "heading">members</h3>
-            <p class = "content">
-                Currently we have a large bank of 17 members to pull from, specialties ranging from excellent gameplay to stunning graphics. In alphabetical order:</p>
+        <div class = "main">
+            <h1 class = "title"><i class = "fa fa-send"></i> rapid programming</h1>
+            
+            <h3 class = "heading">project</h3>
+                <p class = "content">
+                    Our current project is a game called <i>Mystery Voyage</i>. You are the captain of a pirate ship exploring the Seventh Sea. Landing on islands, fighting with other pirates, and defending yourself against sharks, this game should be pretty epic when finished. For a full outline of this game, go <a href="https://www.khanacademy.org/profile/chesterbanks">here</a>.
+                </p>
+            
+            <h3 class = "heading">members</h3>
+                <p class = "content">
+                    Currently we have a bank of 9 members to pull from, specialties ranging from excellent gameplay to stunning graphics. In alphabetical order:</p>
+                    <ul>
+                        <li>AlexT</li>
+                        <li>AquaOrchid</li>
+                        <li>Chester Banks</li>
+                        <li>Captain</li>
+                        <li>Infiltration</li>
+                        <li>Nobody™</li>
+                        <li>Piceratops</li>
+                        <li>Seth W.</li>
+                        <li>Tegoon</li>
+                    </ul>
+            
+            <h3 class = "heading">joining</h3>
+                <p class = "content">
+                    If you wish to join Rapid, there are two ways to make it into the team. The first is if you are invited by me (Chester Banks) on one of your programs. The second way is to apply in the Tips and Thanks by answering four questions:</p>
                 <ul>
-                    <li>Member #1</li>
-                    <li>Member #2</li>
-                    <li>Chester Banks</li>
-                    <li>Member #4</li>
-                    <li>Member #5</li>
-                    <li>Member #6</li>
-                    <li>Member #7</li>
-                    <li>Chester Banks</li>
-                    <li>Member #9</li>
-                    <li>Member #10</li>
-                    <li>Member #11</li>
+                    <li>What do you consider your specialties?</li>
+                    <li>What three programs do you think are your best?</li>
+                    <li>How active would you be on Rapid?</li>
+                    <li>Have you done any collaborations before? If so, please give link(s).</li>
                 </ul>
-        
-        <h3 class = "heading">joining</h3>
+                <p class = "content">
+                    If you get accepted, the first thing you need to do is create a post on the Tips & Thanks titled "[name] Contact Post". Under that, put if you are available to be working on something for the team (either <i>Available</i> or <i>Busy</i>), and your specialties (so we know what to assign to you). If you're still confused, look at my <a>example Contact Post</a>.
+                </p>
+                
+            <h3 class = "heading">team mechanics</h3>
             <p class = "content">
-                If you wish to join Rapid, there are two ways to make it into the team. The first is if you are invited by me (Chester Banks) on one of your programs. The second way is to apply in the Tips and Thanks by answering four questions:</p>
-            <ul>
-                <li>What do you consider your specialties?</li>
-                <li>What three programs do you think are your best?</li>
-                <li>How active would you be on Rapid?</li>
-                <li>Have you done any collaborations before? If so, please give link(s).</li>
-            </ul>
-            <p class = "content">
-                If you get accepted, the first thing you need to do is create a post on the Tips & Thanks titled "[name] Contact Post". Under that, put if you are available to be working on something for the team (either <i>Available</i> or <i>Busy</i>), and your specialties (so we know what to assign to you). If you're still confused, look at my <a>example Contact Post</a>.
+                This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than the deadline, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.<br><br>The finished game will be released on an official Rapid account. Since there's not really a reason to give all members the password, I will keep it to myself (for now) unless someone has a good reason to get it.<br><br>Those who help the most will get the most credit, but everyone who helped will be listed in the credits or the code.
             </p>
             
-        <h3 class = "heading">team mechanics</h3>
-        <p class = "content">
-            This is how Rapid will work on its projects. I will make a large list of things needed to get done, and then I will distribute the work among our members. Under your contact post (if you are <i>Available</i>), I will assign a job to you, as well as a deadline to get it done. If you take longer than the deadline, then you won't get jobs as often.<br><br>All programs related to the project should be spin-offs of the Project Hub, to keep everything clean and organized.<br><br>Suggestions for the project will go in the "Suggestions" Tips & Thanks thread, and then added to the HQ.<br><br>The finished game will be released on an official Rapid account. Since there's not really a reason to give all members the password, I will keep it to myself (for now) unless someone has a good reason to get it.<br><br>Those who help the most will get the most credit, but everyone who helped will be listed in the credits or the code.
-        </p>
+            <h3 class = "heading">life of a project</h3>
+            <p class = "content">
+                Each project will go through a number of steps, roughly following this outline:
+            </p>
+            <ol>
+                <li>Deciding the Project - first, we will decide what we will be making. Some ways to go about doing this is to ask the community for requests, look at our member's ideas, or look at other websites for remake ideas.</li>
+                <li>Brainstorming - In this step, we brainstorm the storyline, the title, the graphics style, the special features, and an outline and/or storyboard of the whole game.</li>
+                <li>Basic Gameplay - Here, we dive into the making of the game. Our gameplay people start out with the raw game code.</li>
+                <li>Basic Graphics - Fleshing it out a bit, the GDs add character art, backgrounds, and graphics. The menu can also be created in this stage.</li>
+                <li>Advanced Gameplay - If we want more gameplay added (i.e. more levels, enemies, characters, powers, worlds, weapons), then this is where we add it. The gameplay masters can go all out here with all their ideas.</li>
+                <li>Special Features and Pages - In this step, we make the menu (if it's not already made), the instructions, credits, high score, and win/lose pages, as well as the level select, logo, and achievements.</li>
+                <li>Final Graphics - The game may still need some graphics touch-ups. If so, we finish it off here. By now, the game should be completely finished.</li>
+                <li>Building Hype (optional) - If we want the community to get excited about our project before we release it, we could make a trailer, poster, and set a release date in this step. However, this step is very optional, and can be easily skipped.</li>
+                <li>The Release - All of our hard work pays off when we press "Save" on the New Program button on the Rapid account.</li>
+                <li>Following the Release - The community may have complaints, compliments, and suggestions for the game once we release it. We should fix the bugs and possibly add suggested features.</li>
+            </ol>
+            
+            <footer>Website coded by Chester Banks | May 3 2016</footer>
+        </div>
+        <div class = "splash">
+            <div class = "splash-bg"></div>
+            <h1 class = "splash-icon"><i class = "fa fa-send"></i></h1>
+            <button class = "splash-btn">ENTER</button>
+        </div>
         
-        <h3 class = "heading">life of a project</h3>
-        <p class = "content">
-            Each project will go through a number of steps, roughly following this outline:
-        </p>
-        <ol>
-            <li>Deciding the Project - first, we will decide what we will be making. Some ways to go about doing this is to ask the community for requests, look at our member's ideas, or look at other websites for remake ideas.</li>
-            <li>Brainstorming - In this step, we brainstorm the storyline, the title, the graphics style, the special features, and an outline and/or storyboard of the whole game.</li>
-            <li>Basic Gameplay - Here, we dive into the making of the game. Our gameplay people start out with the raw game code.</li>
-            <li>Basic Graphics - Fleshing it out a bit, the GDs add character art, backgrounds, and graphics. The menu can also be created in this stage.</li>
-            <li>Advanced Gameplay - If we want more gameplay added (i.e. more levels, enemies, characters, powers, worlds, weapons), then this is where we add it. The gameplay masters can go all out here with all their ideas.</li>
-            <li>Special Features and Pages - In this step, we make the menu (if it's not already made), the instructions, credits, high score, and win/lose pages, as well as the level select, logo, and achievements.</li>
-            <li>Final Graphics - The game may still need some graphics touch-ups. If so, we finish it off here. By now, the game should be completely finished.</li>
-            <li>Building Hype (optional) - If we want the community to get excited about our project before we release it, we could make a trailer, poster, and set a release date in this step. However, this step is very optional, and can be easily skipped.</li>
-            <li>The Release - All of our hard work pays off when we press "Save" on the New Program button on the Rapid account.</li>
-            <li>Following the Release - The community may have complaints, compliments, and suggestions for the game once we release it. We should fix the bugs and possibly add suggested features.</li>
-        </ol>
-        
-        <footer>Website coded by Chester Banks | May 3 2016</footer>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+        <script>
+            $(".main").hide();
+            
+            $(".splash-btn").click(function (){
+                $(".splash").hide();
+                $(".main").show();
+            });
+        </script>
     </body>
 </html>
-
