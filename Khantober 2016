@@ -1,13 +1,32 @@
 var x = 0;
 var y = 0;
 
+imageMode(CENTER);
+
 var keys = [];
 keyPressed = function(){keys[keyCode]=true;};
 keyReleased = function(){keys[keyCode]=false;};
 
+var Leaf = function(){
+    this.x = random(width);
+    this.y = random(200);
+    this.sz = random(50, 100);
+    this.scaleOff = random(360);
+};
+Leaf.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(this.scaleOff+frameCount*15);
+    scale(sin(frameCount*10), 1);
+    image(getImage("avatars/leaf-yellow"), 0, 0, this.sz, this.sz);
+    popMatrix();
+    
+    this.y += this.sz / 10;
+};
+var Leaves = [];
+
 draw = function() {
     textAlign(CENTER, CENTER);
-    
     textFont(createFont('Arial Black'));
     noStroke();
     for(var i = 0; i < height; i += 20){
@@ -18,6 +37,16 @@ draw = function() {
         for(var j = 0; j < height; j += 20){
             fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/3)*15), 1.1)*90);
             rect(i, j, 20, 20);
+        }
+    }
+    
+    if(frameCount % 20 === 0){
+        Leaves.push(new Leaf());
+    }
+    for(var i in Leaves){
+        Leaves[i].draw();
+        if(Leaves[i].y > 700){
+            Leaves.splice(i, 1);
         }
     }
     
@@ -69,10 +98,13 @@ draw = function() {
     text("Navigate with the arrow keys", 300, 470);
     
     fill(255);
-    textSize(13);
+    textFont(createFont("Trebuchet MS"), 15);
     textAlign(LEFT, TOP);
     text('- Chester Banks', 650, 50);
     textAlign(CENTER, CENTER);
+    
+    text("+ Challenging you to The Khantober 2015: 31 Days of Smashing Programming!\n\n+ If you accept, you will:\n\n+ Try to make a quality program every week of October (something better than you usally make, something that isn't a button, pixelized image, joke book program, or a copy).\n\n+ You'll work on your program during six days of the week, and then release it on the day of which group you're in (for instance, if you're in Group Tuesday, you work on your program Wed-Mon, then release it on Tuesday).\n\n+ You will get to post your program that you made every week on your day's sharing post!\n\n- Get encouragement and feedback from other challengers!\n\n+ Let's flood the Hot List with great programs! :D", 50, -450, 500, 400);
+    textFont(createFont("Arial Black"));
     popMatrix();
     
     if(keys[LEFT] && x < 555){x += 5;}
