@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>New Webpage</title>
+        
+        <link href='https://fonts.googleapis.com/css?family=Lato:100,300,400,700,900|Trade+Winds|Poppins|Baloo+Chettan|Fascinate+Inline|Londrina+Solid|Londrina+Outline|Josefin+Sans|Josefin+Slab:100,300,400,600' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        
+        <style>
+            body {
+                background: linear-gradient(60deg, rgb(0, 82, 140), rgb(207, 62, 71));
+                padding: 10px;
+            }
+            h1 {
+                font-family: "Londrina Solid";
+                font-weight: 500;
+                text-align: center;
+                font-size: 50px;
+                color: white;
+                text-shadow: 0px 0px 15px white;
+                margin-bottom: 0px;
+                margin-top: 10px;
+            }
+            h4 {
+                font-family: "Londrina Outline";
+                color: white;
+                font-size: 35px;
+                margin: 0px;
+                font-weight: 300;
+                margin-top: 20px;
+                letter-spacing: 2px;
+                transition: all 0.3s;
+            }
+            h4:first-of-type {
+                margin: 0px;
+            }
+            h4:hover{
+                margin-left: 20px;
+                letter-spacing: 3px;
+            }
+            
+            p {
+                background: rgba(255, 255, 255, 0.4);
+                padding: 20px 20px 20px 20px;
+                font-family: "Josefin Slab";
+                border-radius: 15px;
+                border: 5px ridge rgba(255, 255, 255, 0.5);
+            }
+            img {
+                border: 4px ridge rgba(255, 255, 255, 0.8);
+                margin: 10px;
+                border-radius: 20px 0px 20px 0px;
+            }
+            code {
+                color: white;
+                text-shadow: 0px 0px 5px white;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Chester's Guide To Graphics</h1>
+        
+        <h4>Color schemes</h4>
+        <p>When you make a game, you have to choose a color scheme and stick with it. Having the menu be filled with blue, the instructions with white and black, and the game rainbow colors just won't work graphically.<br><br>To pick a color scheme, you'll need to decide on which type of scheme you want for each page - HBMF, or MBHF. HBMF stands for Highlight Background, Main Foreground - this means that your highlight color (usually white and black) will be the background, with the foreground stuff (text, buttons, icons) set as the main color (usually a darker or lighter solid color). MBHF stands for Main Background, Highlight Foreground - the background would be your main color, and the foreground your highlight colors.<br>This webpage uses MBHF - the main color (purple and red) are the background, with white and black as the foreground.<br><br><img src = "https://www.khanacademy.org/computer-programming/life-of-a-square/5231013561499648/1.png"><img src = "https://www.khanacademy.org/computer-programming/solid/6151503357280256/5718998062727168.png"><br>[Life of a Square is an example of HBMF, while Solid is an example of MBHF]<br><br>Once you've decided which scheme, you need to decide your main and highlight colors. These should stay the same all throughout the game (hey, that rhymed). For the main color, just pick a solid color - blue, green, red, purple, orange, pink, and teal all work good. The highlight color(s) are almost always white and black (although gray sometimes also looks good).</p>
+        <h4>Strokes and their relation to fills</h4>
+        <p>Removing the stroke off of shapes with <code>noStroke();</code> almost <i>always</i> looks better. If you do have a stroke on a shape, I would make sure the stroke weight is at least 2 and the stroke color is just slightly darker or lighter than the shape's fill. For example, if you have a rect colored at <code>color(255, 0, 0)</code>, then make the stroke <code>color(217, 21 21)</code>.</p>
+        <h4>Shadows</h4>
+        <h4>Gradients</h4>
+        <h4>Text sizes and fonts</h4>
+    </body>
+</html>
