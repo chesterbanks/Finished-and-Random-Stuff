@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>New Webpage</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Lora|Pridi|Playfair+Display|Poppins|Noto+Serif|Antic+Slab|Josefin+Sans|Crimson+Text|Lobster|Arvo|Rochester|Lato:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        
+        <style>
+            body {
+                background: rgb(255, 255, 255);
+                font-family: Lato;
+            }
+            .title {
+                color: rgb(56, 56, 56);
+                box-shadow: 0px 8px 11px -7px rgba(0, 0, 0, 0.2);
+                margin: 10px;
+                padding: 15px;
+                padding-left: 30px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 30px;
+            }
+            .heading {
+                color: rgb(56, 56, 56);
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 15px;
+                border-left: 5px rgb(56, 56, 56) solid;
+                font-size: 20px;
+            }
+            .content, li {
+                color: rgb(56 ,56 ,56);
+                font-weight: 300;
+                margin-left: 35px;
+                padding: 5px;
+                padding-left: 30px;
+            }
+            img {
+                float: left;
+                margin-right: 20px;
+                margin-left: 60px;
+                padding: 0px;
+                border: 7px solid rgb(207, 207, 207);
+                margin-bottom: 10px;
+            }
+            ul {
+                padding-left: 70px;
+            }
+            li {
+                list-style-type: circle;
+                padding-left: 0px;
+            }
+            footer {
+                margin: -10px;
+                background: rgb(245, 245, 245);
+                font-weight: 200;
+                font-size: 15px;
+                padding: 10px;
+                border-top: 5px rgb(56, 56, 56);
+            }
+            a {
+                text-decoration: none;
+                color: rgb(54, 133, 194);
+                border-bottom: 1px black dotted;
+                transition: all 0.2s;
+            }
+            a:visited {
+                color: rgb(20, 186, 81);
+            }
+        </style>
+    </head>
+    <body>
+        <h1 class="title">Chester's News Corner</h1>
+        
+        <div class = "about">
+                <h3 class = "heading">popular games</h3>
+                
+                
+                <img src = "https://www.khanacademy.org/computer-programming/planetary-101/5959586888089600/5700735861784576.png">
+                <p class = "content"><b>Planetary</b><br><i>Planetary</i> is The #1 Planet Proponent's latest game. In the game, you can explore worlds, build buildings and roads, and eventually build a whole town on the planet! T#1PP also included a poll on what he should make next, and a way to submit your own worlds to the game. Though the game was said to fall short by crashing on some people's devices, and that it was not difficult enough, it was also praised for its clean graphics.</p>
+                
+                <img src = "https://www.khanacademy.org/computer-programming/obi-run-kenobi/4691980457672704/5757334940811264.png">
+                <p class = "content"><b>Obi Run Kenobi</b><br>Chester Banks' latest game, <i>Obi Run Kenobi</i>, is a Star Wars themed endless runner. In the game, you play as the character Obi-Wan Kenobi jumping on rock formations to catch up to his fallen apprentice Anakin. You have to dodge the falling lava-rocks and avoid falling in the lava. The game was praised for its pseudo-3D effect and its great graphics. The game was said to fall short on original gameplay. It has reached a total of 336 votes.</p>
+                
+                <img src = "https://www.khanacademy.org/computer-programming/our-valley-landscape-maker/5468117244903424/5649050225344512.png">
+                <p class = "content"><b>Our Valley - Landscape Maker</b><br>Talal Zulfiqar is one of the most renouned artists (that are active) on KA for his unique twist on flat design. His latest program to hit the Hot List, <i>Our Valley - Landscape Maker</i>, is a piece of art up to his usual standards, but it is customizable. There are a lot of booleans and strings in the code that users can change to make the landscape their very own. The program is praised for its stunning graphics.</p>
+                
+                <h3 class = "heading">hidden gems</h3>
+                <img src = "https://www.khanacademy.org/computer-programming/de-germer/4699246820917248/5757334940811264.png">
+                <p class = "content"><b><a href="https://www.khanacademy.org/computer-programming/de-germer/4699246820917248">De-Germer</a></b><br><i>De-Germer</i> by PhineasGreene (@PhineasGreene) is a fun and simple game made with clean pixel graphics. In the game, you play as a little blue man jumping on platforms in the sky. There are different types of germs that you try to defeat - green jellyfish-like germs are defeated when you jump on their head, while you destroy blue germs when you hit them from below. Even though the game is pretty good, it ended up with only 11 votes.</p>
+                <img src = "https://www.khanacademy.org/computer-programming/basic-js-login/5277989645910016/5724160613416960.png">
+                <p class = "content"><b><a href="https://www.khanacademy.org/computer-programming/basic-js-login/5277989645910016">Basic JS Login</a></b><br>This HTML/CSS/JS project created by Ethan Luis McDonough is very well designed, making it look clean and professional. It has working text boxes, a nice background choice, and a classic user image. The project only currently has 6 votes, though!<br><br><br><br><br></p>
+                <img src = "https://www.khanacademy.org/computer-programming/softball-wip/5277546324754432/5629499534213120.png">
+                <p class = "content"><b><a href="https://www.khanacademy.org/computer-programming/softball-wip/5277546324754432">Softball</a></b><br>This piece of art isn't too stunning, but it definitely deserves more than two votes! <br><br><br><br><br><br><br><br><br></p>
+                <p class = "content">Hidden Gems are really hard to find! If you know of any, please post them in the T&T! Note: the Hidden Gem should be fairly new, at most two weeks old.</p>
+                
+                <h3 class = "heading">interviews</h3>
+                <p class = "content">
+                    <b><i class = "fa fa-chevron-circle-right"></i> Chester Banks (@chesterbanks)</b><br>
+                </p>
+                <ol>
+                    <li>Q: What do you love most about KA?
+                    <li>A: The community. (Mostly) everyone on here is super nice and encouraging to new and old programmers, making programs is just so fun when the community tells you what they love about your project and what to improve!
+                    <li>Q: What do you think could be improved about KA?
+                    <li>A: The coding section of Khan really isn't built for collaborations. It would be nice if you could have a Google-doc sort of program for collaborations. Also, it would be nice to have a Publish feature (so you could save programs without the community being able to see it).
+                    <li>Q: Do you have any projects you're working on?
+                    <li>A: Yes, two large games that I'm keeping a secret for now. Once I get most of them done, I'll tell you guys more about them!
+                </ol>
+                
+                <h3 class = "heading">coding challenge</h3>
+                <p class = "content">
+                    Make a game or program that includes these three words as a large-ish part of the game:<br><br>
+                    <i>bounce, grayscale, penguin</i><br><br>
+                    The best attempt at this challenge will be featured in a future issue!
+                </p>
+                
+                <h3 class = "heading">riddles</h3>
+                <p class = "content">
+                    Water cannot drown me, fire cannot burn me. What am I?
+                </p>
+            </div>
+        <footer>Chester Banks  3.4.17</footer>
+    </body>
+</html>
