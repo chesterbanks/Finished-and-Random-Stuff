@@ -1,4 +1,5 @@
-
+var x = 0, y = 0;
+var move = '';
 
 draw = function() {
     textAlign(CENTER, CENTER);
@@ -19,6 +20,9 @@ draw = function() {
             rect(i, j + 27, 30, 3);
         }
     }
+    
+    pushMatrix();
+    translate(x, y);
     
     fill(255, 255, 255, 100);
     textSize(400);
@@ -53,6 +57,14 @@ draw = function() {
     textSize(20);
     text('^ about\n< program of the day\nchallengers >', 300, 450);
     
+    fill(255);
+    textSize(100);
+    text('ABOUT', 300, -500);
+    textSize(15);
+    text('Khantober is a challenge, not a competition. If you accept the challenge of Khantober, you will:\n\n+ Try to make a quality program (something better than you usually make) every week of October.\n\n+ You will be placed on a day of the week. On that day, you will release your weekly program.\n\n+ You can share your program with the other people on your day through the sharing threads!\n\n+ You can subscribe to the Program of the Day - I will be choosing what I think is the best program of the day and posting it on there!\n\n+ Your name will be put on the Challengers section for all to see!', 50, -500, 500, 500);
+    popMatrix();
+    
+    
     noFill();
     stroke(255, 255, 255, 30);
     for(var i = 30; i > 0; i -= 5){
@@ -63,4 +75,17 @@ draw = function() {
     noStroke();
     fill(255, 255, 255, 50);
     rect(0, 0, 0.5, 0.5, -600);
+    
+    if(keyIsPressed && keyCode === UP){
+        move = 'up';
+    }
+    if(keyIsPressed && keyCode === DOWN){
+        move = 'down';
+    }
+    if(move === 'up'){
+        y += (600 - y) / 10;
+    }
+    if(move === 'down'){
+        y += (-y) / 10;
+    }
 };
