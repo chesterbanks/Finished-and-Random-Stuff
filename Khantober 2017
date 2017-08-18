@@ -1,0 +1,66 @@
+
+
+draw = function() {
+    textAlign(CENTER, CENTER);
+    textFont(createFont('Arial Black'));
+    noStroke();
+    for(var i = 0; i < height; i += 20){
+        fill(lerpColor(
+            color(255, 85, 0), color(252, 202, 65), i / height));
+        rect(0, i, width, 30);
+    }
+    for(var i = 0; i < width; i += 30){
+        for(var j = 0; j < height; j += 30){
+            fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/3)*15), 1.1)*100);
+            rect(i, j, 30, 30);
+            fill(255, 255, 255, 10);
+            rect(i, j, 30, 3);
+            fill(0, 0, 0, 10);
+            rect(i, j + 27, 30, 3);
+        }
+    }
+    
+    fill(255, 255, 255, 100);
+    textSize(400);
+    text('2', 150, 150);
+    text('0', 450, 150);
+    text('1', 150, 450);
+    text('7', 450, 450);
+    
+    pushMatrix();
+    translate(300, 300);
+    scale(1 + sin(frameCount*3) / 5, 1 + sin(frameCount*10) / 10);
+    rotate(sin(frameCount*5) * 10);
+    fill(25);
+    textSize(35);
+    text('                         YOU TO...', 0, -45);
+    fill(255);
+    text('CHALLENGING', -97, -45);
+    fill(25);
+    textSize(23);
+    text('31 DAYS OF                    PROGRAMMING', 0, 43);
+    fill(255);
+    text('SMASHING', -26, 43);
+    fill(0, 0, 0, 30);
+    textSize(75);
+    text('KHANTOBER', 4, 4);
+    fill(255);
+    textSize(75);
+    text('KHANTOBER', 0, 0);
+    popMatrix();
+    
+    fill(255, 255, 255, 200);
+    textSize(20);
+    text('^ about\n< program of the day\nchallengers >', 300, 450);
+    
+    noFill();
+    stroke(255, 255, 255, 30);
+    for(var i = 30; i > 0; i -= 5){
+        strokeWeight(i);
+        rect(0, 0, width, height);
+    }
+    
+    noStroke();
+    fill(255, 255, 255, 50);
+    rect(0, 0, 0.5, 0.5, -600);
+};
