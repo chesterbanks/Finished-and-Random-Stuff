@@ -1,5 +1,21 @@
+
+var challengers = [];
+
+challengers.push('Chester Banks', 'LNY', 'AlexT');
+
+challengers = challengers.sort();
+
 var x = 0, y = 0;
 var move = '';
+var onMenu = true;
+
+var keys = [];
+keyPressed = function(){
+    keys[keyCode] = true;
+};
+keyReleased = function(){
+    keys[keyCode] = false;
+};
 
 draw = function() {
     textAlign(CENTER, CENTER);
@@ -33,8 +49,8 @@ draw = function() {
     
     pushMatrix();
     translate(300, 300);
-    scale(1 + sin(frameCount*3) / 5, 1 + sin(frameCount*10) / 10);
-    rotate(sin(frameCount*5) * 10);
+    scale(1 + sin(frameCount*10) / 10);
+    //rotate(sin(frameCount*5) * 10);
     fill(25);
     textSize(35);
     text('                         YOU TO...', 0, -45);
@@ -54,14 +70,26 @@ draw = function() {
     popMatrix();
     
     fill(255, 255, 255, 200);
+    textSize(30);
+    text('arrow keys to navigate', 300, 425);
     textSize(20);
-    text('^ about\n< program of the day\nchallengers >', 300, 450);
+    text('^ about\n< program of the day\nchallengers >', 300, 490);
     
     fill(255);
     textSize(100);
     text('ABOUT', 300, -500);
     textSize(15);
     text('Khantober is a challenge, not a competition. If you accept the challenge of Khantober, you will:\n\n+ Try to make a quality program (something better than you usually make) every week of October.\n\n+ You will be placed on a day of the week. On that day, you will release your weekly program.\n\n+ You can share your program with the other people on your day through the sharing threads!\n\n+ You can subscribe to the Program of the Day - I will be choosing what I think is the best program of the day and posting it on there!\n\n+ Your name will be put on the Challengers section for all to see!', 50, -500, 500, 500);
+    textAlign(LEFT, CENTER);
+    textSize(50);
+    text('CHALLENGERS', 640, 55);
+    textSize(20);
+    for(var i = 0; i < challengers.length; i ++){
+        text('+ ' + challengers[i], 645, 105 + (i * 30));
+    }
+    textAlign(CENTER, CENTER);
+    textSize(30);
+    text('No program of the day,\nbecause Khantober hasn\'t\nstarted!', -300, 300);
     popMatrix();
     
     
@@ -76,16 +104,41 @@ draw = function() {
     fill(255, 255, 255, 50);
     rect(0, 0, 0.5, 0.5, -600);
     
-    if(keyIsPressed && keyCode === UP){
-        move = 'up';
-    }
-    if(keyIsPressed && keyCode === DOWN){
-        move = 'down';
+    if(onMenu){
+        onMenu = false;
+        if(keys[UP]){
+            move = 'up';
+        }
+        if(keys[RIGHT]){
+            move = 'right'; 
+        }
+        if(keys[LEFT]){
+            move = 'left';
+        }
     }
     if(move === 'up'){
         y += (600 - y) / 10;
+        if(keys[DOWN]){
+            move = 'back';
+        }
     }
-    if(move === 'down'){
+    if(move === 'right'){
+        x += (-600 - x) / 10;
+        if(keys[LEFT]){
+            move = 'back';
+        }
+    }
+    if(move === 'left'){
+        x += (600 - x) / 10;
+        if(keys[RIGHT]){
+            move = 'back';
+        }
+    }
+    if(move === 'back'){
+        x += (-x) / 10;
         y += (-y) / 10;
+    }
+    if(x < 10 && y < 10){
+        onMenu = true;
     }
 };
