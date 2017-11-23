@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>WriteSpace</title>
+        
+        <link href="https://fonts.googleapis.com/css?family=Molle:400i|Anton|Montserrat|Dosis|Caveat" rel="stylesheet">
+        
+        <style>
+            body {
+                padding: 20px;
+            }
+            h1 {
+                font-family: 'Montserrat';
+                font-weight: 300;
+                font-size: 37px;
+                padding: 10px;
+                margin-left: 140px;
+                margin-right: 140px;
+                color: black;
+                background: rgb(206, 235, 14);
+                box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+                text-align: center;
+            }
+            h2 {
+                font-family: 'Caveat';
+                font-weight: 300;
+                font-size: 28px;
+                padding: 6px;
+                border-bottom: 2px dotted black;
+            }
+            h3 {
+                margin-top: -32px;
+                margin-left: 150px;
+                margin-right: 150px;
+                font-family: 'Caveat';
+                font-weight: 300;
+                font-size: 22px;
+                color: black;
+                background: white;
+                text-align: center;
+                box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+            }
+            .post {
+                margin: 20px;
+                font-family: 'Montserrat';
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Write Space</h1>
+        <h3>the town center for writers</h3>
+        
+        <h2>LATEST STORIES</h2>
+        
+        
+        <h2>ABOUT</h2>
+        <div class = "post">
+            <p>Write Space is a place on KA for writers to come together, share their work, and help others grow in their writing skills.</p>
+        </div>
+        
+        <h2>WHY JOIN?</h2>
+        <div class = "post">
+            <p>If you join Write Space, you will get to have your story featured at the top of this webpage, and other writers will critique your writing and help you sharpen your skills!</p>
+        </div>
+        <h2>HOW TO JOIN</h2>
+        
+        
+        <h2>RULES</h2>
+        <div class = "post">
+            <p>There are a few rules here at Write Space that make this place better for everyone.</p>
+            <ul>
+                <li>
+                <li>
+            </ul>
+        </div>
+        
+        <footer style="position: fixed; left: 0; bottom: 0; right: 0; font-family: 'Avenir'; background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)); color: white; padding: 10px;">Sponsored by <a style="color:white;" href="https://www.khanacademy.org">Write Space.</a></footer>
+    </body>
+</html>
