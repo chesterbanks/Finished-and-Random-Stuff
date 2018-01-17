@@ -1,0 +1,1283 @@
+/**
+ * Dig Deep
+ * Chester Banks
+ * October 10 2017
+ * 
+ * This was made for Khantober!
+ * This game was based off an old game I played when I was younger called Mega Drill!
+*/
+
+textAlign(CENTER, CENTER);
+
+var loadGoogleFont = (function () {
+    return this.Function ( "gfName", "gfName = gfName.replace ( /\\s+/g, '+' );var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 ), url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ], gfs = document.querySelectorAll('link[href=\"'+url+'\"]');if(!gfs.length){var f=document.createElement('link');f.setAttribute('rel','stylesheet');f.setAttribute('type','text/css');f.onload=callback;f.setAttribute('href',url);document.head.appendChild(f);}else if ( typeof callback === 'function' ) { callback.call ( gfs [ 0 ] ); }");
+})();
+var fontloaded = false;
+
+if ( !fontloaded ) {
+    loadGoogleFont('Rokkitt|Sigmar One', 'latin-ext', 'vietnamese');
+}
+
+var fonts = {
+    title: createFont('Sigmar One', 62),
+    larger: createFont('Rokkitt', 25),
+    italic: createFont('Rokkitt', 20),
+    medium: createFont('Rokkitt', 20),
+    small: createFont('Rokkitt', 62)
+};
+
+var scene = 'Logo';
+
+var money = 0;
+var collected = [0, 0, 0, 0, 0];
+var clicked = false;
+var overButton = false;
+var keys = [];
+
+var trans = {
+    active: false,
+    out: false,
+    nextScene: '',
+    h: height
+};
+
+var shop = [
+    // Range
+    {
+        prices: [10, 20, 100, 200, 300, 500],
+        bought: [false, false, false, false, false, false],
+        result: [100, 150, 200, 250, 350, 400],
+        x: [0, 0, 0, 0, 0, 0],
+        y: [0, 0, 0, 0, 0, 0],
+    },
+    
+    // Fuel capacity
+    {
+        prices: [15, 20, 50, 100, 200, 500],
+        bought: [false, false, false, false, false, false],
+        result: [20, 30, 40, 60, 80, 130],
+        x: [0, 0, 0, 0, 0, 0],
+        y: [0, 0, 0, 0, 0, 0],
+    },
+    
+    // Hull strength
+    {
+        prices: [15, 20, 50, 100, 200, 500],
+        bought: [false, false, false, false, false, false],
+        result: [20, 30, 40, 60, 80, 240],
+        x: [0, 0, 0, 0, 0, 0],
+        y: [0, 0, 0, 0, 0, 0],
+    },
+    
+    // Steering
+    {
+        prices: [5, 10, 20, 25, 30, 35],
+        bought: [false, false, false, false, false, false],
+        result: [2, 2.5, 3, 3.5, 4, 4.5],
+        x: [0, 0, 0, 0, 0, 0],
+        y: [0, 0, 0, 0, 0, 0],
+    },
+    
+    // Speed
+    {
+        prices: [15, 20, 50, 100, 200, 500],
+        bought: [false, false, false, false, false, false],
+        result: [1, 1.2, 1.6, 2, 2.4, 3],
+        x: [0, 0, 0, 0, 0, 0],
+        y: [0, 0, 0, 0, 0, 0],
+    },
+];
+var achievements = [
+    { name: 'Coin Grabber', desc: 'Collect 70 coins', unlocked: false },
+    { name: 'Treasure Hunter', desc: 'Collect 15 chests', unlocked: false },
+    { name: 'Isaac Emerald', desc: 'Collect 10 emeralds', unlocked: false },
+    { name: 'Robbing Rubies', desc: 'Collect 10 rubies', unlocked: false },
+    { name: 'Diamond Master', desc: 'Collect 12 diamonds', unlocked: false },
+    { name: 'Variety Digger', desc: 'Collect 1 of each', unlocked: false },
+    { name: 'Getting Deeper', desc: 'Dig 600 feet', unlocked: false },
+    { name: 'Center of the Earth', desc: 'Dig 2400 feet', unlocked: false },
+];
+
+mouseClicked = function(){
+    clicked = true;
+};
+keyPressed = function(){ keys[keyCode] = true; };
+keyReleased = function(){ keys[keyCode] = false; };
+
+var images = {
+    bg: function(){
+        background(0, 0, 0, 0);
+        
+        noStroke();
+        for(var i = -100; i < width; i += 2){
+            for(var j = 0; j < height; j += 50){
+                fill(0, 0, 0, random(10));
+                rect(i, j + random(-10, 10), random(15), random(100, 150));
+            }
+        }
+        
+        return get(0, 0, width, height);
+    },
+    shopBG: function(){
+        background(50, 123, 179);
+        stroke(255, 255, 255, 50);
+        for(var i = 0; i < height; i += 15){
+            strokeWeight(1);
+            line(i, 0, i, 600);
+            line(0, i, 600, i);
+            if(i / 15 % 5 === 0){
+                strokeWeight(5);
+                line(i, 0, i, 600);
+                line(0, i, 600, i);
+            }
+        }
+        return get(0, 0, width, height);
+    },
+    drill: function(){
+        background(168, 168, 168);
+        noFill();
+        strokeWeight(3);
+        stroke(255);
+        for(var i = 0; i < 30; i += 6){
+            arc(5, i, 50, 21, 0, 180);
+        }
+        var backOfDrill = get(0, 0, 30, 30);
+        
+        noStroke();
+        background(0, 0, 0, 0);
+        pushMatrix();
+        translate(15, 15);
+        endShape();fill(181, 181, 181);
+        beginShape();
+        vertex(0, 15);
+        bezierVertex(-12, 6, -13, 2, -16, -9);
+        bezierVertex(-16, -7, -6, -14, 14, -9);
+        bezierVertex(14, 0, 13, 6, 0, 15);
+        endShape();
+        popMatrix();
+        var frontOfDrill = get(0, 0, 30, 30);
+        
+        backOfDrill.mask(frontOfDrill);
+        
+        background(0, 0, 0, 0);
+        image(backOfDrill, 0, 0);
+        
+        return get(0, 0, 30, 30);
+    },
+    filledBox: function(){
+        background(0, 0, 0, 0);
+        pushMatrix();
+        translate(15, 15);
+        rotate(-30);
+        translate(-15, -15);
+        strokeWeight(1);
+        stroke(255);
+        for(var i = 0; i < 30; i += 2){
+            line(-12, i, 42, i + random(10, -10));
+            //line(random(30), 30, random(30), 0);
+        }
+        popMatrix();
+        
+        return get(0, 0, 30, 30);
+    },
+};
+
+var circleCollide = function(object1, object2){
+    return (dist(object1.x, object1.y, object2.x, object2.y) <= (object1.sz / 2) + (object2.sz / 2));
+};
+
+var drillTrail = [];
+
+var Drill = function(){
+    this.x = 200;
+    this.y = 50;
+    this.sz = 40;
+    this.angle = 0;
+    
+    // Drill stats
+    this.range = 80;
+    this.fuel_capacity = 5;
+    this.steering = 1;
+    this.speed = 0.5;
+    this.hull_strength = 10;
+    
+    this.fuel = 5;
+};
+Drill.prototype.draw = function() {
+    noStroke();
+    fill(0, 0, 0, 50);
+    ellipse(this.x, this.y, this.range, this.range);
+    //ellipse(this.x, this.y, this.sz, this.sz);
+    fill(138, 138, 138);
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(-this.angle);
+    imageMode(CENTER);
+    image(images.drill, 0, 0);
+    imageMode(CORNER);
+    popMatrix();
+    if(keys[RIGHT]){
+        this.angle -= this.steering;
+    }
+    if(keys[LEFT]){
+        this.angle += this.steering;
+    }
+    if(keys[UP] && this.fuel > 0){
+        this.x += sin(this.angle)*this.speed;
+        this.y += cos(this.angle)*this.speed;
+    }
+    if(keys[DOWN] && this.fuel > 0){
+        this.x -= sin(this.angle)*this.speed;
+        this.y -= cos(this.angle)*this.speed;
+    }
+    
+    if((keys[UP] || keys[DOWN]) && frameCount % 10 === 0){
+        drillTrail.push({x: this.x, y: this.y});
+    }
+    
+    this.fuel -= (0.05 / this.fuel_capacity);
+    if(this.fuel < 0){ this.fuel = 0; }
+};
+var drill = new Drill();
+
+var Treasure = function(x, y, type){
+    this.x = x;
+    this.y = y;
+    this.sz = 10;
+    
+    this.trans = 1;
+    
+    this.type = type;
+    switch(this.type){
+        case 'Coin': this.value = 1; break;
+        case 'Chest': this.value = 3; break;
+        case 'Emerald': this.value = 10; break;
+        case 'Ruby': this.value = 12; break;
+        case 'Diamond': this.value = 15; break;
+    }
+    
+    this.disappear = false;
+};
+Treasure.prototype.draw = function() {
+    if(this.type === 'Coin'){
+        strokeWeight(1);
+        stroke(144, 145, 65, this.trans);
+        fill(210, 214, 92, this.trans);
+        pushMatrix();
+        translate(this.x, this.y);
+        ellipse(0, 0, this.sz, this.sz);
+        popMatrix();
+    }
+    if(this.type === 'Chest'){
+        this.sz = 25;
+        strokeWeight(1);
+        pushMatrix();
+        translate(this.x, this.y);
+        stroke(66, 33, 8, this.trans);
+        fill(102, 64, 34, this.trans);
+        arc(0, 0, 24, 18, -180, 0);
+        stroke(144, 145, 65, this.trans);
+        fill(210, 214, 92, this.trans);
+        arc(0, 0, 24, 6, -180, 0);
+        arc(0, 0, 12, 10, -180, 0);
+        stroke(66, 33, 8, this.trans);
+        fill(102, 64, 34, this.trans);
+        quad(-12, 0, 12, 0, 8, 11, -7, 11);
+        line(0, 0, 0, 11);
+        line(6, 0, 4, 11);
+        line(-6, 0, -4, 11);
+        popMatrix();
+    }
+    if(this.type === 'Ruby'){
+        this.sz = 15;
+        strokeWeight(1);
+        pushMatrix();
+        translate(this.x, this.y);
+        stroke(143, 17, 43, this.trans);
+        fill(232, 23, 58, this.trans);
+        ellipse(0, 0, this.sz, this.sz);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        ellipse(0, 0, this.sz / 1.5, this.sz / 1.5);
+        popMatrix();
+    }
+    if(this.type === 'Emerald'){
+        this.sz = 15;
+        strokeWeight(1);
+        pushMatrix();
+        translate(this.x, this.y);
+        stroke(17, 143, 30, this.trans);
+        fill(35, 232, 54, this.trans);
+        rect(-8, -7, 15, 15, 5);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        rect(-5, -4, 9, 8);
+        popMatrix();
+    }
+    if(this.type === 'Diamond'){
+        this.sz = 25;
+        strokeWeight(1);
+        pushMatrix();
+        translate(this.x, this.y);
+        stroke(205, 205, 205, this.trans);
+        fill(215, 215, 215, this.trans);
+        beginShape();
+        vertex(4, -8); 
+        vertex(10, -2);
+        vertex(0, 11);
+        vertex(-10, -2);
+        vertex(-4, -8);
+        endShape(CLOSE);
+        stroke(255, 255, 255, this.trans);
+        beginShape();
+        vertex(2, -8); 
+        vertex(4, -1);
+        vertex(0, 11);
+        vertex(-4, -1);
+        vertex(-2, -8);
+        endShape();
+        popMatrix();
+    }
+    
+    if(!this.disappear){
+        if(circleCollide(this, drill)){
+            this.disappear = true;
+            money += this.value;
+            switch(this.type){
+                case 'Coin':
+                    collected[0] ++;
+                    break;
+                case 'Chest':
+                    collected[1] ++;
+                    break;
+                case 'Ruby':
+                    collected[2] ++;
+                    break;
+                case 'Emerald':
+                    collected[3] ++;
+                    break;
+                case 'Diamond':
+                    collected[4] ++;
+                    break;
+            }
+        } else if(dist(this.x, this.y, drill.x, drill.y) < (this.sz + drill.range) / 2.1){
+            this.trans *= 2;
+        } else {
+            this.trans /= 2;
+        }
+    }
+    
+    if(this.disappear){
+        this.y --;
+        this.trans /= 1.3;
+    }
+    
+    if(this.trans > 255){ this.trans = 255; }
+    if(this.trans < 1){ this.trans = 1; }
+};
+var Treasures = [];
+
+for(var i = 0; i < 100; i ++){
+    Treasures.push(new Treasure(random(400), random(70,1300), 'Coin'));
+}
+for(var i = 0; i < 30; i ++){
+    Treasures.push(new Treasure(random(400), random(400, 1800), 'Chest'));
+}
+for(var i = 0; i < 25; i ++){
+    Treasures.push(new Treasure(random(400), random(800, 2800), 'Emerald'));
+}
+for(var i = 0; i < 25; i ++){
+    Treasures.push(new Treasure(random(400), random(1200, 2800), 'Ruby'));
+}
+for(var i = 0; i < 20; i ++){
+    Treasures.push(new Treasure(random(400), random(2000, 2800), 'Diamond'));
+}
+
+var Message = function(type){
+    this.type = type;
+    this.trans = 70;
+    
+    this.x = [-300, 350, -550];
+};
+Message.prototype.draw = function() {
+    fill(0, 0, 0, 70 - this.trans);
+    rect(0, 0, width, height);
+    
+    pushMatrix();
+    translate(width / 2, height / 2);
+    rotate(-15);
+    textFont(fonts.title);
+    if(this.type === 0){
+        fill(255, 111, 0);
+        for(var i = 0; i < 360; i += 60){
+            pushMatrix();
+            translate(sin(i)*3, cos(i)*3);
+            text('NO', this.x[0], -55);
+            text('MORE', this.x[1], 0);
+            text('FUEL', this.x[2], 55);
+            popMatrix();
+        }
+        fill(0, 0, 0);
+        text('NO', this.x[0], -55);
+        text('MORE', this.x[1], 0);
+        text('FUEL', this.x[2], 55);
+    }
+    
+    if(this.type === 1){
+        fill(0, 179, 255);
+        for(var i = 0; i < 360; i += 60){
+            pushMatrix();
+            translate(sin(i)*3, cos(i)*3);
+            text('TOO', this.x[0], -55);
+            text('MUCH', this.x[1], 0);
+            text('PRESSURE', this.x[2], 55);
+            popMatrix();
+        }
+        fill(0, 0, 0);
+        text('TOO', this.x[0], -55);
+        text('MUCH', this.x[1], 0);
+        text('PRESSURE', this.x[2], 55);
+    }
+    popMatrix();
+    
+    this.x[0] /= 1.1;
+    if(this.x[0] > -100){
+        this.x[1] /= 1.1;
+    }
+    if(this.x[1] < 100){
+        this.x[2] /= 1.1;
+    }
+    
+    this.trans /= 1.05;
+};
+var Messages = {
+    no_fuel: new Message(0),
+    pressure: new Message(1),
+};
+
+var Button = function(x, y, w, h, txt,nxt){
+    this.x = x;
+    this.y = y;
+    this.plus = 10;
+    
+    this.w = w;
+    this.h = h;
+    
+    this.txt = txt;
+    this.nxt = nxt;
+};
+Button.prototype.draw = function() {
+    fill(255, 255, 255, 255 - (this.plus * 30));
+    rect(this.x + (this.plus / 2), this.y + (this.plus / 2), this.w - this.plus, this.h - this.plus);
+    textFont(fonts.italic);
+    fill(255);
+    text(this.txt, (this.x + this.w / 2), (this.y + this.h / 2));
+    fill(5, 5, 5, 255 - (this.plus * 30));
+    text(this.txt, (this.x + this.w / 2), (this.y + this.h / 2));
+    
+    if(mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h){
+        overButton = true;
+        this.plus /= 1.1;
+        if(clicked){
+            trans.active = true;
+            trans.nextScene = this.nxt;
+        }
+    } else {
+        this.plus *= 1.1;
+    }
+    
+    if(this.plus < 1){ this.plus = 1; }
+    if(this.plus > 10){ this.plus = 10; }
+};
+
+var Notif = function(txt){
+    this.minusY = 80;
+    this.txt = txt;
+    this.trans = 255;
+};
+Notif.prototype.draw = function() {
+    pushMatrix();
+    translate(0, -this.minusY);
+    noStroke();
+    fill(0, 0, 0, this.trans - 200);
+    rect(0, 0, width, 80);
+    textFont(fonts.italic);
+    fill(255, 255, 255, this.trans);
+    textSize(15);
+    text('ACHIEVEMENT UNLOCKED!', 200, 27);
+    textSize(30);
+    text(this.txt, 200, 50);
+    popMatrix();
+    
+    this.minusY /= 1.1;
+    if(this.minusY < 0.05){
+        this.trans /= 1.1;
+    }
+};
+var Notifs = [];
+
+var Camera = {
+    y: 0,
+    right: 600,
+    zoom: 1
+};
+
+// SCENES
+var logo = function(x, y, sz){
+    var logoColors = [
+        color(120, 138, 19),
+        color(198, 217, 89),
+        color(215, 255, 56),
+        color(211, 230, 69),
+    ];
+    
+    pushMatrix();
+    translate(x, y);
+    scale(sz);
+    noFill();
+    strokeCap(SQUARE);
+    stroke(0, 0, 0, 30);
+    strokeWeight(30);
+    arc(10, 20, 160, 160, 30, 330);
+    strokeWeight(11);
+    // Outer layer
+    stroke(logoColors[0]);
+    arc(0, 0, 200, 200, -85, -30);
+    arc(0, 0, 180, 180, -75, -30);
+    arc(0, 0, 200, 200, -300, -240);
+    arc(0, 0, 180, 180, -285, -250);
+    stroke(logoColors[1]);
+    arc(0, 0, 200, 200, -125, -85);
+    arc(0, 0, 180, 180, -115, -75);
+    arc(0, 0, 200, 200, -200, -160);
+    arc(0, 0, 180, 180, -200, -150);
+    stroke(logoColors[2]);
+    arc(0, 0, 200, 200, -160, -125);
+    arc(0, 0, 180, 180, -150, -116);
+    arc(0, 0, 200, 200, -330, -300);
+    arc(0, 0, 180, 180, -330, -286);
+    stroke(logoColors[3]);
+    arc(0, 0, 200, 200, -240, -200);
+    arc(0, 0, 180, 180, -250, -200);
+    
+    // Inner layer
+    stroke(logoColors[0]);
+    arc(0, 0, 160, 160, -200, -160);
+    arc(0, 0, 140, 140, -200, -150);
+    stroke(logoColors[1]);
+    arc(0, 0, 160, 160, -300, -240);
+    arc(0, 0, 140, 140, -285, -250);
+    stroke(logoColors[2]);
+    arc(0, 0, 160, 160, -240, -200);
+    arc(0, 0, 140, 140, -250, -200);
+    arc(0, 0, 160, 160, -125, -85);
+    arc(0, 0, 140, 140, -115, -75);
+    stroke(logoColors[3]);
+    arc(0, 0, 160, 160, -85, -30);
+    arc(0, 0, 140, 140, -75, -30);
+    arc(0, 0, 160, 160, -330, -300);
+    arc(0, 0, 140, 140, -330, -286);
+    arc(0, 0, 160, 160, -160, -125);
+    arc(0, 0, 140, 140, -150, -116);
+    
+    stroke(0, 0, 0, 50);
+    strokeWeight(20);
+    arc(0, 0, 150, 150, 30, 330);
+    popMatrix();
+};
+
+var Menu = function(){
+    this.snap = false;
+    this.x = 350;
+    
+    this.buttons = [
+        new Button(50, 380, 300, 50, 'PLAY', 'How'),
+        new Button(50, 430, 300, 50, 'ABOUT', 'About'),
+    ];
+};
+Menu.prototype.draw = function() {
+    background(110, 55, 23);
+    
+    noStroke();
+    for(var i = 0; i < 600; i += 30){
+        fill(lerpColor(color(94, 58, 42), color(18, 6, 1), i/(height)));
+        rect(0, i, width, 50);
+    }
+    
+    image(images.bg, 0, 0);
+    
+    pushMatrix();
+    if(this.snap){
+        scale(1, 1.5);
+        translate(0, -50);
+    }
+    textFont(fonts.title, 100);
+    
+    for(var i = 0; i < 360; i += 30){
+        fill(255, 255, 0, 30);
+        text('DIG', 200 + sin(i) * 10 + this.x, 190 + cos(i) * 10);
+        fill(255, 0, 34, 30);
+        text('DEEP', 200 + sin(i) * 10 - this.x, 270 + cos(i) * 10);
+    }
+    
+    fill(0, 0, 0);
+    text('DIG', 200 + this.x, 190);
+    text('DEEP', 200 - this.x, 270);
+    
+    textFont(fonts.medium);
+    fill(255);
+    text('CHESTER BANKS | KHANTOBER 2017', 200, 330 + (this.x * 2));
+    popMatrix();
+    
+    if(!this.snap){
+        strokeWeight(2);
+        stroke(255);
+        pushMatrix();
+        translate(-this.x, 0);
+        for(var i = 0; i < this.buttons.length; i ++){
+            this.buttons[i].draw();
+        }
+        popMatrix();
+    }
+    if(keys[ENTER]){
+        this.snap = true;
+    }
+    
+    for(var i = 25; i < width; i += 50){
+        strokeWeight(1);
+        pushMatrix();
+        translate(i, 560 + this.x);
+        scale(2);
+        stroke(143, 17, 43);
+        fill(232, 23, 58);
+        ellipse(0, 0, 15, 15);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        ellipse(0, 0, 15 / 1.5, 15 / 1.5);
+        popMatrix();
+        
+        pushMatrix();
+        translate(i, 40 - this.x);
+        scale(2);
+        stroke(143, 17, 43);
+        fill(232, 23, 58);
+        ellipse(0, 0, 15, 15);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        ellipse(0, 0, 15 / 1.5, 15 / 1.5);
+        popMatrix();
+    }
+    
+    this.x /= 1.1;
+};
+var menu = new Menu();
+
+var About = function(){
+    this.x = 350;
+    
+    this.back = new Button(50, 450, 300, 50, 'Back', 'Menu');
+};
+About.prototype.draw = function() {
+    background(110, 55, 23);
+    
+    noStroke();
+    for(var i = 0; i < 600; i += 30){
+        fill(lerpColor(color(94, 58, 42), color(18, 6, 1), i/(height)));
+        rect(0, i, width, 50);
+    }
+    
+    image(images.bg, 0, 0);
+    
+    fill(255);
+    textFont(fonts.title);
+    text('ABOUT', 200 - this.x, 100);
+    
+    textFont(fonts.medium);
+    fill(255);
+    text('This game was made by Chester Banks on October 10 2017 as part of Khantober! Chester was inspired by a game called Mega Drill and based this game off of it.\n\nIn the game, you play as a rookie driller, hoping to get rich quick by finding jewels in the vast underground!\n\nEnjoy!', 50, 30 + this.x * 2, 300, 500);
+    
+    strokeWeight(2);
+    stroke(255);
+    pushMatrix();
+    translate(-this.x, 0);
+    this.back.draw();
+    popMatrix();
+    
+    for(var i = 25; i < width; i += 50){
+        strokeWeight(1);
+        pushMatrix();
+        translate(i, 560 + this.x);
+        scale(2);
+        stroke(143, 17, 43);
+        fill(232, 23, 58);
+        ellipse(0, 0, 15, 15);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        ellipse(0, 0, 15 / 1.5, 15 / 1.5);
+        popMatrix();
+        
+        pushMatrix();
+        translate(i, 40 - this.x);
+        scale(2);
+        stroke(143, 17, 43);
+        fill(232, 23, 58);
+        ellipse(0, 0, 15, 15);
+        line(0, -7, 0, 7);
+        line(-7, 0, 7, 0);
+        ellipse(0, 0, 15 / 1.5, 15 / 1.5);
+        popMatrix();
+    }
+    
+    this.x /= 1.1;
+};
+var about = new About();
+
+var How = function(){
+    this.x = 350;
+    
+    this.go = new Button(50, 450, 300, 50, 'Got it?', 'Shop');
+    
+    this.Treasures = [
+        new Treasure(170, 250, 'Coin'),
+        new Treasure(250, 350, 'Chest'),
+    ];
+};
+How.prototype.draw = function() {
+    background(13, 7, 2);
+    
+    pushMatrix();
+    translate(200, Camera.y);
+    
+    rectMode(CORNER);
+    imageMode(CORNER);
+    translate(-drill.x, 0);
+    noStroke();
+    for(var i = 0; i < height * 5; i += 49){
+        fill(lerpColor(color(94, 58, 42), color(18, 6, 1), i/(height * 5)));
+        rect(0, i, width, 50);
+    }
+    for(var i = 0; i < height * 5; i += 600){
+        
+        image(images.bg, 0, i, 400, 600);
+    }
+    
+    strokeWeight(5);
+    stroke(0, 0, 0, 50);
+    fill(52, 201, 107);
+    rect(0, 7, 400, 50);
+    stroke(16, 115, 52);
+    rect(0, 4, 400, 50);
+    stroke(22, 150, 69);
+    rect(0, 0, 400, 50);
+    
+    noStroke();
+    
+    fill(0, 0, 0);
+    for(var i = drillTrail.length - 1; i >= 0; i --){
+        ellipse(drillTrail[i].x, drillTrail[i].y, 30, 25);
+    }
+    
+    fill(0, 0, 0, 30);
+    ellipse(200, 300, 200, 200);
+    image(images.drill, 200 - 15, 300 - 15);
+    
+    for(var i = this.Treasures.length - 1; i >= 0; i --){
+        this.Treasures[i].trans = 255;
+        this.Treasures[i].draw();
+    }
+    popMatrix();
+    
+    textFont(fonts.medium, 13);
+    fill(255);
+    pushMatrix();
+    translate(210, 254);
+    rotate(-15);
+    text('This is your drill.\nPress UP for power, and LEFT and RIGHT to steer.', 0, 0, 130, 100);
+    popMatrix();
+    
+    pushMatrix();
+    translate(120, 154);
+    rotate(15);
+    text('Collect coins, chests, and gems!', 0, 0, 130, 100);
+    popMatrix();
+    
+    stroke(255);
+    strokeWeight(2);
+    this.go.draw();
+};
+var how = new How();
+
+var Calculate = function(){
+    this.x = 350;
+    this.out = false;
+};
+Calculate.prototype.draw = function() {
+    image(images.shopBG, 0, 0);
+    
+    pushMatrix();
+    translate(this.out ? (-400 + this.x) : (this.x), 0);
+    noStroke();
+    fill(0, 0, 0, 8);
+    for(var i = 0; i < 360; i += 30){
+        rect(52 + sin(i) * 3, 118 + cos(i) * 5, 300, 400);
+    }
+    fill(230, 242, 242);
+    rect(50, 110, 300, 400);
+    strokeWeight(1);
+    stroke(194, 120, 134);
+    line(75, 110, 75, 510);
+    stroke(119, 141, 194);
+    for(var i = 0; i < 350; i += 23){
+        line(50, i + 160, 350, i + 160);
+    }
+    
+    strokeWeight(1);
+    stroke(144, 145, 65);
+    fill(210, 214, 92);
+    pushMatrix();
+    translate(105, 190);
+    ellipse(0, 0, 15, 15);
+    popMatrix();
+    
+    strokeWeight(1);
+    pushMatrix();
+    translate(105, 230);
+    stroke(66, 33, 8);
+    fill(102, 64, 34);
+    arc(0, 0, 24, 18, -180, 0);
+    stroke(144, 145, 65);
+    fill(210, 214, 92);
+    arc(0, 0, 24, 6, -180, 0);
+    arc(0, 0, 12, 10, -180, 0);
+    stroke(66, 33, 8);
+    fill(102, 64, 34);
+    quad(-12, 0, 12, 0, 8, 11, -7, 11);
+    line(0, 0, 0, 11);
+    line(6, 0, 4, 11);
+    line(-6, 0, -4, 11);
+    popMatrix();
+    
+    strokeWeight(1);
+    pushMatrix();
+    translate(105, 270);
+    stroke(143, 17, 43);
+    fill(232, 23, 58);
+    ellipse(0, 0, 15, 15);
+    line(0, -7, 0, 7);
+    line(-7, 0, 7, 0);
+    ellipse(0, 0, 15 / 1.5, 15 / 1.5);
+    popMatrix();
+    
+    strokeWeight(1);
+    pushMatrix();
+    translate(105, 308);
+    stroke(17, 143, 30);
+    fill(35, 232, 54);
+    rect(-8, -7, 15, 15, 5);
+    line(0, -7, 0, 7);
+    line(-7, 0, 7, 0);
+    rect(-5, -4, 9, 8);
+    popMatrix();
+    
+    strokeWeight(1);
+    pushMatrix();
+    translate(105, 346);
+    stroke(143, 143, 143);
+    fill(215, 215, 215);
+    beginShape();
+    vertex(4, -10); 
+    vertex(10, -2);
+    vertex(0, 13);
+    vertex(-10, -2);
+    vertex(-4, -10);
+    endShape(CLOSE);
+    stroke(255, 255, 255);
+    beginShape();
+    vertex(2, -8); 
+    vertex(4, -1);
+    vertex(0, 11);
+    vertex(-4, -1);
+    vertex(-2, -8);
+    endShape();
+    popMatrix();
+    
+    stroke(45);
+    line(88, 370, 173, 370);
+    
+    fill(45);
+    textFont(fonts.larger);
+    text('Gems Collected', 185, 140);
+    textFont(fonts.medium);
+    for(var i = 0; i <= 4; i ++){
+        text(collected[i], 150, 188 +  i * 40);
+    }
+    text('Total: $' + (collected[0] + (collected[1]*3) + (collected[2]*10) + (collected[3]*12) + (collected[4]*15)), 130, 389);
+    fill(0, 0, 0, 70);
+    text('( Click anywhere to continue )', 200, 445);
+    popMatrix();
+    
+    this.x /= 1.1;
+    
+    if(clicked){
+        this.out = true;
+        this.x = 350;
+    }
+    if(this.out && this.x < 10){
+        scene = 'Shop';
+    }
+};
+var calculate = new Calculate();
+
+var Shop = function(){
+    this.load = false;
+    this.x = 0;
+    this.go = new Button(100, 465, 200, 50, 'Start Digging', 'Game');
+    this.a = new Button(100, 510, 200, 40, 'Achievements', 'Achievements');
+};
+Shop.prototype.draw = function() {
+    if(!this.load){
+        collected = [0, 0, 0, 0, 0];
+        
+        Treasures = [];
+        for(var i = 0; i < 100; i ++){
+            Treasures.push(new Treasure(random(400), random(70,1300), 'Coin'));
+        }
+        for(var i = 0; i < 30; i ++){
+            Treasures.push(new Treasure(random(400), random(400, 1800), 'Chest'));
+        }
+        for(var i = 0; i < 25; i ++){
+            Treasures.push(new Treasure(random(400), random(800, 2800), 'Emerald'));
+        }
+        for(var i = 0; i < 25; i ++){
+            Treasures.push(new Treasure(random(400), random(1200, 2800), 'Ruby'));
+        }
+        for(var i = 0; i < 20; i ++){
+            Treasures.push(new Treasure(random(400), random(2000, 2800), 'Diamond'));
+        }
+        
+        drill.x = 200;
+        drill.y = 50;
+        drill.fuel = 5;
+        drill.angle = 0;
+        
+        drillTrail = [];
+        
+        Camera = {
+            y: 0,
+            right: 600,
+            zoom: 1
+        };
+        
+        calculate = new Calculate();
+        Messages.no_fuel = new Message(0);
+        Messages.pressure = new Message(1);
+        
+        this.load = true;
+    }
+    
+    
+    image(images.shopBG, 0, 0);
+    
+    pushMatrix();
+    translate(this.x, 0);
+    textFont(fonts.title);
+    fill(0, 0, 0, 30);
+    text('Shop', 200, 82);
+    fill(255);
+    text('Shop', 200, 75);
+    textFont(fonts.larger);
+    text('You have $' + money, 200, 125);
+    
+    // idk if this is efficient, it certainly doesn't look pretty
+    for(var a = 0; a < shop.length; a ++){
+        for(var i = 0; i < shop[a].prices.length; i ++){
+            shop[a].x[i] = 130 + i * 40;
+            shop[a].y[i] = 200 + a * 40;
+            
+            noFill();
+            strokeWeight(2);
+            stroke(255);
+            rect(shop[a].x[i], shop[a].y[i], 30, 30);
+            
+            if(shop[a].bought[i]){
+                image(images.filledBox, shop[a].x[i], shop[a].y[i]);
+            }
+            
+            if(mouseY > shop[a].y[i] && mouseY < shop[a].y[i] + 30 && mouseX > shop[a].x[i] && mouseX < shop[a].x[i] + 30 && !shop[a].bought[i]){
+                if((i > 0 && shop[a].bought[i - 1]) || i === 0){
+                    overButton = true;
+                    fill(255);
+                    textFont(fonts.medium);
+                    text('That will cost $' + shop[a].prices[i] + '.', 200, 150);
+                    if(clicked && money >= shop[a].prices[i]){
+                        switch(a){
+                            case 0:
+                                drill.range = shop[a].result[i];
+                                break;
+                            case 1:
+                                drill.fuel_capacity = shop[a].result[i];
+                                break;
+                            case 2:
+                                drill.hull_strength = shop[a].result[i];
+                                break;
+                            case 3:
+                                drill.steering = shop[a].result[i];
+                                break;
+                            case 4:
+                                drill.speed = shop[a].result[i];
+                                break;
+                        }
+                        money -= shop[a].prices[i];
+                        shop[a].bought[i] = true;
+                        clicked = false;
+                    }
+                }
+            }
+        }
+    }
+    
+    fill(255);
+    textAlign(LEFT, CENTER);
+    textFont(fonts.medium);
+    text('Range (' + drill.range + ')', 20, 213);
+    text('Fuel Capacity', 20, 253);
+    text('Hull Strength', 20, 293);
+    text('Steering', 20, 333);
+    text('Speed', 20, 373);
+    textAlign(CENTER, CENTER);
+    
+    this.go.draw();
+    this.a.draw();
+    popMatrix();
+    
+    this.x /= 1.1;
+};
+var shopScene = new Shop();
+
+var backButton = new Button(50, 520, 300, 50, 'Back', 'Shop');
+
+draw = function() { // all this program started out as was this draw function!
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    if(scene === 'Logo'){
+        background(110, 55, 23);
+    
+        noStroke();
+        for(var i = 0; i < 600; i += 30){
+            fill(lerpColor(color(94, 58, 42), color(18, 6, 1), i/(height)));
+            rect(0, i, width, 50);
+        }
+        
+        image(images.bg, 0, 0);
+        
+        for(var i = 0; i < 360; i += 24){
+            for(var j = 0; j < 360; j += 61){
+            pushMatrix();
+            noStroke();
+            translate(200, 300);
+            rotate(frameCount*2);
+            rotate(i);
+            fill(255, 255, 0, -j + 100);
+            arc(0, -325 + j, 100, 77, -307, 16);
+            popMatrix();
+            }
+        }
+        
+        logo(200, 300, 1.5 + sin(frameCount*20)/40);
+        if(frameCount > 100 || clicked){
+            trans.active = true;
+            trans.nextScene = 'Menu';
+        }
+    }
+    if(scene === 'Menu'){
+        menu.draw();
+    }
+    if(scene === 'About'){
+        about.draw();
+    }
+    if(scene === 'How'){
+        how.draw();
+    }
+    if(scene === 'Shop'){
+        shopScene.draw();
+    }
+    if(scene === 'Game'){
+        shopScene.load = false;
+        
+        background(13, 7, 2);
+        
+        pushMatrix();
+        Camera.x = drill.x;
+        translate(Camera.x, Camera.y + Camera.zoom);
+        scale(Camera.zoom);
+        if(drill.y > 200 / Camera.zoom){
+            Camera.y = -drill.y + (200 / Camera.zoom);
+        }
+        
+        rectMode(CORNER);
+        imageMode(CORNER);
+        translate(-drill.x, 0);
+        noStroke();
+        for(var i = 0; i < height * 5; i += 49){
+            fill(lerpColor(color(94, 58, 42), color(18, 6, 1), i/(height * 5)));
+            rect(0, i, width, 50);
+        }
+        for(var i = 0; i < height * 5; i += 600){
+            
+            image(images.bg, 0, i, 400, 600);
+        }
+        
+        strokeWeight(5);
+        stroke(0, 0, 0, 50);
+        fill(52, 201, 107);
+        rect(0, 7, 400, 50);
+        stroke(16, 115, 52);
+        rect(0, 4, 400, 50);
+        stroke(22, 150, 69);
+        rect(0, 0, 400, 50);
+        
+        noStroke();
+        
+        fill(0, 0, 0);
+        for(var i = drillTrail.length - 1; i >= 0; i --){
+            //if(drillTrail[i].y > -50 && drillTrail[i].y < 650){
+                ellipse(drillTrail[i].x, drillTrail[i].y, 30, 25);
+            //}
+        }
+        
+        drill.draw();
+        for(var i = Treasures.length - 1; i >= 0; i --){
+            if(dist(Treasures[i].x, Treasures[i].y, drill.x, drill.y) < drill.range){
+                Treasures[i].draw();
+            }
+            if(Treasures[i].disappear && Treasures[i].trans < 10){
+                Treasures.splice(i, 1);
+            }
+        }
+        popMatrix();
+        
+        fill(0, 0, 0, 50);
+        textFont(fonts.small, 15);
+        text('Fuel: ' + floor((drill.fuel / 5) * 100), 347, 25);
+        text('Depth: ' + floor(drill.y), 47, 25);
+        
+        if(drill.fuel <= 0 && drill.y <= drill.hull_strength * 20){
+            Messages.no_fuel.draw();
+            if(Messages.no_fuel.x[2] > -10){
+                scene = 'Calculate';
+            }
+        }
+        if(drill.y > drill.hull_strength * 20 && drill.fuel >= 0){
+            Messages.pressure.draw();
+            if(Messages.pressure.x[2] > -10){
+                scene = 'Calculate';
+            }
+        }
+    }
+    if(scene === 'Calculate'){
+        calculate.draw();
+    }
+    if(scene === 'Achievements'){
+        image(images.shopBG, 0, 0);
+        
+        textFont(fonts.larger, 40);
+        fill(255);
+        text('Achievements', 200, 60);
+        
+        textAlign(LEFT, CENTER);
+        for(var i = 0; i < achievements.length; i ++){
+            stroke(255);
+            strokeWeight(2);
+            noFill();
+            rect(50, 115 + (i * 50), 30, 30);
+            if(achievements[i].unlocked){
+                image(images.filledBox, 50, 115 + (i * 50));
+            }
+            fill(255);
+            textFont(fonts.larger, 20);
+            text(achievements[i].name, 100, 120 + (i * 50));
+            textFont(fonts.medium, 16);
+            text(achievements[i].desc, 100, 137 + (i * 50));
+        }
+        textAlign(CENTER, CENTER);
+        
+        backButton.draw();
+    }
+    
+    if(collected[0] >= 70 && !achievements[0].unlocked){
+        achievements[0].unlocked = true;
+        Notifs.push(new Notif('Coin Grabber'));
+    }
+    if(collected[1] >= 15 && !achievements[1].unlocked){
+        achievements[1].unlocked = true;
+        Notifs.push(new Notif('Treasure Hunter'));
+    }
+    if(collected[2] >= 10 && !achievements[2].unlocked){
+        achievements[2].unlocked = true;
+        Notifs.push(new Notif('Isaac Emerald'));
+    }
+    if(collected[3] >= 10 && !achievements[3].unlocked){
+        achievements[3].unlocked = true;
+        Notifs.push(new Notif('Robbing Rubies'));
+    }
+    if(collected[4] >= 12 && !achievements[4].unlocked){
+        achievements[4].unlocked = true;
+        Notifs.push(new Notif('Diamond Master'));
+    }
+    if(collected[0] > 0 && collected[1] > 0 && collected[2] > 0 && collected[3] > 0 && collected[4] > 0 && !achievements[5].unlocked){
+        achievements[5].unlocked = true;
+        Notifs.push(new Notif('Variety Digger'));
+    }
+    if(drill.y > 600 && !achievements[6].unlocked){
+        achievements[6].unlocked = true;
+        Notifs.push(new Notif('Getting Deeper'));
+    }
+    if(drill.y > 2400 && !achievements[7].unlocked){
+        achievements[7].unlocked = true;
+        Notifs.push(new Notif('Center of the Earth'));
+    }
+    
+    for(var i = Notifs.length - 1; i >= 0; i --){
+        Notifs[i].draw();
+    }
+    
+    // Cursor
+    cursor('default');
+    if(overButton){
+        cursor('pointer');
+    }
+    if(trans.active && trans.h > 10){
+        cursor('wait');
+    }
+    
+    // Reset mouse properties
+    clicked = false;
+    overButton = false;
+    
+    if(trans.active){
+        fill(0);
+        noStroke();
+        rect(0, 0, width, trans.out ? trans.h : height - trans.h);
+        if(!trans.out){
+            if(trans.h < 10){
+                trans.h = height;
+                trans.out = true;
+                scene = trans.nextScene;
+            }
+        } else {
+            if(trans.h < 10){
+                trans.h = height;
+                trans.out = false;
+                trans.active = false;
+            }
+        }
+        trans.h /= 1.1;
+    }
+};
+
