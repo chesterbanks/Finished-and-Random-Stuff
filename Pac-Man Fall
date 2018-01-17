@@ -1,0 +1,593 @@
+/**
+ * Pac-Man Fall
+ * Chester Banks
+ * August 14 2017
+ * 
+ * This was made in 1 hour in a code-off against Thomas Li! Hope you like it!
+*/
+
+var loadGoogleFont = (function () {
+    return this.Function ( "gfName", "gfName = gfName.replace ( /\\s+/g, '+' );var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 ), url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ], gfs = document.querySelectorAll('link[href=\"'+url+'\"]');if(!gfs.length){var f=document.createElement('link');f.setAttribute('rel','stylesheet');f.setAttribute('type','text/css');f.onload=callback;f.setAttribute('href',url);document.head.appendChild(f);}else if ( typeof callback === 'function' ) { callback.call ( gfs [ 0 ] ); }");
+})();
+var fontloaded = false;
+
+if ( !fontloaded ) {
+    loadGoogleFont('Bowlby One SC|Nixie One', 'latin-ext', 'vietnamese');
+}
+
+var fonts = {
+    big: createFont('Bowlby One SC'),
+    little: createFont('Nixie One'),
+};
+
+textFont(createFont('Bowlby One SC'));
+textAlign(CENTER, CENTER);
+
+var score = 0;
+var player;
+
+var scene = 'Menu';
+var ghostTurn = false;
+var ghostTimer = 0;
+
+var trans = {
+    active: false,
+    nextScene: '',
+    out: false,
+    plusH: 400,
+};
+var ad = {
+    timer: 5,
+    title: 'Knight Monkey',
+    creator: 'Chester Banks',
+    link: 'khanacademy.org/cs/knight-monkey/6397323504582656',
+};
+
+var keys = [];
+var keyPressed = function(){ 
+    keys[keyCode] = true; 
+};
+var keyReleased = function(){ 
+    keys[keyCode] = false; 
+};
+
+var circleCollide = function(object1, object2){
+    return (dist(object1.x, object1.y, object2.x, object2.y) <= (object1.sz / 2) + (object2.sz / 2));
+};
+
+var Ghost = function(){
+    this.x = random(width);
+    this.y = random(-50, -150);
+    this.sz = 50;
+    this.type = floor(random(4));
+};
+var Ghosts = [];
+Ghost.prototype.draw = function() {
+    noStroke();
+    switch(this.type){
+        case 0: fill(235, 21, 21); break;
+        case 1: fill(235, 149, 21); break;
+        case 2: fill(240, 113, 130); break;
+        case 3: fill(21, 221, 235); break;
+        case 4: fill(43, 43, 230); break;
+    }
+    pushMatrix();
+    translate(this.x, this.y);
+    ellipse(0, 0, this.sz, this.sz);
+    beginShape();
+    vertex(-25, 0);
+    vertex(25, 0);
+    vertex(25, 45);
+    vertex(15, 32);
+    vertex(5, 45);
+    vertex(-5, 32);
+    vertex(-15, 45);
+    vertex(-20, 32);
+    vertex(-25, 45);
+    endShape();
+    fill(255);
+    ellipse(-13, 0, this.sz / 3, this.sz / 3);
+    ellipse(7, 0, this.sz / 3, this.sz / 3);
+    fill(25);
+    ellipse(-15, 0, this.sz / 5, this.sz / 5);
+    ellipse(5, 0, this.sz / 5, this.sz / 5);
+    popMatrix();
+    
+    this.y += 3;
+    
+    if(ghostTurn){
+        this.type = 4;
+    }
+};
+
+var Dot = function(){
+    this.x = random(width);
+    this.y = random(-50, -150);
+    this.sz = random(5, 10);
+    this.type = floor(random(15));
+    if(this.type === 1){
+        this.sz = 20;
+    }
+};
+var Dots = [];
+Dot.prototype.draw = function() {
+    noStroke();
+    if(this.type === 1){
+        fill(255, 255, 255, 10);
+        for(var i = 50; i > 20; i -= 2){
+            ellipse(this.x, this.y, i, i);
+        }
+    }
+    fill(255);
+    ellipse(this.x, this.y, this.sz, this.sz);
+    
+    if(this.type === 1){
+        this.y += 3;
+    } else {
+        this.y += this.sz / 2;
+    }
+};
+
+var Player = function(){
+    this.x = 200;
+    this.y = 200;
+    this.sz = 50;
+    
+    this.xvel = 0;
+    this.yvel = 0;
+    this.speed = 5;
+    
+    this.jumping = false;
+    this.dir = 'left';
+};
+Player.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(this.xvel * 5);
+    noStroke();
+    fill(255, 255, 0);
+    arc(0, 0, this.sz, this.sz, -60 + sin(frameCount*7)*10, 240 + sin(-frameCount*7)*10);
+        fill(0);
+        ellipse(-13, -3, 8, 8);
+    popMatrix();
+    
+    // Player movement
+    if(keys[LEFT]){
+        this.xvel -= 2;
+        this.dir = 'left';
+    }
+    if(keys[RIGHT]){
+        this.xvel += 2; 
+        this.dir = 'right';
+    }
+    if(!keys[LEFT] && !keys[RIGHT]){
+        this.xvel /= 1.1;
+    }
+    
+    if ((keys[UP]) && !this.jumping) {
+        this.yvel -= 10;
+        this.jumping = true;
+    }
+    if(this.xvel > this.speed){
+        this.xvel = this.speed;
+    }
+    if(this.xvel < -this.speed){
+        this.xvel = -this.speed;
+    }
+    this.jumping = true;
+    this.y += this.yvel;
+    this.yvel += 0.6;
+    this.x += this.xvel;
+    
+    if (this.y >= 325 && this.yvel > 0) {
+        this.jumping = false;
+        this.yvel = 0;
+        this.y = 325;
+    }
+    
+    this.x = constrain(this.x, (this.sz / 2), width - (this.sz / 2));
+};
+player = new Player();
+
+var clicked = false, overButton = false;
+mouseClicked = function(){
+    clicked = true;
+};
+
+var Button = function(x, y, w, h, txt, nxt){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.txt = txt;
+    this.nxt = nxt;
+    this.plusY = 5;
+};
+Button.prototype.draw = function() {
+    pushStyle();
+    textAlign(LEFT, TOP);
+    textSize(30);
+    for(var i = 0; i < 360; i += 30){
+        fill(255, 255, 255, 30);
+        text(this.txt, this.x + sin(i)*3, 5 - this.plusY + this.y + cos(i)*3);
+    }
+    fill(255);
+    text(this.txt, this.x, this.y);
+    popStyle();
+    
+    if(mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h){
+        overButton = true;
+        this.plusY /= 1.1;
+        if(clicked){
+            if(this.txt === 'RESTART'){
+                ghostTurn = false;
+                ghostTimer = 0;
+                score = 0;
+                player = new Player();
+                Dots = [];
+                Ghosts = [];
+            }
+            
+            trans.active = true;
+            trans.nextScene = this.nxt;
+            clicked = false;
+        }
+    } else {
+        if(this.plusY < 5){ 
+            this.plusY *= 1.1;
+        }
+    }
+    
+    if(this.plusY < 1){ this.plusY = 1; }
+};
+var Buttons = {
+    start: new Button(59, 271, 100, 30, 'START', 'Ad'),
+    how: new Button(59, 304, 80, 30, 'HOW', 'How'),
+    about: new Button(59, 335, 120, 30, 'ABOUT', 'About'),
+    back: new Button(30, 340, 100, 30, 'BACK', 'Menu'),
+    restart: new Button(30, 340, 100, 30, 'RESTART', 'Menu'),
+};
+
+draw = function() {
+    background(0);
+    
+    if(scene === 'Menu'){
+        textFont(fonts.big);
+        fill(255);
+        textSize(60);
+        text('PAC-MAN', 200, 124);
+        textSize(130);
+        text('FALL', 200, 200);
+        textSize(14);
+        text('CHESTER BANKS | AUGUST 2017', 233, 90);
+        
+        Buttons.start.draw();
+        Buttons.how.draw();
+        Buttons.about.draw();
+        
+        noStroke();
+        pushMatrix();
+        translate(56, 68);
+        rotate(65);
+        noStroke();
+        fill(255, 255, 0);
+        arc(0, 0, 80, 80, -60 + sin(frameCount*7)*10, 240 + sin(-frameCount*7)*10);
+        fill(0);
+        ellipse(-19, -2, 10, 10);
+        popMatrix();
+        
+        noStroke();
+        fill(235, 149, 21);
+        pushMatrix();
+        translate(356, 293 + sin(frameCount*5)*5);
+        scale(2);
+        rotate(-10);
+        ellipse(0, 0, 50, 50);
+        beginShape();
+        vertex(-25, 0);
+        vertex(25, 0);
+        vertex(25, 45);
+        vertex(15, 32);
+        vertex(5, 45);
+        vertex(-5, 32);
+        vertex(-15, 45);
+        vertex(-20, 32);
+        vertex(-25, 45);
+        endShape();
+        fill(255);
+        ellipse(-13, 0, 50 / 3, 50 / 3);
+        ellipse(7, 0, 50 / 3, 50 / 3);
+        fill(25);
+        ellipse(-15, 0, 50 / 5, 50 / 5);
+        ellipse(5, 0, 50 / 5, 50 / 5);
+        popMatrix();
+    }
+    if(scene === 'How'){
+        fill(255);
+        textFont(fonts.big);
+        textSize(40);
+        text('HOW TO PLAY', 200, 80);
+        textFont(fonts.little);
+        textSize(18);
+        text('- Move Pac-Man with the arrow keys\n\n- Avoid the ghosts\n\n- Eat the white dots\n\n- Collect glowing dots to turn the ghosts blue\n\n- When the ghosts are blue, eat them for bonus points!', 25, 45, 350, 350);
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'About'){
+        fill(255);
+        textFont(fonts.big);
+        textSize(40);
+        text('ABOUT', 200, 80);
+        textFont(fonts.little);
+        textSize(18);
+        text('I made this program in exactly one hour in a code-off against the one and only Thomas Li! The challenge was to make a Pac-Man themed game.', 25, 45, 350, 350);
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'Game'){
+        fill(255, 255, 255, 50);
+        textFont(fonts.big, 200);
+        text(score, width / 2, height / 2);
+        
+        if(frameCount % 30 === 0){
+            Dots.push(new Dot());
+        }
+        for(var i = Dots.length - 1; i > 0; i --){
+            Dots[i].draw();
+            if(Dots[i].y > 450){
+                Dots.splice(i, 1);
+            }
+            if(circleCollide(player, Dots[i])){
+                if(Dots[i].type === 1){
+                    ghostTimer = 10;
+                    ghostTurn = true;
+                } else {
+                    score ++;
+                }
+                Dots.splice(i, 1);
+            }
+        }
+        
+        if(frameCount % 30 === 0){
+            Ghosts.push(new Ghost());
+        }
+        for(var i = Ghosts.length - 1; i > 0; i --){
+            Ghosts[i].draw();
+            if(Ghosts[i].y > 450){
+                Ghosts.splice(i, 1);
+            }
+            if(circleCollide(Ghosts[i], player)){
+                if(Ghosts[i].type === 4){
+                    Ghosts.splice(i, 1);
+                    score += 5;
+                } else {
+                    trans.active = true;
+                    trans.nextScene = 'Lose';
+                }
+            }
+        }
+        
+        noFill();
+        stroke(38, 38, 224);
+        strokeWeight(5);
+        rect(2, 350, width - 4, 17);
+        noStroke();
+        fill(38, 38, 224, 20);
+        for(var i = 0; i < 30; i += 2){
+            rect(2, 368, width - 4, i);
+        }
+        
+        player.draw();
+        
+        if(ghostTurn){
+            ghostTimer -= 0.2;
+        }
+        if(ghostTimer < 0){
+            ghostTurn = false;
+        }
+    }
+    if(scene === 'Lose'){
+        fill(255);
+        textSize(60);
+        text('GAME', 200, 80);
+        textSize(100);
+        text('OVER', 200, 150);
+        textSize(30);
+        text('YOU ENDED WITH', 200, 250);
+        textSize(60);
+        text(score + ' POINT' + (score === 1 ? '' : 'S'), 200, 294);
+        
+        Buttons.restart.draw();
+    }
+    
+    if(scene === 'Ad'){
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(color(46, 199, 82), color(49, 179, 212), i / height));
+            rect(0, i, width, 20);
+        }
+        
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/10)*15), 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        
+        pushMatrix();
+        translate(200, 200);
+        rotate(-5);
+        scale(7.0 + sin(frameCount*5));
+        strokeWeight(2);
+        fill(227, 143, 143);
+        stroke(130, 75, 33);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -18, 16);
+        noStroke();
+        fill(130, 76, 33);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(232, 189, 132);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(43, 43, 43);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(45);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        pushMatrix();
+        translate(96, 319);
+        rotate(-15);
+        scale(3.8);
+        strokeWeight(2);
+        fill(158, 158, 158);
+        stroke(128, 128, 128);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -16, 15);
+        noStroke();
+        fill(128);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(94);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(128);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(94);
+        arc(0, -4, 20, 8, 0, 180);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(128);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        pushMatrix();
+        translate(305, 310);
+        rotate(15);
+        scale(3.6);
+        strokeWeight(2);
+        fill(227, 143, 143);
+        stroke(79, 45, 20);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -18, 16);
+        noStroke();
+        fill(77, 46, 23);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(168, 134, 89);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(43, 43, 43);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(45);
+        noFill();
+        strokeWeight(1);
+        line(-1, 8, 3, 8);
+        noStroke();
+        fill(59, 51, 42);
+        bezier(-15, 2, -12, 24, 14, 17, 15, 3);
+        bezier(-15, -1, -12, -23, 14, -17, 15, -2);
+        fill(0, 0, 0, 30);
+        bezier(-15, 2, -9, 18, -8, 17, 4, 3);
+        bezier(-15, -1, -12, -23, 14, -17, 7, -2);
+        popMatrix();
+        
+        textFont(createFont('Avenir Bold'));
+        textAlign(CENTER, CENTER);
+        
+        fill(255);
+        textSize(40);
+        text(ad.title.toUpperCase(), 200, 50);
+        textSize(18);
+        text('PLAY THIS GAME BY ' + ad.creator.toUpperCase() +  ' !', 200, 80);
+        textSize(15);
+        text('(Click anywhere for link)', 200, 375);
+        
+        pushStyle();
+        textFont(createFont(''), 15);
+        strokeWeight(1);
+        stroke(255);
+        fill(0);
+        rect(298, 340, 100, 40);
+        fill(255);
+        if(ad.timer < 1){
+            textSize(20);
+            text('Skip Ad', 350, 360);
+        } else {
+            textSize(15);
+            text('Skip Ad in ' + ad.timer.toFixed(0), 350, 360);
+        }
+        popStyle();
+        
+        ad.timer -= 0.02;
+        
+        if(mouseX > 298 && mouseX < 398 && mouseY > 340 && mouseY < 380 && ad.timer < 1){
+            overButton = true;
+            if(clicked){
+                scene = 'Game';
+            }
+        } else {
+            if(clicked){
+                println(ad.link);
+            }
+        }
+    }
+    
+    if(trans.active){
+        fill(0, 0, 0);
+        if(!trans.out){
+            rect(0, 0, width, 400 - trans.plusH);
+            if(trans.plusH < 10){
+                trans.plusH = 400;
+                trans.out = true;
+                scene = trans.nextScene;
+            }
+        } else {
+            rect(0, 0, width, trans.plusH);
+            if(trans.plusH < 10){
+                trans.plusH = 400;
+                trans.active = false;
+                trans.out = false;
+            }
+        }
+        trans.plusH /= 1.2;
+    }
+    
+    cursor(overButton ? 'pointer' : 'default');
+    
+    overButton = false;
+    clicked = false;
+};
