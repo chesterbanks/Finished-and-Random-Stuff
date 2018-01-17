@@ -1,0 +1,1288 @@
+/**
+ * Fruit Frenzy
+ * Chester Banks
+ * October 17 2017
+ * 
+ * Whew, definitely learned a lot about pixel art while I made this game! I've only tried it once before, in River Raid!
+ * 
+ * Big thanks to Larry Serflaten for the awesome pixel font!
+*/
+
+var scene = 'Menu';
+var ranks = 'Toddler|Starter|Minion|Orange|Junior Fruit Ninja|Lemon|Cherry|Intermediate|Banana|The Fruit Fear You|Sweet|Pear|Pro|Expert|Fruit Maestro|Grape Think|FroYo|Talal Zulfiqar|Fruit Ninja|Fruit Master|Indescribable'.split('|');
+var rank = 0;
+
+var mode = 'Lives';
+var score = 0;
+var shake = 0;
+var inAFruit = false;
+var bombPurge = 0, slowDown = 0;
+var gameTimer = 0;
+var lives = 3;
+
+var overButton = false;
+var clicked = false;
+mouseClicked = function(){ clicked = true; };
+
+var trans = {
+    active: false,
+    nextScene: false,
+    img: undefined,
+    x: 400
+};
+
+/*
+  Old 8-bit style (ATARI) font copied from
+  http://www.khanacademy.org/cs/retro-font/2583796852
+*/
+{
+var letters = [];
+var initLetters = function(){
+    // each string holds the vertical representation of each
+    // glyph (in 2-byte hexidecimal notation).
+    // 33-47 = "!"#$&%'()*+,-./"
+    letters[33] = "0018181818001800";  // !
+    letters[34] = "0066666600000000";  // "
+    letters[35] = "0066FF6666FF6600";  // # ...
+    letters[36] = "183E603C067C1800";
+    letters[37] = "00666C1830664600";
+    letters[38] = "1C361C386F663B00";
+    letters[39] = "0018181800000000";
+    letters[40] = "000E1C18181C0E00";
+    letters[41] = "0070381818387000";
+    letters[42] = "00663CFF3C660000";
+    letters[43] = "0018187E18180000";
+    letters[44] = "0000000000181830";
+    letters[45] = "0000007E00000000";
+    letters[46] = "0000000000181800";
+    letters[47] = "00060C1830604000";
+    // 48-57 = 0-9
+    letters[48] = "003C666E76663C00";  // 0
+    letters[49] = "0018381818187E00";  // 1
+    letters[50] = "003C660C18307E00";  // 2 ...
+    letters[51] = "007E0C180C663C00";
+    letters[52] = "000C1C3C6C7E0C00";
+    letters[53] = "007E607C06663C00";
+    letters[54] = "003C607C66663C00";
+    letters[55] = "007E060C18303000";
+    letters[56] = "003C663C66663C00";
+    letters[57] = "003C663E060C3800";
+    // 58-64 = ":;<=>?@"
+    letters[58] = "0000181800181800";
+    letters[59] = "0000181800181830";
+    letters[60] = "060C1830180C0600";
+    letters[61] = "00003E00003E0000";
+    letters[62] = "6030180C18306000";
+    letters[63] = "003C660C18001800";
+    letters[64] = "003C666E6E603E00";
+    // 65-90 = A-Z
+    letters[65] = "00183C66667E6600";  // A
+    letters[66] = "007C667C66667C00";  // B
+    letters[67] = "003C666060663C00";  // C ...
+    letters[68] = "00786C66666C7800";
+    letters[69] = "007E607C60607E00";
+    letters[70] = "007E607C60606000";
+    letters[71] = "003E60606E663E00";
+    letters[72] = "0066667E66666600";
+    letters[73] = "007E181818187E00";
+    letters[74] = "0006060606663C00";
+    letters[75] = "00666C78786C6600";
+    letters[76] = "0060606060607E00";
+    letters[77] = "0063777F6B636300";
+    letters[78] = "0066767E7E6E6600";
+    letters[79] = "003C666666663C00";
+    letters[80] = "007C66667C606000";
+    letters[81] = "003C6666666C3600";
+    letters[82] = "007C66667C6C6600";
+    letters[83] = "003C603C06063C00";
+    letters[84] = "007E181818181800";
+    letters[85] = "0066666666667E00";
+    letters[86] = "00666666663C1800";
+    letters[87] = "0063636B7F776300";
+    letters[88] = "0066663C3C666600";
+    letters[89] = "0066663C18181800"; 
+    letters[90] = "007E0C1830607E00";
+    // 91-96 = "[\]^_`"   //       ` added for completeness 
+    letters[91] = "001E181818181E00";
+    letters[92] = "00406030180C0600";
+    letters[93] = "0078181818187800";
+    letters[94] = "00081C3663000000";
+    letters[95] = "000000000000FF00";
+    letters[96] = "0018180C00000000";
+    // 97-122 = a-z
+    letters[97] = "00003C063E663E00";
+    letters[98] = "0060607C66667C00";
+    letters[99] = "00003C6060603C00";
+    letters[100] = "0006063E66663E00";
+    letters[101] = "00003C667E603C00";
+    letters[102] = "000E183E18181800";
+    letters[103] = "00003E66663E067C";
+    letters[104] = "0060607C66666600";
+    letters[105] = "0018003818183C00";
+    letters[106] = "000600060606063C";
+    letters[107] = "0060606C786C6600";
+    letters[108] = "0038181818183C00";
+    letters[109] = "0000667F7F6B6300";
+    letters[110] = "00007C6666666600";
+    letters[111] = "00003C6666663C00";
+    letters[112] = "00007C66667C6060";
+    letters[113] = "00003E66663E0606";
+    letters[114] = "00007C6660606000";
+    letters[115] = "00003E603C067C00";
+    letters[116] = "00187E1818180E00";
+    letters[117] = "0000666666663E00";
+    letters[118] = "00006666663C1800";
+    letters[119] = "0000636B7F3E3600";
+    letters[120] = "0000663C183C6600";
+    letters[121] = "00006666663E0C78";
+    letters[122] = "00007E0C18307E00";
+    // 123-126 = "{|}~"  // {} and ~ added for completeness
+    letters[123] = "1C30306030301C00";
+    letters[124] = "1818181818181818";
+    letters[125] = "380C0C060C0C3800";
+    letters[126] = "000070DB0E000000";
+};
+// Use the drawLetter function to draw single letters
+var drawLetter = function(ltr, x, y, z){
+    // ensure letters are prepared
+    if (letters.length === 0){initLetters();}
+    // get letter element (string)
+    var code = letters[ltr.charCodeAt(0)];
+    // verify letter is properly defined
+    if (typeof code === "string" && code.length === 16){
+        // calc cell size from letter size
+        var s = floor(z/8);
+        if (s<1){s=1;}
+        // vert loop
+        for (var i=0; i<8; i++){
+            // get 2-byte hexadecimal value
+            var seg = parseInt(code.substr(i+i, 2), 16);
+            var yy = y+(i*s);
+            // horz loop
+            for (var xx=x+(s*7); xx>=0; xx-=s){
+                if (seg & 1){
+                   rect(xx, yy, s, s);
+                }
+                seg >>= 1;
+            }
+        }
+    }
+};
+
+// Use the drawWords function to draw a string of text
+var drawWords = function(wrd, x, y, z){
+// wrd = string to draw
+// x   = x position (LEFT)
+// y   = y position (TOP)
+// z   = font size (reduced to multiples of 8)
+
+    // validate input
+    if (typeof wrd !== "string"){
+        wrd = wrd.toString();
+    }
+    // calc size (multiple of 8) 
+    var s = floor(z/8) * 8;
+    if (s<8){s=8;}
+    var xx = x; 
+    // loop through word(s)
+    for (var i=0; i<wrd.length; i++){
+        drawLetter(wrd.substr(i, 1), xx, y, s);
+        xx += s;
+        // wrap around
+        if (xx+s > width){
+            xx = x;
+            y += s;
+        }
+    }
+};
+}
+
+var arrays = {
+    orange: [
+        '     oooooo     ',
+        '   ooOttOOOoo   ',
+        '  o0OtOttOOOOo  ',
+        ' o0O0twttOOOOOo ',
+        ' oOOt0tt0OOOOOo ',
+        'o0OOOtOOtOOOOO0o',
+        'o0OO0O0OOOOOOO0o',
+        'o0OOtOtOOOOOOO0o',
+        'b0OOOOOOOOOOOO0b',
+        'br0OOOOOOOOOO0rb',
+        'bor0OOOOOOOO0rob',
+        ' boor000000roob ',
+        ' borrrrrrrrrrob ',
+        '  borrrrrrrrob  ',
+        '   bboooooobb   ',
+        '     bbbbbb     ',
+    ],
+    lemon: [
+        '      oooo      ',
+        '    ooYYYYoo    ',
+        '   oYyyyYyyYo   ',
+        '  oYyYwywYyyYo  ',
+        ' oYyYwwYywyyyYo ',
+        'oyyywYywYyyyyyyo',
+        'oYyyywyywyyyyyYo',
+        'b0OYyyyyyyyyYO0b',
+        ' boOOYYYYYYOOob ',
+        '  bOYOOOOOOYOb  ',
+        '   bOYYYYYYOb   ',
+        '    bbOOOObb    ',
+        '      bbbb      ',
+    ],
+    cherry: [
+        '      ccggggg  ',
+        '    ccGGGcgccg ',
+        '   cTGTGTbbbgcg',
+        '  cTGbcGg bggcg',
+        '  gGb gGg  bbgb',
+        '  gTb gTb    bb',
+        '  bcb gcb     ',
+        '  vvvb gcb    ',
+        ' vVVRvbgbvvv  ',
+        'vRwRvvvbRRVVv ',
+        'bvRRvvbVwVvvVv',
+        'bvvvvvbvVVvvvb',
+        'bRVVVVbvvvvvVb',
+        ' vRRRRbVVVVVRv',
+        '  vvvv bRRRRv ',
+        '        vvvv  ',
+    ],
+    banana: [
+        '          oooooo',
+        '          bbbbbb',
+        ' oo        oRRb',
+        'o00oo      oR0qb',
+        'o0000ooooooqRy0b',
+        'bq00000000q0RyYb',
+        ' bq000000o00RyYb',
+        '  bqqqqooyYRyyYb',
+        '  bboooYyY0RwyYb',
+        ' b0YYYYYYYRywyYb',
+        ' bYYYYYY0RYyyy0b',
+        '  b0000RRYyyyYb',
+        '   bbRR0YyyyY0b',
+        '     b0YYYyY0b',
+        '     b00YY0bb ',
+        '      bbbbb ',
+    ],
+    pear: [
+        '       l      ',
+        '     llll     ',
+        '    lLLLLl    ',
+        '   lLGGGLTl   ',
+        '   lGGGGGLl   ',
+        '   lGLwGGGl   ',
+        '  lTGLLGGGTl  ',
+        ' lTGGGGGGGGTl ',
+        ' lGGGGGGGGGGl ',
+        'lTGGGGGGGGGGTl',
+        'lTTGGGGGGGGTTl',
+        'bcTTGGGGGGTTcb',
+        'bccccTTTTccccb',
+        'bccccccccccccb',
+        ' bbTTTTTTTTbb ',
+        '   bbbbbbbb   ',
+    ],
+    grapes: [
+        '             bm',
+        '     bbm mmb mbm',
+        '    bmppbpppbb b',
+        '   bmpmbbPpmmb',
+        '   bbbppmmbPpmb',
+        '  bmbpPmpppbPpb',
+        ' bmpbmmmpPpbpmmb',
+        ' bvbmpPbppmmmbmb',
+        ' bbbmppmbmpPpbvb',
+        'bmpmbvmpPpmpmbb ',
+        'bmvbmbbpppbmvbmb',
+        'bvbmppbvpmbbbvvb',
+        'bmbmmpbbbbmmbbb ',
+        ' bbvvmbmmbvvb   ',
+        ' bvbbbvvbbbb    ',
+        '  bbbbbb        ',
+    ],
+    wood: [
+        'QQqqqqdQQQqqd',
+        'QqqqqqdQQqQqd',
+        'QQqqqqdQqQQqd',
+        'QqqqqqdQqqqqd',
+        'QqqqqqdQqqqqd',
+        'QqqqqqdQqqqqd',
+        'QqqqqddQqqqqd',
+        'QQqqqddQqqqqd',
+        'Qqqqqddqqqqdd',
+        'qQqdqddqqdqqd',
+        'qqdqdddqqqddd',
+        'qqqddddqqqddd',
+        'qqqqqqdqqqqqd',
+    ],
+    cursor: [
+        'b',
+        'bb',
+        'bwb',
+        'bwwb',
+        'bwwwb',
+        'bwwwwb',
+        'bwwwwwb',
+        'bwwwwwwb',
+        'bwwwwwwwb',
+        'bwwwwwwwwb',
+        'bwwwwwwwwwb',
+        'bwwwwwwbbbbb',
+        'bwwwbwwb ',
+        'bwwb bwwb',
+        'bwb  bwwb',
+        'bb    bwwb',
+        '      bwwb',
+        '       bb',
+    ],
+    cursor2: [
+        'b',
+        'bb',
+        'bwb',
+        'bwwb',
+        'bwwwb',
+        'bwwwwb',
+        'bwwwwwb',
+        'bwwwbbbb',
+        'bwbwwb',
+        'bwbbwb  ',
+        'bb bwwb',
+        '    bbb',
+    ],
+    pointer: [
+        '  bb ',
+        '  bwb',
+        '  bwb',
+        '  bwbbbbb',
+        'bbbwwbwbwb',
+        'bwbwwbwbwb',
+        'bwwwwwwwwb  ',
+        'bwwwwwwwb',
+        ' bwwwwwb',
+        '  bbbbb',
+    ],
+    bomb: [
+        '             Y',
+        '           YYY ',
+        '     bbbbbYY  ',
+        '    bbbbbYY    ',
+        '   bbbbggYgbb  ',
+        '  bDbbgggDDbbb ',
+        ' bDDDbbgDDbbggb',
+        ' bDDgbbbbbbbggb',
+        'bDDwwbbbbbbggggb',
+        'bDDwgggggggggggb',
+        'bDgggggggggggbbb',
+        'bggggggggggbbbbb',
+        'bggggggbgbbbbbbb',
+        ' bggggggbgbbbbbb',
+        ' bggggggbbbbbbb',
+        '  bggggbbgbbbb ',
+        '   bbgggbbbbb  ',
+        '     bbbbbb    ',
+    ],
+    watermelon: [
+        '             vvv',
+        '           vvGGg',
+        '         vvo11Lg',
+        '       vvoo1RgLg',
+        '     vvoo21RRRLg',
+        '   vvoo22RRgRrGg',
+        'gggoo12RRRRRRrGg',
+        'gLo12RRRgRRRRLGg',
+        'gGLRgRRRRRgRrLTg',
+        ' gGLRRgRRRRrLGg',
+        '  gGLrRRRRrLGTg  ',
+        '   gTGGLLLGGTg  ',
+        '    gbTTTTTbb   ',
+        '      bbbbb     ',
+    ],
+    apple: [
+        '      ggwLLL',
+        '      ggLLGG',
+        '    vvvgGGRv ',
+        '  vvRRRRRRRRvv ',
+        ' vRRRRRRRRRRRRv',
+        ' vRRR2RRRRRRRRv',
+        'vRRRRRRRRRRRRRRv',
+        'v3RRRRRRRRRRRR3v',
+        'v03RRRRRRRRRR30v',
+        'vyt0333333330tyv',
+        'vyyyttttttttyyyv',
+        ' btyyyyyyyyyytb',
+        ' b00ttyyyytt00b',
+        '  bee000000eeb',
+        '   beeeeeeeeb',
+        '    bbbbbbbb',
+    ],
+    heart: [
+        '         rvvr',
+        '  rvr   vR22Rv',
+        ' vR222 vR2222Rv',
+        'rR22wwv122ww21Rr',
+        'v12w22122w22121v',
+        'rR1222222221211v',
+        ' vR12122121211vr',
+        '  v1221121211Rr',
+        '   r12121211Rv',
+        '    v12121Rrv',
+        '     v111Rr',
+        '     v11Rv',
+        '     r1Rv',
+        '      Rr',
+        '      v',
+    ],
+    pineapple: [
+        '        b',
+        '       bGb',
+        '      bGGGb',
+        '  bbbbbGcGbbbb',
+        '  bGGGGGcGGGGGb',
+        '   bGccGcGccGb ',
+        '  bbbGcccccGbbb',
+        '  bGGGGclcGGGGb',
+        '   bGcclllcc b',
+        '    bclbbblcb',
+        '    bbb000bbb',
+        '   bo000tttttb',
+        '   b000t0wwwtb',
+        '  bo00t0twwwwtb',
+        '  b00t0t0twwwtb',
+        ' bo0o0t0ttttwwtb',
+        ' bo000ttt0t0twtb',
+        'bo0ot0t0tttttwttb',
+        'bo000ttttt0t0twtb',
+        'bo0ot0tt0tttttttb',
+        'bo00ttt0t0t0tt0tb',
+        'booo00tt0tttt0ttb',
+        ' bo000t0tt0t0ttb',
+        '  boo00000ttt0b',
+        '   bboooooo00b',
+        '     bbbbbbbb',
+    ],
+};
+
+var drawArray = function(arr, x, y, w,h ){
+    noStroke();
+    for(var i = 0; i < arr.length; i ++){
+        for(var j = 0; j < arr[i].length; j ++){
+            var char = arr[i][j];
+            
+            switch(char){
+                case 'o':
+                    fill(144, 0, 10);
+                    break;
+                case 'O':
+                    fill(246, 127, 13);
+                    break;
+                case '0':
+                    fill(214, 92, 30);
+                    break;
+                case '3':
+                    fill(214, 55, 30);
+                    break;
+                case 't':
+                    fill(249, 177, 43);
+                    break;
+                case 'b':
+                    fill(0);
+                    break;
+                case 'w':
+                    fill(255, 255, 255);
+                    break;
+                case 'r':
+                    fill(155, 33, 38);
+                    break;
+                case 'Q':
+                    fill(193, 134, 119);
+                    break;
+                case 'q':
+                    fill(163, 114, 89);
+                    break;
+                case 'd':
+                    fill(128, 90, 70);
+                    break;
+                case 'y':
+                    fill(251, 244, 43);
+                    break;
+                case 'Y':
+                    fill(249, 177, 43);
+                    break;
+                case 'R':
+                    fill(185, 0, 14);
+                    break;
+                case 'V':
+                    fill(144, 0, 10);
+                    break;
+                case 'v':
+                    fill(91, 0, 26);
+                    break;
+                case 'g':
+                    fill(38, 46, 43);
+                    break;
+                case 'G':
+                    fill(91, 182, 37);
+                    break;
+                case 'c':
+                    fill(41, 105, 23);
+                    break;
+                case 'T':
+                    fill(46, 133, 91);
+                    break;
+                case 'l':
+                    fill(38, 46, 43);
+                    break;
+                case 'L':
+                    fill(139, 229, 64);
+                    break;
+                case 'p':
+                    fill(89, 0, 192);
+                    break;
+                case 'P':
+                    fill(140, 28, 160);
+                    break;
+                case 'm':
+                    fill(65, 0, 37);
+                    break;
+                case 'D':
+                    fill(117, 94, 94);
+                    break;
+                case '1':
+                    fill(207, 64, 80);
+                    break;
+                case '2':
+                    fill(246, 98, 103);
+                    break;
+                case 'e':
+                    fill(123, 68, 45);
+                    break;
+                default:
+                    noFill();
+                    break;
+            }
+            
+            rect(x + j * w, y +i * h, w, h);
+        }
+    }
+};
+
+var images = {
+    "orange": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.orange, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "pear": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.pear, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "lemon": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.lemon, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "grapes": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.grapes, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "banana": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.banana, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "cherry": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.cherry, 0, 0, 25, 25);
+        
+        return get(0, 0, 400, 400);
+    },
+    "bomb": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.bomb, 0, 0, 22,22);
+        
+        return get(0, 0, width, height);
+    },
+    "apple": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.apple, 0, 0, 25,25);
+        
+        return get(0, 0, width, height);
+    },
+    "watermelon": function(){
+        background(0, 0, 0, 0);
+        drawArray(arrays.watermelon, 0, 0, 25, 25);
+        
+        return get(0, 0, width, height);
+    },
+    "woodBG": function(){
+        for(var i = 0; i < 400; i += 39){
+            for(var j = 0; j < 400; j += 39){
+                drawArray(arrays.wood, i, j, 3, 3);
+            }
+        }
+        
+        return get(0, 0, 400, 400);
+    },
+    "pineapple": function(){
+        drawArray(arrays.pineapple, 0, 0, 15, 15);
+        
+        return get(0, 0, 400, 400);
+    },
+    /*"logo": function(){
+        background(255, 255, 255);
+        
+        for(var i = 0; i < 360; i += 24){
+            for(var j = 0; j < 360; j += 61){
+                pushMatrix();
+                noStroke();
+                translate(200, 200);
+                rotate(i);
+            fill(0, 187, 255, -j + 200);
+                arc(0, -325 + j, 100, 77, -307, 16);
+                popMatrix();
+            }
+        }
+        
+        var logoColors = [
+            color(17, 67, 138),
+            color(87, 156, 217),
+            color(56, 179, 255),
+            color(69, 192, 230),
+        ];
+        
+        pushMatrix();
+        translate(200, 200);
+        noFill();
+        strokeCap(SQUARE);
+        stroke(0, 0, 0, 30);
+        strokeWeight(30);
+        arc(10, 20, 160, 160, 30, 330);
+        strokeWeight(11);
+        // Outer layer
+        stroke(logoColors[0]);
+        arc(0, 0, 200, 200, -85, -30);
+        arc(0, 0, 180, 180, -75, -30);
+        arc(0, 0, 200, 200, -300, -240);
+        arc(0, 0, 180, 180, -285, -250);
+        stroke(logoColors[1]);
+        arc(0, 0, 200, 200, -125, -85);
+        arc(0, 0, 180, 180, -115, -75);
+        arc(0, 0, 200, 200, -200, -160);
+        arc(0, 0, 180, 180, -200, -150);
+        stroke(logoColors[2]);
+        arc(0, 0, 200, 200, -160, -125);
+        arc(0, 0, 180, 180, -150, -116);
+        arc(0, 0, 200, 200, -330, -300);
+        arc(0, 0, 180, 180, -330, -286);
+        stroke(logoColors[3]);
+        arc(0, 0, 200, 200, -240, -200);
+        arc(0, 0, 180, 180, -250, -200);
+        
+        // Inner layer
+        stroke(logoColors[0]);
+        arc(0, 0, 160, 160, -200, -160);
+        arc(0, 0, 140, 140, -200, -150);
+        stroke(logoColors[1]);
+        arc(0, 0, 160, 160, -300, -240);
+        arc(0, 0, 140, 140, -285, -250);
+        stroke(logoColors[2]);
+        arc(0, 0, 160, 160, -240, -200);
+        arc(0, 0, 140, 140, -250, -200);
+        arc(0, 0, 160, 160, -125, -85);
+        arc(0, 0, 140, 140, -115, -75);
+        stroke(logoColors[3]);
+        arc(0, 0, 160, 160, -85, -30);
+        arc(0, 0, 140, 140, -75, -30);
+        arc(0, 0, 160, 160, -330, -300);
+        arc(0, 0, 140, 140, -330, -286);
+        arc(0, 0, 160, 160, -160, -125);
+        arc(0, 0, 140, 140, -150, -116);
+        
+        stroke(0, 0, 0, 50);
+        strokeWeight(20);
+        arc(0, 0, 150, 150, 30, 330);
+        popMatrix();
+        
+        var quality = 10;
+        var imgs = [];
+        for(var i = 0; i < width; i += quality){
+            for(var j = 0; j < height; j += quality){
+                imgs.push({x: i, y: j, colo: get(i, j)});
+            }
+        }
+        
+        background(255, 255, 255);
+        noStroke();
+        for(var i in imgs){
+            fill(imgs[i].colo);
+            rect(imgs[i].x, imgs[i].y, quality, quality);
+        }
+        
+        return get(0, 0, width, height);
+    },*/
+};
+
+var Fruit = function(type, x, y){
+    this.x = x || random(50, 350);
+    this.y = y || random(100, 300);
+    this.w = 30;
+    this.h = 30;
+    
+    this.slowTimer = 0;
+    
+    this.type = type;
+    this.disappear = false;
+    
+    if(this.type === 'Orange' || this.type === 'Cherry' || this.type === 'Grapes' || this.type === 'Moving Bomb' || this.type === 'Apple'){
+        this.xSpeed = random(5);
+    } else {
+        this.xSpeed = 0;
+    }
+    
+    if(this.type === 'Lemon' || this.type === 'Cherry' || this.type === 'Pear' || this.type === 'Watermelon' || this.type === 'Moving Bomb'){
+        this.ySpeed = random(5);
+    } else {
+        this.ySpeed = 0;
+    }
+    
+    this.originalSs = [this.xSpeed, this.ySpeed];
+    
+    this.timer = random(40, 60);
+};
+var Fruits = [];
+var fruitNames = ['Orange', 'Lemon', 'Cherry', 'Banana', 'Pear', 'Grapes'];
+Fruit.prototype.draw = function() {
+    pushMatrix();
+    imageMode(CENTER);
+    translate(this.x, this.y);
+    scale(this.w / 30);
+    switch(this.type){
+        case 'Orange':
+            image(images.orange, 0, 0, 30, 30);
+            break;
+        case 'Lemon':
+            image(images.lemon, 0, 0, 30, 30);
+            break;
+        case 'Cherry':
+            image(images.cherry, 0, 0, 30, 30);
+            break;
+        case 'Banana':
+            image(images.banana, 0, 0, 30, 30);
+            break;
+        case 'Pear':
+            image(images.pear, 0, 0, this.w, this.h);
+            break;
+        case 'Grapes':
+            image(images.grapes, 0, 0, this.w, this.h);
+            break;
+        case 'Bomb':
+        case 'Moving Bomb':
+            image(images.bomb, 0, 0, this.w, this.h);
+            break;
+        case 'Watermelon':
+            image(images.watermelon, 0, 0, this.w, this.h);
+            break;
+        case 'Apple':
+            image(images.apple, 0, 0, this.w, this.h);
+            break;
+        case 'Pineapple':
+            image(images.pineapple, 0, 0, this.w * 1.5, this.h * 1.5);
+            break;
+    }
+    imageMode(CORNER);
+    popMatrix();
+    
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    
+    if(this.x > width - (this.w / 2) || this.x <= this.w / 2){
+        this.xSpeed = -this.xSpeed;
+    }
+    if(this.y > 350 - (this.h / 2) || this.y <= 50 + this.h / 2){
+        this.ySpeed = -this.ySpeed;
+    }
+    
+    if(mouseX > this.x - (this.w / 2) && mouseX < this.x + this.w / 2 && mouseY > this.y  - (this.h / 2) && mouseY < this.y + this.h / 2){
+        inAFruit = true;
+        overButton = true;
+        if(clicked){
+            if(this.type === 'Bomb' || this.type === 'Moving Bomb'){
+                lives --;
+                if(mode === 'Timed'){
+                    gameTimer += 10;
+                }
+                if(mode === 'Endless'){
+                    score /= 2;
+                }
+            } else if (this.type === 'Watermelon'){
+                bombPurge = 3;
+            } else if (this.type === 'Apple'){
+                slowDown = 5;
+            } else if(this.type === 'Cherry'){
+                score *= 2;
+            } else if (this.type === 'Pineapple'){
+                for(var i = 0; i < 5; i ++){
+                    Fruits.push(new Fruit(fruitNames[floor(random(fruitNames.length - 1))], this.x, this.y));
+                }
+            } else {
+                score += round(this.xSpeed) + 1;
+                score += round(this.ySpeed) + 1;
+            }
+            this.disappear = true;
+            if(this.type === 'Bomb' || this.type === 'Moving Bomb'){
+                shake = 20;
+            }
+        }
+    }
+    if(this.disappear){
+        this.w = this.h /= 1.1;
+    }
+    
+    if(this.slowTimer >= 29){
+        this.xSpeed /= 2;
+        this.ySpeed /= 2;
+    }
+    if(this.slowTimer === 0.5){
+        this.xSpeed = this.originalSs[0];
+        this.ySpeed = this.originalSs[0];
+    }
+    this.slowTimer -= 0.5;
+    
+    this.timer -= 0.1;
+    if(this.timer < 0 && (this.type === 'Bomb' || this.type === 'Moving Bomb')){
+        this.disappear = true;
+    }
+    if(this.timer < 30 && this.type === 'Watermelon'){
+        this.disappear = true;
+    }
+    if(this.timer < -20){
+        this.disappear = true;
+    }
+};
+
+for(var i = 0; i < 10; i ++){
+    Fruits.push(new Fruit(fruitNames[floor(random(fruitNames.length))]));
+}
+
+draw = function() {
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    if(scene === 'Logo'){
+        background(255);
+        pushMatrix();
+        translate(200, 200);
+        //scale(1 + sin((floor(frameCount / 10))*40) / 5);
+        translate(-200, -200);
+        image(images.logo, 0, 0);
+        popMatrix();
+        
+        if(frameCount > 100 || clicked){
+            if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+            trans.active = true;
+            scene = 'Menu';
+            clicked = false;
+        }
+    }
+    if(scene === 'Menu'){
+        image(images.woodBG, 0, 0);
+        
+        image(images.orange, 40, 60, 50, 50);
+        image(images.lemon, 100, 62, 50, 50);
+        image(images.cherry, 156, 62, 50, 50);
+        image(images.banana, 206, 63, 50, 50);
+        image(images.pear, 260, 63, 50, 50);
+        image(images.grapes, 310, 64, 50, 50);
+        
+        fill(0, 0, 0, 80);
+        drawWords("FRUIT", 40 + sin(floor(frameCount / 5)*50)*10, 143, 70);
+        drawWords("FRENZY", 56 - sin(floor(frameCount / 5)*50)*10, 206, 54);
+        drawWords("CHESTER BANKS", 96, 258, 16);
+        
+        fill(168, 168, 168);
+        drawWords("FRUIT", 40 + sin(floor(frameCount / 5)*50)*10, 139, 70);
+        drawWords("FRENZY", 56 - sin(floor(frameCount / 5)*50)*10, 202, 54);
+        drawWords("CHESTER BANKS", 96, 255, 16);
+        
+        fill(255, 255, 255);
+        drawWords("FRUIT", 40 + sin(floor(frameCount / 5)*50)*10, 135, 70);
+        drawWords("FRENZY", 56 - sin(floor(frameCount / 5)*50)*10, 200, 54);
+        drawWords("CHESTER BANKS", 96, 253, 16);
+        fill(0, 0, 0, 200 + sin(frameCount * 5) * 100);
+        drawWords("> CLICK TO START <", 57, 320, 23);
+        
+        if(mouseY > 310 && mouseY < 343){
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                scene = 'Fruits';
+                clicked = false;
+            }
+        }
+    }
+    if(scene === 'Fruits'){
+        image(images.woodBG, 0, 0);
+        fill(0, 0, 0, 50);
+        rect(0, 0, width, height);
+        
+        imageMode(CENTER);
+        if(frameCount % 60 < 10){
+            image(images.orange, 100, 135, 100, 100);
+        } else if(frameCount % 60 < 20){
+            image(images.banana, 100, 135, 100, 100);
+        } else if(frameCount % 60 < 30){
+            image(images.lemon, 100, 135, 100, 100);
+        } else if(frameCount % 60 < 40){
+            image(images.pear, 100, 135, 100, 100);
+        } else if(frameCount % 60 < 50){
+            image(images.cherry, 100, 135, 100, 100);
+        } else {
+            image(images.grapes, 100, 150, 100, 100);
+        }
+        image(images.bomb, 100, 251, 100, 100);
+        imageMode(CORNER);
+        
+        fill(255);
+        drawWords("HOW TO PLAY", 28, 40, 34);
+        drawWords("CLICK ON THE FRUITS TO    GET POINTS.", 179, 110, 20);
+        drawWords("CHERRIES DOUBLE YOUR       SCORE!", 179, 162, 15);
+        drawWords("YOU LOSE A   LIFE WHEN    YOU CLICK A  BOMB,", 179, 220, 20);
+        
+        pushMatrix();
+        translate(210, 305);
+        scale(0.9);
+        translate(-210, -305);
+        drawWords("YOU ALSO LOSE POINTS IF  YOU CLICK ANYWHERE ELSE.", 0, 320, 20);
+        popMatrix();
+        
+        
+        fill(0, 0, 0, 200 + sin(frameCount * 5) * 100);
+        drawWords("> GOT IT! <", 117, 365, 23);
+        
+        if(mouseY > 360 && mouseY < 385){
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                scene = 'Choose';
+                clicked = false;
+            }
+        }
+    }
+    if(scene === 'Choose'){
+        image(images.woodBG, 0, 0);
+        fill(0, 0, 0, 50);
+        rect(0, 0, width, height);
+        
+        imageMode(CENTER);
+        image(images.orange, 100, 118, 80, 80);
+        image(images.cherry, 100, 335, 80, 80);
+        drawArray(arrays.heart, 58, 182, 5, 5);
+        imageMode(CORNER);
+        
+        noStroke();
+        fill(255, 255, 255 ,30);
+        if(mouseY > 65 && mouseY < 170){
+            rect(0, 65, 400, 105);
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                mode = 'Timed';
+                scene = 'Game';
+                clicked = false;
+            }
+        }
+        if(mouseY > 170 && mouseY < 285){
+            rect(0, 170, 400, 105);
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                mode = 'Lives';
+                scene = 'Game';
+                clicked = false;
+            }
+        }
+        if(mouseY > 285){
+            rect(0, 285, 400, 105);
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                mode = 'Endless';
+                scene = 'Game';
+                clicked = false;
+            }
+        }
+        
+        fill(255);
+        drawWords("GAME MODE", 56, 25, 34);
+        drawWords("TIMED", 179, 106, 27);
+        drawWords("LIVES", 179, 211, 27);
+        drawWords("ENDLESS", 179, 324, 27);
+    }
+    if(scene === 'Game'){
+        pushMatrix();
+        if(shake > 1){
+            translate(random(shake), random(shake));
+            shake /= 1.1;
+        }
+        image(images.woodBG, 0, 0);
+        fill(255, 187, 0, 50);
+        rect(0, 0, width, height);
+        
+        fill(0, 0, 0, 100);
+        rect(0, 0, width, 50);
+        rect(0, 350, width, 50);
+        
+        fill(255);
+        drawWords(score.toFixed(0), 20, 15, 30);
+        
+        if(mode === 'Lives'){
+            for(var i = 0 ; i < lives; i ++){
+                drawArray(arrays.heart, 348 - (i * 35), 10, 2, 2);
+            }
+        }
+        if(mode === 'Timed'){
+            drawWords(99 - gameTimer, 330, 15, 30);
+        }
+        
+        fill(255, 255, 255, 150);
+        pushMatrix();
+        translate(200, 159);
+        scale(0.8);
+        translate(-200, -150);
+        drawWords('PRESS A KEY TO SAVE SCORE', 0, 427, 20);
+        popMatrix();
+        
+        fill(255, 255, 255);
+        drawWords(ranks[rank].toUpperCase(), 215 - (ranks[rank].length * 9), 360, 20);
+        
+        for(var i = Fruits.length - 1; i >= 0; i --){
+            Fruits[i].draw();
+            if(bombPurge > 0){
+                if(Fruits[i].type === 'Bomb'){
+                    Fruits[i].disappear = true;
+                }
+            }
+            if(slowDown > 0){
+                Fruits[i].slowTimer = 30;
+            }
+            if(Fruits[i].w < 1){
+                Fruits.splice(i, 1);
+            }
+        }
+        bombPurge --;
+        slowDown --;
+        
+        if(frameCount % 50 === 0){
+            Fruits.push(new Fruit(fruitNames[floor(random(fruitNames.length))]));
+        }
+        if(frameCount % 40 === 0){
+            Fruits.push(new Fruit('Bomb'));
+        }
+        if(frameCount % 80 === 0 && gameTimer > 80){
+            Fruits.push(new Fruit('Moving Bomb'));
+        }
+        if(shake > 1){
+            noStroke();
+            fill(255, 0, 0, this.shake * 10);
+            rect(0, 0, width, height);
+        }
+        popMatrix();
+        
+        
+        if(clicked && !inAFruit){
+            score -= 2;
+        }
+        
+        if(score < 0){ score = 0; }
+        
+        inAFruit = false;
+        
+        if(floor(score / 15) < 5){
+            rank = floor(score / 15);
+        } else if (floor(score / 15) < 10){
+            rank = floor(score / 25);
+        } else {
+            rank = floor(score / 50);
+        }
+        
+        if(keyIsPressed){
+            scene = 'Score';
+        }
+        if(frameCount % 30 === 0){
+            gameTimer ++;
+        }
+        
+        if((gameTimer > 30 && fruitNames.length < 7) || (gameTimer > 60 && fruitNames.length < 8)|| (gameTimer > 80 && fruitNames.length < 9)){
+            if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+            trans.active = true;
+            scene = 'New Fruit';
+        }
+        
+        if((mode === 'Lives' && lives < 0) || (mode === 'Timed' && gameTimer > 99)){
+            if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+            trans.active = true;
+            scene = 'Finished';
+            clicked = false;
+        }
+        
+        if(rank > ranks.length - 1){ 
+            rank = ranks.length - 1; 
+        }
+    }
+    if(scene === 'New Fruit'){
+        pushMatrix();
+        image(images.woodBG, 0, 0);
+        fill(232, 174, 14, 50);
+        rect(0, 0, width, height);
+        
+        
+        fill(255);
+        drawWords('NEW FRUIT!', 23, 25, 20);
+        
+        if(fruitNames.length < 7){
+            image(images.watermelon, 95, 100, 200, 200);
+            
+            fill(255);
+            drawWords('WATERMELON', 23, 47, 36);
+            drawWords('WHEN CLICKED, THIS     FRUIT WILL DESTROY ALL STATIC BOMBS.', 23, 290, 20);
+        } else if (fruitNames.length < 8){
+            image(images.apple, 95, 100, 200, 200);
+            
+            fill(255);
+            drawWords('APPLE', 23, 47, 36);
+            drawWords('WHEN CLICKED, THIS     FRUIT WILL SLOW THINGS DOWN FOR A WHILE.', 23, 309, 20);
+        } else {
+            image(images.pineapple, 95, 100, 200, 200);
+            
+            fill(255);
+            drawWords('PINEAPPLE', 23, 47, 36);
+            drawWords('WHEN CLICKED, THIS     FRUIT WILL EXPLODE     INTO OTHER FRUITS', 23, 309, 20);
+        }
+        drawWords('GOT IT >', 245, 363, 21);
+        
+        
+        if(mouseY > 355 && mouseY < 385 && mouseX > 230){
+            overButton = true;
+            if(clicked){
+                if(fruitNames.length < 7){ 
+                    fruitNames.push('Watermelon'); 
+                } else if (fruitNames.length < 8){
+                    fruitNames.push('Apple'); 
+                } else {
+                    fruitNames.push('Pineapple'); 
+                }
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                scene = 'Game';
+                clicked = false;
+            }
+        }
+    }
+    if(scene === 'Score'){
+        pushMatrix();
+        image(images.woodBG, 0, 0);
+        fill(232, 174, 14, 50);
+        rect(0, 0, width, height);
+        
+        fill(255);
+        drawWords('YOU HAVE', 23, 116, 28);
+        drawWords('POINTS', 23, 218, 28);
+        drawWords(score.toFixed(0), 10, 138, 86);
+        drawWords('< CLICK TO RESUME', 23, 363, 21);
+        
+        image(images.banana, 290, 50, 50, 50);
+        image(images.cherry, 290, 130, 50, 50);
+        image(images.pear, 290, 210, 50, 50);
+        image(images.grapes, 290, 290, 50, 50);
+        
+        if(clicked){
+            if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+            trans.active = true;
+            scene = 'Game';
+            clicked = false;
+        }
+    }
+    if(scene === 'Finished'){
+        pushMatrix();
+        image(images.woodBG, 0, 0);
+        fill(232, 174, 14, 50);
+        rect(0, 0, width, height);
+        
+        fill(255);
+        drawWords('YOU GOT', 23, 145, 28);
+        drawWords('POINTS', 23, 244, 28);
+        drawWords(ranks[rank].toUpperCase(), 48, 363, 28);
+        drawWords(score.toFixed(0), 10, 165, 86);
+        
+        image(images.watermelon, 10, 360, 30, 30);
+        
+        image(images.banana, 290, 50, 50, 50);
+        image(images.cherry, 290, 130, 50, 50);
+        image(images.pear, 290, 210, 50, 50);
+        image(images.grapes, 290, 290, 50, 50);
+        
+        drawWords('< PLAY AGAIN!', 16, 21, 21);
+        
+        if(mouseY < 50 && mouseX < 230){
+            overButton = true;
+            if(clicked){
+                if(trans.img === undefined){ trans.img = get(0, 0, 400, 400); }
+                trans.active = true;
+                score = 0;
+                lives = 3;
+                gameTimer = 0;
+                Fruits = [];
+                rank = 0;
+                scene = 'Menu';
+            }
+        }
+    }
+    
+    cursor('none');
+    if(overButton){
+        drawArray(arrays.pointer, mouseX, mouseY, 1.5, 1.5);
+    } else if(mouseX > 0 && mouseX < 400 && mouseY < 400 && mouseY > 0){
+        drawArray(arrays.cursor2, mouseX, mouseY, 1.5, 1.5);
+    }
+    
+    if(trans.active){
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect((trans.x * 1.3) - 400, 0, 400, 400);
+        image(trans.img, trans.x - 400, 0);
+        
+        trans.x /= 1.1;
+        
+        if(trans.x < 2){
+            trans.active = false;
+            trans.img = undefined;
+            trans.x = 400;
+        }
+    }
+    
+    
+    clicked = false;
+    overButton = false;
+    
+    //background(255);
+};
