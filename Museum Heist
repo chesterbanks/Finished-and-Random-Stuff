@@ -1,0 +1,396 @@
+/** Museum Heist
+ * Chester Banks
+ * March 31 2016
+ * 
+ * An entry to awk888's Puzzle Game contest.
+ * 
+ * Thanks to my subscribers!
+ * You can subscribe to me here: https://www.khanacademy.org/cs/a/4790207744704512
+ * This program's lucky subscriber is JAKE! He is an awesome programmer, and even helped with this game by making a level creator! Check out his profile here: khanacademy.org/profile/bookworm1202
+*/
+
+// NOTE: IF YOU HAVE ALWAYS CONSIDERED ROBBING MUSEUMS, DO NOT PLAY THIS GAME.
+    
+// Center the text and set the font
+var loadGoogleFont = (function () {
+    return this.Function ( "gfName", "gfName = gfName.replace ( /\\s+/g, '+' );var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 ), url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ], gfs = document.querySelectorAll('link[href=\"'+url+'\"]');if(!gfs.length){var f=document.createElement('link');f.setAttribute('rel','stylesheet');f.setAttribute('type','text/css');f.onload=callback;f.setAttribute('href',url);document.head.appendChild(f);}else if ( typeof callback === 'function' ) { callback.call ( gfs [ 0 ] ); }");
+})();
+var fontloaded = false;
+
+if ( !fontloaded ) {
+    loadGoogleFont('Vollkorn SC', 'latin-ext', 'vietnamese');
+}
+textFont(createFont('Vollkorn SC'));
+textAlign(CENTER, CENTER);
+
+// Scene, level, etc.
+var scene = "Home";
+var level = 0;
+var switchingLevels = false;
+
+// Sliding screen variables
+var slide = 400;
+var slideSpeed = -16;
+
+// Key movement
+var keys = [];
+var keyPressed = function(){keys[keyCode] = true;};
+var keyReleased = function(){keys[keyCode] = false;};
+
+// The rectangle collision function
+var rectCollide = function(one, two){
+    if( one.x+one.w > two.x &&
+        one.y+one.h > two.y &&
+        one.x < two.x+two.w &&
+        one.y < two.y+two.h){
+        return true;
+    }
+};
+
+// All game images
+var images = {
+    "background1": function(){
+        background(82, 0, 0);
+        
+        noStroke();
+        for(var i = -50; i < width+100; i += 60){
+            for(var j = 0; j < height+100; j += 30){
+                pushMatrix();
+                translate(i + ((j/50)%2)*50 - 50, j);
+                rotate(random(-3, 3));
+                fill(j/5 + 100, 15, 15);
+                rect(0, 0, 55, 25);
+                fill(0, 0, 0, 50);
+                triangle(0, 0, 0, 25, 55, 0);
+                popMatrix();
+            }
+        }
+        
+        for(var i = 0; i < width; i += 100){
+            noStroke();
+            fill(196, 188, 196);
+            rect(i, 500, 15, 100);
+            ellipse(i+7, 500, 20, 20);
+            fill(255, 255, 255, 70);
+            rect(i+2, 500, 5, 100);
+            noFill();
+            strokeWeight(10);
+            stroke(128, 22, 22);
+            arc(i+60, 510, 100, 30, 0, 180);
+        }
+        
+        //filter(BLUR, 3);
+        
+        return get(0, 0, width, height);
+    },
+    "floor": function(){
+        noStroke();
+        fill(102, 0, 0);
+        rect(0, 0, 60, 60);
+        fill(0, 0, 0, 10);
+        triangle(0, 0, 60, 0, 0, 60);
+        for(var i = 60; i > 0; i -= 3){
+            fill(0, 0, 0, i/5);
+            rect(0, 0, i, i);
+        }
+        
+        return get(0, 0, 60, 60);
+    },
+    "artifact": function(){
+        background(0, 0, 0, 0);
+        
+        noStroke();
+        fill(161, 92, 39);
+        ellipse(30, 30, 30, 30);
+        fill(125, 71, 29);
+        ellipse(30, 20, 30, 10);
+        
+        return get(0, 0, 60, 60);
+    },
+    
+    "title": function(){
+        background(0, 0, 0, 0);
+        
+        for(var i = -30; i < 30; i ++){
+            fill(255, 255, 255, abs(i)-15);
+            textSize(80);
+            text("M U S E U M\nH E I S T", i+300+random(-6, 6), 200+random(-6, 6));
+            textSize(20);
+            text("C H E S T E R   B A N K S | 2 0 1 6", i+300, 300+random(-10, 10));
+        }
+        
+        fill(242, 242, 242);
+        textSize(80);
+        text("M U S E U M\nH E I S T", 300, 200);
+        textSize(20);
+        text("C H E S T E R   B A N K S | 2 0 1 6", 300, 300);
+        
+        return get(0, 0, width, height);
+    },
+};
+
+// The player
+var player = {
+    x: 0,
+    y: 0,
+    w: 60,
+    h: 60,
+};
+
+// The toys
+var trap = function(x, y, type){
+    this.x = x;
+    this.y = y;
+    this.w = 60;
+    this.h = 60;
+    
+    this.type = type;
+    this.hit = false;
+    this.hitTrans = 0;
+};
+trap.prototype.draw = function() {
+    noStroke();
+    image(images.floor, slide + this.x, this.y);
+    if(this.type === "Trap"){
+        if(rectCollide(this, player)){
+            // playSound(getSound("retro/boom1"));
+            this.hitTrans = 255;
+            this.hit = true;
+            player.x = 0;
+            player.y = 0;
+        }
+        fill(255, 0, 0, this.hitTrans);
+        rect(slide + this.x, this.y, this.w, this.h);
+        if(this.hit){
+            this.hitTrans -= 10;
+        }
+        if(this.hitTrans < 0){
+            this.hitTrans = 0;
+            this.hit = false;
+        }
+    }
+    if(this.type === "Artifact"){
+        fill(0, 255, 0);
+        image(images.artifact, slide + this.x, this.y);
+        if(rectCollide(this, player)){
+            slide = 400;
+            level ++;
+            switchingLevels = true;
+            player.x = 0;
+            player.y = 0;
+        }
+    }
+};
+
+// The code for the level
+var levelCreators = ["Chester Banks", "Chester Banks", "Chester Banks", "Aqua Orchid", "Dave Gibbons", "Dave Gibbons", "Jake", "Savageookwolfgaming"];
+var finalLevel = [];
+var levels = [
+    ['         T',
+    '         T',
+    ' T        ',
+    '          ',
+    '          ',
+    '        T ',
+    '        T ',
+    '          ',
+    '          ',
+    '         A',],
+    ['         T',
+    '         T',
+    ' T        ',
+    '          ',
+    '          ',
+    '        T ',
+    '   TTTTTT ',
+    '          ',
+    'T         ',
+    'A        T',],
+    ['          ',
+    '         T',
+    'TT        ',
+    '          ',
+    '        T ',
+    '        T ',
+    ' T      T ',
+    ' T        ',
+    ' T        ',
+    ' T      TA',],
+    ['  T       ',
+    'T  T      ',
+    ' T  T     ',
+    '  T  T    ',
+    '   T  T   ',
+    '    T  T  ',
+    '     T  T ',
+    '      T  T',
+    '       T  ',
+    '        TA',], // AquaOrchid
+    ['          ',
+    'TTTTTTTT  ',
+    '          ',
+    ' TTTTTTTTT',
+    '          ',
+    'TTTTTTTTT ',
+    '          ',
+    ' TTTTTTTTT',
+    '         T',
+    'TTTTTTT  A',],// D. Gibbons
+    ['  T       T',
+    '   T   T T',
+    'T      T T',
+    '    T    T',
+    'T   T  T T',
+    '        TT',
+    '        T ',
+    '  TT      ',
+    'T  T  T  T',
+    '      TT A',], // D. Gibbons
+    [
+    "      T   ",
+    " T TT T T ",
+    " T T  T T ",
+    "     T  T ",
+    "TT  T  T  ",
+    " T T  T  T",
+    "     T  T ",
+    "TTTTT  T  ",
+    "      T   ",
+    "        TA",
+    ], // Jake
+    [
+    " T T T T T",
+    "  T  T T  ",
+    "T  T  T  T",
+    "  T  T T  ",
+    "T TT   T T",
+    "     T    ",
+    "T T   T T ",
+    "   TTT    ",
+    "  T    TTT",
+    "T T  T   A",
+    ], //Savage
+];
+var drawLevel = function(){
+    for(var columns = 0; columns < levels[level].length; columns ++){ // Loop through level columns
+        for(var rows = 0; rows < levels[level][columns].length; rows ++){ // Loop through level rows
+            
+            var theLetter = levels[level][columns].charAt(rows); // Get which letter
+            
+            switch(theLetter){
+                case 'T': // If the letter is a T
+                    finalLevel.push(new trap(rows*60, columns*60, "Trap")); // Add a toy
+                    break;
+                case 'A':
+                    finalLevel.push(new trap(rows*60, columns*60, "Artifact"));
+                    break;
+                default:
+                    finalLevel.push(new trap(rows*60, columns*60, "nolan_owensby")); // Add a non-dangerous tile
+            }
+        }
+    }
+};
+
+drawLevel();
+
+draw = function() {
+    if(switchingLevels){
+        finalLevel = [];
+        drawLevel();
+        switchingLevels = false;
+    }
+    
+    // Learned this from Lionofgd (who learned it from Blue Leaf, who discovered it). Pretty much kills the lag.
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+        
+    if(scene === "Home"){
+        background(0);
+        
+        // Draw the home screen
+        image(images.background1, 0, 0);
+        
+        fill(255, 255, 255, 100 + sin(frameCount*5)*205);
+        textSize(15);
+        text("Thanks for help from Dave Gibbons, AquaOrchid, Jake, and SavageookwolfGaming!", 300 + sin(frameCount*2)*80, 30);
+        fill(255, 255, 255, 200 + sin(frameCount*5)*105);
+        textSize(25);
+        text("CLICK TO BEGIN", 300, 400);
+        image(images.title, 0, 0);
+    }
+    if(scene === "Play"){
+        background(0);
+        
+        // Draw the level
+        for(var i in finalLevel){
+            finalLevel[i].draw();
+        }
+        
+        // The player
+        pushMatrix();
+        translate(slide + player.x, player.y);
+        noStroke();
+        fill(237, 176, 107);
+        ellipse(30, 30, 35, 35);
+        fill(0, 0, 0, 20);
+        arc(30, 30, 35, 35, -90, 90);
+        fill(0);
+        ellipse(25, 30, 6, 6);
+        ellipse(35, 30, 6, 6);
+        popMatrix();
+        
+        slide += slideSpeed;
+        slideSpeed += 0.3;
+        
+        if(slide < 0){
+            slide = 0;
+            slideSpeed = -16;
+        }
+        
+        pushMatrix();
+        translate(345, 25);
+        rotate(4);
+        stroke(255, 0, 0, 100);
+        strokeWeight(7);
+        fill(255, 255, 255, 50);
+        rect(0, 0, 200, 80);
+        fill(255, 255, 255, 150);
+        textSize(35);
+        text("EXHIBIT " + (level+1), 100, 35);
+        textSize(15);
+        text((levelCreators[level]), 100, 60);
+        popMatrix();
+        
+        if(level === 0){
+            textSize(20);
+            fill(255, 255, 255, 100);
+            text("Move with the WASD keys.\n\nTry to steal the artifact without\nrunning into a laser trap.", slide+300, 300);
+        }
+    }
+};
+
+var mouseClicked = function(){
+    if(scene === "Home"){
+        scene = "Play";
+    }
+};
+
+var keyTyped = function(){
+    if(key.toString().toUpperCase() === "A" && player.x > 20){
+        player.x -= 60;
+    }
+    if(key.toString().toUpperCase() === "D" && player.x < 540){
+        player.x += 60;
+    }
+    if(key.toString().toUpperCase() === "W" && player.y > 20){
+        player.y -= 60;
+    }
+    if(key.toString().toUpperCase() === "S" && player.y < 540){
+        player.y += 60;
+    }
+};
