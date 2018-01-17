@@ -1,0 +1,872 @@
+/**
+ * Knight Monkey
+ * Chester Banks
+ * October 11 2016
+ * 
+ * Made for Khantober!
+ * 
+ * This program's LUCKY SUBSCRIBER is MATT! Check out his profile here: https://www.khanacademy.org/profile/GoalieMutt
+ * Thanks to my subscribers! Subscribe to me here: khanacademy.org/cs/subscribe/4790207744704512
+ * 
+ * I am open to suggestions! What would make this game better?
+*/
+
+// Hint: Don't spend all your money on guards, or you will lose.
+
+/*
+    TO DO
+        get() the images (character art and backgrounds).
+        Add restart button
+        
+        Add more advanced Robot Monkeys
+        Add multiplayer mode
+        Make it so you have to carry the coins back to your side; if you hit a robot monkey, you lose all the coins you were carrying
+        Make it so you can't buy a guard when you only have 1 coin left??
+*/
+
+var clicked = false;
+
+var scene = "Home";
+
+var keys = [];
+mouseReleased = function(){clicked = true;};
+keyPressed = function(){keys[keyCode]=true;};
+keyReleased = function(){keys[keyCode]=false;};
+
+var circleCollide = function(a, b){
+    return (dist(a.x, a.y, b.x, b.y) < (a.w + b.w) / 2);
+};
+
+var allGuards = false; // checks if all robots are guards
+
+var images = {
+    bg1: function(){
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(color(46, 199, 82), color(49, 179, 212), i / height));
+            rect(0, i, width, 20);
+        }
+        
+        return get(0, 0, width, height);
+    },
+    bg2: function(){
+        background(62, 181, 92);
+        noStroke();
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*10, 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        
+        return get(0, 0, width, height);
+    },
+    bg3: function(){
+        background(37, 176, 72);
+        noStroke();
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*10, 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        
+        return get(0, 0, width, height);
+    },
+};
+
+var Treasure = function(x, y){
+    this.x = x;
+    this.y = y;
+    this.w = 20;
+    this.h = 20;
+    
+    this.trans = 255;
+    this.caught = false;
+};
+var Treasures = [];
+var myTreasures = [];
+Treasure.prototype.draw = function() {
+    noStroke();
+    fill(168, 171, 19, this.trans);
+    ellipse(this.x - 2, this.y, this.w, this.h);
+    fill(216, 222, 36, this.trans);
+    ellipse(this.x, this.y, this.w, this.h);
+    fill(0, 0, 0, this.trans - 200);
+    textSize(this.w / 2);
+    text('K', this.x, this.y);
+    
+    if(this.caught){
+        this.y --;
+        this.trans -= 20;
+    }
+};
+
+var Player = function(){
+    this.x = 300;
+    this.y = 450;
+    this.w = 30;
+    this.h = 30;
+    
+    this.speed = 3;
+};
+Player.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    strokeWeight(2);
+    fill(227, 143, 143);
+    stroke(130, 75, 33);
+    ellipse(-14, 0, 10, 10);
+    ellipse(14, 0, 10, 10);
+    noFill();
+    stroke(0, 0, 0, 60);
+    arc(0, 0, 30, 30, -195, -161);
+    arc(0, 0, 30, 30, -16, 15);
+    noStroke();
+    fill(130, 76, 33);
+    ellipse(0, 0, 30, 30);
+    fill(0, 0, 0, 30);
+    arc(0, 0, 30, 30, -90, 90);
+    fill(232, 189, 132);
+    ellipse(-5, 0, 15, 15);
+    ellipse(5, 0, 15, 15);
+    ellipse(0, 5, 15, 15);
+    fill(43, 43, 43);
+    ellipse(-5, 0, 5, 5);
+    ellipse(5, 0, 5, 5);
+    fill(43, 43, 43, 100);
+    ellipse(-1.5, 4, 2, 2);
+    ellipse(1.5, 4, 2, 2);
+    stroke(45);
+    noFill();
+    strokeWeight(1);
+    arc(0, 7, 7, 5, 0, 180);
+    popMatrix();
+    
+    if(keys[LEFT] && this.x > this.w / 2){
+        this.x -= this.speed;
+    }
+    if(keys[RIGHT] && this.x < width - (this.w / 2)){
+        this.x += this.speed;
+    }
+    if(keys[UP] && this.y > this.h / 2){
+        this.y -= this.speed;
+    }
+    if(keys[DOWN] && this.y < height - (this.h / 2)){
+        this.y += this.speed;
+    }
+    
+    for(var i in Treasures){
+        if(circleCollide(this, Treasures[i])){
+            Treasures[i].caught = true;
+        }
+    }
+};
+var player = new Player();
+
+var Guard = function(x, y){
+    this.x = x;
+    this.y = y;
+    this.w = 20;
+    this.h = 20;
+    
+    this.speed = 5;
+};
+var Guards = [];
+Guard.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    strokeWeight(2);
+    fill(227, 143, 143);
+    stroke(79, 45, 20);
+    ellipse(-14, 0, 10, 10);
+    ellipse(14, 0, 10, 10);
+    noFill();
+    stroke(0, 0, 0, 60);
+    arc(0, 0, 30, 30, -195, -161);
+    arc(0, 0, 30, 30, -18, 16);
+    noStroke();
+    fill(77, 46, 23);
+    ellipse(0, 0, 30, 30);
+    fill(0, 0, 0, 30);
+    arc(0, 0, 30, 30, -90, 90);
+    fill(168, 134, 89);
+    ellipse(-5, 0, 15, 15);
+    ellipse(5, 0, 15, 15);
+    ellipse(0, 5, 15, 15);
+    fill(43, 43, 43);
+    ellipse(-5, 0, 5, 5);
+    ellipse(5, 0, 5, 5);
+    fill(43, 43, 43, 100);
+    ellipse(-1.5, 4, 2, 2);
+    ellipse(1.5, 4, 2, 2);
+    stroke(45);
+    noFill();
+    strokeWeight(1);
+    line(-1, 8, 3, 8);
+    noStroke();
+    fill(59, 51, 42);
+    bezier(-15, 2, -12, 24, 14, 17, 15, 3);
+    bezier(-15, -1, -12, -23, 14, -17, 15, -2);
+    fill(0, 0, 0, 30);
+    bezier(-15, 2, -9, 18, -8, 17, 4, 3);
+    bezier(-15, -1, -12, -23, 14, -17, 7, -2);
+    popMatrix();
+    
+    this.x += this.speed;
+    if(this.x > width - (this.w / 2) || this.x < this.w / 2){
+        this.speed = -this.speed;
+    }
+};
+
+var Enemy = function(x, y, type){
+    this.x = x;
+    this.y = y;
+    this.w = 20;
+    this.h = 20;
+    this.type = type;
+    
+    this.speed = 5;
+    this.dead = false;
+};
+var Enemies = [];
+Enemy.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    strokeWeight(2);
+    fill(158, 158, 158);
+    stroke(128, 128, 128);
+    ellipse(-14, 0, 10, 10);
+    ellipse(14, 0, 10, 10);
+    noFill();
+    stroke(0, 0, 0, 60);
+    arc(0, 0, 30, 30, -195, -161);
+    arc(0, 0, 30, 30, -16, 15);
+    noStroke();
+    fill(128);
+    ellipse(0, 0, 30, 30);
+    fill(0, 0, 0, 30);
+    arc(0, 0, 30, 30, -90, 90);
+    fill(94);
+    ellipse(-5, 0, 15, 15);
+    ellipse(5, 0, 15, 15);
+    ellipse(0, 5, 15, 15);
+    fill(128);
+    ellipse(-5, 0, 5, 5);
+    ellipse(5, 0, 5, 5);
+    fill(94);
+    arc(0, -4, 20, 8, 0, 180);
+    fill(43, 43, 43, 100);
+    ellipse(-1.5, 4, 2, 2);
+    ellipse(1.5, 4, 2, 2);
+    stroke(128);
+    noFill();
+    strokeWeight(1);
+    arc(0, 7, 7, 5, 0, 180);
+    popMatrix();
+    
+    if(this.type === 0){
+        this.x += this.speed;
+        if(this.x > width - (this.w / 2) || this.x < this.w / 2){
+            this.speed = -this.speed;
+        }
+    } else {
+        this.y += this.speed;
+        if(this.y > height - (this.h / 2) || this.y < this.h / 2){
+            this.speed = -this.speed;
+        }
+    }
+    
+    // Collision with player
+    if(circleCollide(this, player) && this.y < 300){
+        player.x = 300;
+        player.y = 450;
+    }
+    if(circleCollide(this, player) && this.y > 300){
+        this.dead = true;
+    }
+    
+    // Collision with player's coins
+    for(var i in myTreasures){
+        if(circleCollide(this, myTreasures[i])){
+            Treasures.push(new Treasure(random(width), random(300)));
+            myTreasures.splice(i, 1);
+        }
+    }
+    
+    // Collision with player's guards
+    for(var i in Guards){
+        if(circleCollide(this, Guards[i])){
+            this.dead = true;
+            //Guards.splice(i, 1);
+        }
+    }
+};
+
+for(var i = 0; i < 15; i ++){
+    Treasures.push(new Treasure(random(width), random(300)));
+}
+for(var i = 0; i < 4; i ++){
+    myTreasures.push(new Treasure(random(width), random(300, 600)));
+}
+for(var i = 0; i < 4; i ++){
+    Enemies.push(new Enemy(random(width), random(300), 0));
+    Enemies.push(new Enemy(random(width), random(300), 1));
+}
+
+// instructions
+/**
+ * ~~ indicates change of background
+ * [] indicates visual changes
+ * 
+ [show player]. This is you - Knight Monkey. Move around with the arrow keys.
+ ~ ~ ~ ~ ~
+ [show enemy]. This is Robot Monkey. They have taken over half of Monkey Realm and are looking to take yours.
+ ~ ~ ~ ~ ~
+ [show guard]. This is one of your guards. Click to spawn a guard, as long as you have a coin to purchase one.
+ ~ ~ ~ ~ ~
+ [show playing field].
+ [point to enemy realm]. This is the enemy's realm. If you touch a coin in their realm, it comes to your side. If you touch an enemy, you get sent back to your side.
+ [point to your realm]. This is your realm. You can place guards to protect your coins by clicking anywhere on this side. If a guard and enemy touch, they both die.
+ ~ ~ ~ ~ ~
+ [show coin]. If you lose all your coins, you lose! If you gain all the coins, you win!
+*/
+var introTxts = [
+    "This is you - Knight Monkey. Move around with the arrow keys.",
+    "This is one of the Robot Monkeys. They have taken over half of Monkey Realm and are looking to take yours.",
+    "This is one of your guards. Click to spawn a guard, as long as you have a coin to purchase one.",
+    "This is the enemy's realm. If you grab a coin from their realm, it comes to your side. If you touch an enemy on their side, you get sent back to your side.",
+    "This is your realm. You can hire guards to protect your coins by clicking anywhere on this side. If a guard and enemy touch, the enemy dies.\n\nNote: When you buy a guard, a coin is taken from your realm and given to the Robots.",
+    "If you lose all your coins, you lose! If you gain all the coins, you win!",
+];
+var intro = -1;
+
+var exampleEnemies = [new Enemy(50, 50, 0), new Enemy(300, 150, 0), new Enemy(500, 100, 0)];
+var exampleCoins = [new Treasure(60, 60), new Treasure(500, 250), new Treasure(300, 100)];
+var exampleCoins2 = [new Treasure(600, 360), new Treasure(500, 450), new Treasure(50, 500)];
+var exampleGuards = [new Guard(50, 350), new Guard(300, 450), new Guard(500, 500)];
+var testPlayer = new Player();
+
+draw = function() {
+    textAlign(CENTER, CENTER);
+    textFont(createFont('Arial Black'));
+    
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    if(scene === "Home"){
+        image(images.bg1, 0, 0);
+        
+        noStroke();
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/10)*15), 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        pushMatrix();
+        translate(width / 2, height / 2);
+        rotate(13);
+        fill(0, 0, 0, 30);
+        textSize(55);
+        text("KNIGHT MONKEY", 7, 6);
+        fill(255, 255, 255);
+        text("KNIGHT MONKEY", 0, 0);
+        textSize(15);
+        text('|| CHESTER BANKS || KHANTOBER 2016 ||', 0, 40);
+        popMatrix();
+        
+        noStroke();
+        triangle(-400, 0, 600, 0, 600, 200);
+        triangle(0, 400, 0, 600, 1000, 600);
+        
+        pushMatrix();
+        translate(200, 550);
+        rotate(15);
+        scale(1.5);
+        strokeWeight(2);
+        fill(227, 143, 143);
+        stroke(79, 45, 20);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -18, 16);
+        noStroke();
+        fill(77, 46, 23);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(168, 134, 89);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(43, 43, 43);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(45);
+        noFill();
+        strokeWeight(1);
+        line(-1, 8, 3, 8);
+        noStroke();
+        fill(59, 51, 42);
+        bezier(-15, 2, -12, 24, 14, 17, 15, 3);
+        bezier(-15, -1, -12, -23, 14, -17, 15, -2);
+        fill(0, 0, 0, 30);
+        bezier(-15, 2, -9, 18, -8, 17, 4, 3);
+        bezier(-15, -1, -12, -23, 14, -17, 7, -2);
+        popMatrix();
+        
+        pushMatrix();
+        translate(100, 530);
+        rotate(-5);
+        scale(3.5);
+        strokeWeight(2);
+        fill(227, 143, 143);
+        stroke(130, 75, 33);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -18, 16);
+        noStroke();
+        fill(130, 76, 33);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(232, 189, 132);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(43, 43, 43);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(45);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        pushMatrix();
+        translate(510, 80);
+        scale(3.5);
+        strokeWeight(2);
+        fill(158, 158, 158);
+        stroke(128, 128, 128);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -16, 15);
+        noStroke();
+        fill(128);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(94);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(128);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(94);
+        arc(0, -4, 20, 8, 0, 180);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(128);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        if(clicked){
+            scene = "Intro";
+        }
+    }
+    if(scene === "Intro"){
+        image(images.bg2, 0, 0);
+        
+        if(intro === 0){
+            pushMatrix();
+            translate(300, 300);
+            scale(7);
+            strokeWeight(2);
+            fill(227, 143, 143);
+            stroke(130, 75, 33);
+            ellipse(-14, 0, 10, 10);
+            ellipse(14, 0, 10, 10);
+            noFill();
+            stroke(0, 0, 0, 60);
+            arc(0, 0, 30, 30, -195, -161);
+            arc(0, 0, 30, 30, -18, 16);
+            noStroke();
+            fill(130, 76, 33);
+            ellipse(0, 0, 30, 30);
+            fill(0, 0, 0, 30);
+            arc(0, 0, 30, 30, -90, 90);
+            fill(232, 189, 132);
+            ellipse(-5, 0, 15, 15);
+            ellipse(5, 0, 15, 15);
+            ellipse(0, 5, 15, 15);
+            fill(43, 43, 43);
+            ellipse(-5, 0, 5, 5);
+            ellipse(5, 0, 5, 5);
+            fill(43, 43, 43, 100);
+            ellipse(-1.5, 4, 2, 2);
+            ellipse(1.5, 4, 2, 2);
+            stroke(45);
+            noFill();
+            strokeWeight(1);
+            arc(0, 7, 7, 5, 0, 180);
+            popMatrix();
+        }
+        if(intro === 1){
+            pushMatrix();
+            translate(300, 300);
+            scale(7);
+            strokeWeight(2);
+            fill(158, 158, 158);
+            stroke(128, 128, 128);
+            ellipse(-14, 0, 10, 10);
+            ellipse(14, 0, 10, 10);
+            noFill();
+            stroke(0, 0, 0, 60);
+            arc(0, 0, 30, 30, -195, -161);
+            arc(0, 0, 30, 30, -16, 15);
+            noStroke();
+            fill(128);
+            ellipse(0, 0, 30, 30);
+            fill(0, 0, 0, 30);
+            arc(0, 0, 30, 30, -90, 90);
+            fill(94);
+            ellipse(-5, 0, 15, 15);
+            ellipse(5, 0, 15, 15);
+            ellipse(0, 5, 15, 15);
+            fill(128);
+            ellipse(-5, 0, 5, 5);
+            ellipse(5, 0, 5, 5);
+            fill(94);
+            arc(0, -4, 20, 8, 0, 180);
+            fill(43, 43, 43, 100);
+            ellipse(-1.5, 4, 2, 2);
+            ellipse(1.5, 4, 2, 2);
+            stroke(128);
+            noFill();
+            strokeWeight(1);
+            arc(0, 7, 7, 5, 0, 180);
+            popMatrix();
+        }
+        if(intro === 2){
+            pushMatrix();
+            translate(300, 300);
+            scale(7);
+            strokeWeight(2);
+            fill(227, 143, 143);
+            stroke(79, 45, 20);
+            ellipse(-14, 0, 10, 10);
+            ellipse(14, 0, 10, 10);
+            noFill();
+            stroke(0, 0, 0, 60);
+            arc(0, 0, 30, 30, -195, -161);
+            arc(0, 0, 30, 30, -18, 16);
+            noStroke();
+            fill(77, 46, 23);
+            ellipse(0, 0, 30, 30);
+            fill(0, 0, 0, 30);
+            arc(0, 0, 30, 30, -90, 90);
+            fill(168, 134, 89);
+            ellipse(-5, 0, 15, 15);
+            ellipse(5, 0, 15, 15);
+            ellipse(0, 5, 15, 15);
+            fill(43, 43, 43);
+            ellipse(-5, 0, 5, 5);
+            ellipse(5, 0, 5, 5);
+            fill(43, 43, 43, 100);
+            ellipse(-1.5, 4, 2, 2);
+            ellipse(1.5, 4, 2, 2);
+            stroke(45);
+            noFill();
+            strokeWeight(1);
+            line(-1, 8, 3, 8);
+            noStroke();
+            fill(59, 51, 42);
+            bezier(-15, 2, -12, 24, 14, 17, 15, 3);
+            bezier(-15, -1, -12, -23, 14, -17, 15, -2);
+            fill(0, 0, 0, 30);
+            bezier(-15, 2, -9, 18, -8, 17, 4, 3);
+            bezier(-15, -1, -12, -23, 14, -17, 7, -2);
+            popMatrix();
+        }
+        if(intro === 3){
+            image(images.bg3, 0, 0);
+            
+            fill(255, 255, 255, 100);
+            for(var i = 0; i < 600; i += 25){
+                rect(i, 298, 20, 5);
+            }
+            for(var i in exampleEnemies){
+                exampleEnemies[i].draw();
+            }
+            for(var i in exampleCoins){
+                exampleCoins[i].draw();
+            }
+        }
+        if(intro === 4){
+            image(images.bg3, 0, 0);
+            
+            noStroke();
+            fill(255, 255, 255, 100);
+            for(var i = 0; i < 600; i += 25){
+                rect(i, 298, 20, 5);
+            }
+            for(var i in exampleGuards){
+                exampleGuards[i].draw();
+            }
+            for(var i in exampleCoins2){
+                exampleCoins2[i].draw();
+            }
+            testPlayer.draw();
+        }
+        if(intro === 5){
+            pushMatrix();
+            translate(300, 300);
+            rotate(sin(frameCount*10)*30);
+            scale(5 + sin(frameCount*7));
+            strokeWeight(2);
+            fill(227, 143, 143);
+            stroke(130, 75, 33);
+            ellipse(-14, 0, 10, 10);
+            ellipse(14, 0, 10, 10);
+            noFill();
+            stroke(0, 0, 0, 60);
+            arc(0, 0, 30, 30, -195, -161);
+            arc(0, 0, 30, 30, -18, 16);
+            noStroke();
+            fill(130, 76, 33);
+            ellipse(0, 0, 30, 30);
+            fill(0, 0, 0, 30);
+            arc(0, 0, 30, 30, -90, 90);
+            fill(232, 189, 132);
+            ellipse(-5, 0, 15, 15);
+            ellipse(5, 0, 15, 15);
+            ellipse(0, 5, 15, 15);
+            fill(43, 43, 43);
+            ellipse(-5, 0, 5, 5);
+            ellipse(5, 0, 5, 5);
+            fill(43, 43, 43, 100);
+            ellipse(-1.5, 4, 2, 2);
+            ellipse(1.5, 4, 2, 2);
+            stroke(45);
+            noFill();
+            strokeWeight(1);
+            arc(0, 7, 7, 5, 0, 180);
+            popMatrix();
+        }
+        
+        textFont(createFont("Trebuchet MS", 16));
+        fill(255);
+        text(introTxts[intro], 150, intro === 3 ? 50 : 300, 300, 300);
+        textFont(createFont("Arial Black"));
+        
+        if(clicked){
+            intro ++;
+            if(intro > introTxts.length - 1){
+                scene = "Game";
+            }
+        }
+    }
+    if(scene === "Game"){
+        image(images.bg3, 0, 0);
+        
+        noStroke();
+        fill(255, 255, 255, 100);
+        for(var i = 0; i < 600; i += 25){
+            rect(i, 298, 20, 5);
+        }
+        
+        fill(0, 0, 0, 30);
+        textSize(50);
+        text('grab these coins', 300, 150);
+        text('click to add guards', 300, 450);
+        
+        for(var i in Enemies){
+            Enemies[i].draw();
+            if(Enemies[i].dead){
+                Enemies.splice(i, 1);
+            }
+        }
+        for(var i in Guards){
+            Guards[i].draw();
+        }
+        player.draw();
+        for(var i in Treasures){
+            Treasures[i].draw();
+            if(Treasures[i].trans < 0){
+                myTreasures.push(new Treasure(random(width), random(height / 2, height)));
+                Treasures.splice(i, 1);
+            }
+        }
+        for(var i in myTreasures){
+            myTreasures[i].draw();
+        }
+        
+        if(clicked && mouseY > 300 && myTreasures.length > 0){
+            myTreasures.splice(myTreasures.length - 1, 1);
+            Treasures.push(new Treasure(random(width), random(height/2)));
+            Guards.push(new Guard(mouseX, mouseY));
+        }
+        
+        if(frameCount % 200 === 0 && Enemies.length < 10){
+            Enemies.push(new Enemy(random(width), random(height / 2), 0));
+            Enemies.push(new Enemy(random(width), random(height / 2), 1));
+            Enemies.push(new Enemy(random(width), random(height / 2), 1));
+        }
+        
+        for(var i in Enemies){
+            if(Enemies[i].type === 0){
+                allGuards = true;
+            } else {
+                allGuards = false;
+            }
+        }
+        
+        // If all robots are horizontal, make a vertical
+        if(allGuards){
+            Enemies.push(new Enemy(random(width), random(height / 2), 1));
+        }
+        
+        if(myTreasures.length <= 0){
+            scene = "Lose";
+        }
+        if(Treasures.length <= 0){
+            scene = "Win";
+        }
+    }
+    if(scene === "Lose"){
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(color(209, 35, 67), color(59, 59, 59), i / height));
+            rect(0, i, width, 20);
+        }
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/10)*15), 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        
+        pushMatrix();
+        translate(300, 300);
+        scale(5);
+        strokeWeight(2);
+        fill(158, 158, 158);
+        stroke(128, 128, 128);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -16, 15);
+        noStroke();
+        fill(128);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(94);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(128);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(94);
+        arc(0, -4, 20, 8, 0, 180);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(128);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        fill(255);
+        textSize(50);
+        text('"BWAHAHA!"', 300, 430);
+        textSize(20);
+        text('You have failed Monkey Realm...\nThe robots now rule it. :(', 300, 490);
+    }
+    if(scene === "Win"){
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(
+                color(35, 207, 207), 
+                color(183, 227, 247), i / height));
+            rect(0, i, width, 20);
+        }
+        for(var i = 0; i < width; i += 20){
+            for(var j = 0; j < height; j += 20){
+                fill(0, 0, 0, noise(i + noise(j, 1.1)*(sin(frameCount/10)*15), 1.1)*90);
+                rect(i, j, 20, 20);
+            }
+        }
+        
+        pushMatrix();
+        translate(300, 280);
+        rotate(-5);
+        scale(7);
+        strokeWeight(2);
+        fill(227, 143, 143);
+        stroke(130, 75, 33);
+        ellipse(-14, 0, 10, 10);
+        ellipse(14, 0, 10, 10);
+        noFill();
+        stroke(0, 0, 0, 60);
+        arc(0, 0, 30, 30, -195, -161);
+        arc(0, 0, 30, 30, -18, 16);
+        noStroke();
+        fill(130, 76, 33);
+        ellipse(0, 0, 30, 30);
+        fill(0, 0, 0, 30);
+        arc(0, 0, 30, 30, -90, 90);
+        fill(232, 189, 132);
+        ellipse(-5, 0, 15, 15);
+        ellipse(5, 0, 15, 15);
+        ellipse(0, 5, 15, 15);
+        fill(43, 43, 43);
+        ellipse(-5, 0, 5, 5);
+        ellipse(5, 0, 5, 5);
+        fill(43, 43, 43, 100);
+        ellipse(-1.5, 4, 2, 2);
+        ellipse(1.5, 4, 2, 2);
+        stroke(45);
+        noFill();
+        strokeWeight(1);
+        arc(0, 7, 7, 5, 0, 180);
+        popMatrix();
+        
+        fill(255);
+        textSize(50);
+        text('"HURRAH!"', 300, 430);
+        textSize(20);
+        text('You have saved Monkey Realm!\nThe robots are now banished!', 300, 490);
+    }
+    
+    clicked = false;
+};
