@@ -1,0 +1,695 @@
+/**
+ * Block Ninja 2
+ * October 4 2016
+ * Chester Banks
+ * 
+ * Made for #Khantober2016
+ * 
+ * Thanks to my subscribers! Subscribe here: khanacademy.org/cs/a/4790207744704512
+ * This program's LUCKY SUBSCRIBER is SILVERWISP! Check out SilverWisp's programs here: khanacademy.org/profile/SilverWisp/projects
+ * 
+ * See the original Block Ninja here: khanacademy.org/cs/bn/4542135253204992
+*/
+
+// Can you beat my high score of 123?
+// Game is slightly based off of Make Them Jump by Ketchapp.
+
+// Set the font and center all text
+textFont(createFont("HelveticaNeue-CondensedBold"));
+textAlign(CENTER, CENTER);
+
+// Colors of the ninjas
+var colors = [
+    color(204, 70, 70),
+    color(76, 136, 189),
+    color(75, 204, 55),
+    color(195, 222, 44),
+    color(142, 44, 222),
+    color(68, 197, 199)
+];
+
+var system = {
+    scene: 'Logo',
+    
+    switchingScenes: false,
+    nextScene: 'Game',
+    ninjaScale: 0,
+    ninjaSpeed: 0.5,
+    which: floor(random(0, 6)),
+};
+
+var ninja = 0, ninjaNames = ['Brick', 'Coby', 'Moss', 'Goldo', 'Raven', 'Teal'], ninjaBios = ['Tough and experienced, Brick has been in the gang the longest. He knows everything a ninja should know.', 'Coby may not have the muscle, but he certainly has the speed of a ninja. Coby is one of the fastest ninjas around.', 'Before Moss became a ninja, he was a gymnast. With his signature triple-flip, Moss is a master of flips and kicks.', 'Goldo is the funniest ninja in the gang - he\'s always the one cracking a joke. Plus, he\'s very good at jumping.', 'Raven is the muscle of the team. If he\'s in danger, he always tries to smash his way out of it.', 'Teal is the youngest and only female member of the team. She is a master of disguise - she can look like anyone on the planet.'];
+var clicked = false;
+var level = 0, score = 0, score2 = 0, lives = 5, highScore = 0;
+
+// The rectangle collision function
+var rectCollide = function(one, two){
+    return one.x+one.w > two.x && one.y+one.h > two.y && one.x < two.x+two.w && one.y < two.y+two.h;
+};
+
+var logo = function(x, y, sz){
+    var logoColors = [
+        color(19, 87, 138),
+        color(87, 156, 217),
+        color(56, 179, 255),
+        color(69, 192, 230),
+    ];
+    
+    pushMatrix();
+    translate(x, y);
+    scale(sz);
+    noFill();
+    strokeCap(SQUARE);
+    stroke(0, 0, 0, 30);
+    strokeWeight(30);
+    arc(10, 20, 160, 160, 30, 330);
+    strokeWeight(11);
+    // Outer layer
+    stroke(logoColors[0]);
+    arc(0, 0, 200, 200, -85, -30);
+    arc(0, 0, 180, 180, -75, -30);
+    arc(0, 0, 200, 200, -300, -240);
+    arc(0, 0, 180, 180, -285, -250);
+    stroke(logoColors[1]);
+    arc(0, 0, 200, 200, -125, -85);
+    arc(0, 0, 180, 180, -115, -75);
+    arc(0, 0, 200, 200, -200, -160);
+    arc(0, 0, 180, 180, -200, -150);
+    stroke(logoColors[2]);
+    arc(0, 0, 200, 200, -160, -125);
+    arc(0, 0, 180, 180, -150, -116);
+    arc(0, 0, 200, 200, -330, -300);
+    arc(0, 0, 180, 180, -330, -286);
+    stroke(logoColors[3]);
+    arc(0, 0, 200, 200, -240, -200);
+    arc(0, 0, 180, 180, -250, -200);
+    
+    // Inner layer
+    stroke(logoColors[0]);
+    arc(0, 0, 160, 160, -200, -160);
+    arc(0, 0, 140, 140, -200, -150);
+    stroke(logoColors[1]);
+    arc(0, 0, 160, 160, -300, -240);
+    arc(0, 0, 140, 140, -285, -250);
+    stroke(logoColors[2]);
+    arc(0, 0, 160, 160, -240, -200);
+    arc(0, 0, 140, 140, -250, -200);
+    arc(0, 0, 160, 160, -125, -85);
+    arc(0, 0, 140, 140, -115, -75);
+    stroke(logoColors[3]);
+    arc(0, 0, 160, 160, -85, -30);
+    arc(0, 0, 140, 140, -75, -30);
+    arc(0, 0, 160, 160, -330, -300);
+    arc(0, 0, 140, 140, -330, -286);
+    arc(0, 0, 160, 160, -160, -125);
+    arc(0, 0, 140, 140, -150, -116);
+    
+    stroke(0, 0, 0, 50);
+    strokeWeight(20);
+    arc(0, 0, 150, 150, 30, 330);
+    popMatrix();
+};
+var heart = function(x, y){
+    pushMatrix();
+    rectMode(CENTER);
+    translate(x, y);
+    rotate(45);
+    fill(45);
+    rect(5, 0, 11, 20);
+    rotate(-90);
+    rect(-5, 0, 11, 20);
+    rectMode(CORNER);
+    popMatrix();
+};
+
+var Block = function(){
+    this.x = random(width, width * 2);
+    this.ys = [
+        [570], [270, 570], [170, 370, 570], [120, 270, 420, 570], [90, 210, 330, 450, 570], [70, 170, 270, 370, 470, 570]
+    ];
+    this.y = this.ys[level][floor(random(this.ys[level].length))];
+    this.w = 25;
+    this.h = 25;
+    this.trans = 255;
+};
+var Blocks = [];
+var blockFrequency = 100;
+Block.prototype.draw = function() {
+    noStroke();
+    fill(45, 45, 45, this.trans);
+    rect(this.x, this.y, this.w, this.h);
+    
+    if(this.y === this.ys[level][1]){
+        this.x -= 7;
+    } else {
+        this.x -= 5;
+    }
+    if(this.hit){ this.trans -= 15; }
+};
+
+var Ninja = function(y, colo){
+    this.x = 30;
+    this.y = y; this.originalY = y;
+    this.w = 20;
+    this.h = 20;
+    this.colo = colo;
+    this.rot = 0;
+    
+    if(colo === colors[3]){
+        this.GRAVITY = 10;
+    } else {
+        this.GRAVITY = 8;
+    }
+    
+    this.jumping = false;
+    this.gravity = this.GRAVITY;
+    
+    this.particle = function(x, y){
+        this.x = x;
+        this.y = y;
+        this.xSpeed = random(-3, -7);
+        this.ySpeed = random(-3);
+        this.sz = random(3, 10);
+    };
+    this.particle.prototype.draw = function() {
+        noStroke();
+        fill(45, 45, 45, 100);
+        rect(this.x, this.y, this.sz, this.sz);
+        
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+    };
+    this.particles = [];
+};
+Ninja.prototype.draw = function() {
+    if(frameCount % 2 === 0 && !this.jumping){
+        this.particles.push(new this.particle(this.x, this.y + this.h - 2));
+    }
+    for(var i in this.particles){
+        this.particles[i].draw();
+        if(this.particles[i].x < -50){
+            this.particles.splice(i, 1);
+        }
+    }
+    
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(this.rot);
+    if(this.jumping && this.colo === colors[2]){
+        this.rot += 30;
+    } else {
+        this.rot = 0;
+    }
+    noStroke();
+    fill(45);
+    (rect)(0, 0, this.w, this.h, 2, 2, 0, 0);
+    fill(this.colo);
+    rect(0, (this.h / 4), this.w, this.h / 4);
+    fill(255, 255, 255, 50);
+    rect(0, (this.h / 4), this.w, this.h / 4);
+    fill(45);
+    rect((this.w / 1.3), (this.h / 3.5), this.w / 6, this.h / 6);
+    rect((this.w / 2.2), (this.h / 3.5), this.w / 6, this.h / 6);
+    popMatrix();
+    
+    if(clicked && mouseY < this.y + this.h && mouseY > this.y - height/(level+1) + 20){
+        this.jumping = true;
+    }
+    if(this.jumping){
+        this.y -= this.gravity;
+        this.gravity -= 0.5;
+    }
+    if(this.y > this.originalY){
+        this.gravity = this.GRAVITY;
+        this.y = this.originalY;
+        this.jumping = false;
+    }
+    
+    for(var i in Blocks){
+        if(rectCollide(this, Blocks[i]) && !Blocks[i].hit){
+            lives --;
+            Blocks[i].hit = true;
+            system.game.shakeTimer = 0;
+            system.game.shake = true;
+        }
+    }
+};
+var Ninjas = [
+    [
+        new Ninja(575, colors[0])
+    ],
+    [
+        new Ninja(275, colors[0]),
+        new Ninja(575, colors[1]),
+    ],
+    [
+        new Ninja(175, colors[0]),
+        new Ninja(375, colors[1]),
+        new Ninja(575, colors[2])
+    ],
+    [
+        new Ninja(125, colors[0]),
+        new Ninja(275, colors[1]),
+        new Ninja(425, colors[2]),
+        new Ninja(575, colors[3]),
+    ],
+    [
+        new Ninja(95, colors[0]),
+        new Ninja(215, colors[1]),
+        new Ninja(335, colors[2]),
+        new Ninja(455, colors[3]),
+        new Ninja(575, colors[4]),
+    ],
+    [
+        new Ninja(75, colors[0]),
+        new Ninja(175, colors[1]),
+        new Ninja(275, colors[2]),
+        new Ninja(375, colors[3]),
+        new Ninja(475, colors[4]),
+        new Ninja(575, colors[5])
+    ],
+];
+
+var Menu = function(){
+    this.x1 = 350;
+    this.buttons = [
+        {name: 'P L A Y', y: 430, xS: 15, trans: 225, txtSize: 40, scene:'Game'},
+        {name: 'H O W', y: 475, xS: 15, trans: 225, txtSize: 45, scene:'How'},
+        {name: 'N I N J A S', y: 510, xS: 15, trans: 225, txtSize: 25, scene:'Ninjas'}
+    ];
+    
+    this.snap = false;
+};
+Menu.prototype.draw = function() {
+    level = 0;
+    score = 0;
+    lives = 5;
+    Blocks = [];
+    blockFrequency = 100;
+
+    strokeWeight(10);
+    for (var i = 0; i <= height; i +=10) {
+        stroke(lerpColor(color(0, 25, 46), color(94, 120, 153), i/height));
+        line(0, i, height, i);
+    }
+    pushMatrix();
+    scale(1);
+    if(keyIsPressed && key.toString().toLowerCase() === 'a'){
+        this.snap = true;
+    }
+    if(this.snap){
+        translate(0, -60);
+        scale(1, 1.5);
+    }
+    fill(255, 255, 255);
+    textSize(100);
+    text('BLOCK', 200 + this.x1, 110);
+    textSize(120);
+    text('NINJA', 200 - this.x1, 189);
+    textSize(387);
+    pushMatrix();
+    translate(200, 300 + this.x1);
+    scale(1.8, 0.6);
+    text('2', 0, 0);
+    popMatrix();
+    if(this.snap){
+        pushMatrix();
+        translate(120, 450);
+        rotate(-10);
+        scale(4);
+        noStroke();
+        fill(245);
+        rect(-27, -27, 54, 54);
+        fill(45);
+        rect(-25, -25, 50, 50);
+        fill(colors[0]);
+        rect(-25, -15, 50, 15);
+        fill(45);
+        rect(-9, -12, 10, 10);
+        rect(5, -12, 10, 10);
+        popMatrix();
+    }
+    popMatrix();
+    
+    if(!this.snap){
+    for(var i in this.buttons){
+        noStroke();
+        fill(5, 5, 5, 105 - this.buttons[i].trans);
+        rect(0, this.buttons[i].y - (this.buttons[i].txtSize / 2), width, this.buttons[i].txtSize);
+        
+        fill(255);
+        textSize(this.buttons[i].txtSize);
+        text(this.buttons[i].name, 215 - this.buttons[i].xS, this.buttons[i].y);
+        
+        if(mouseY > this.buttons[i].y - (this.buttons[i].txtSize / 2) && mouseY < this.buttons[i].y + (this.buttons[i].txtSize / 2)){
+            this.buttons[i].xS /= 1.1;
+            this.buttons[i].trans /= 1.1;
+            if(clicked){
+                system.nextScene = this.buttons[i].scene;
+                system.switchingScenes = true;
+            }
+        } else {
+            if(this.buttons[i].xS < 15){this.buttons[i].xS ++;}
+            if(this.buttons[i].trans < 225){this.buttons[i].trans+=5;}
+        }
+    }
+    
+    noStroke();
+    for(var i = 12; i < width; i += 65){
+        pushMatrix();
+        translate(i + 25, 565);
+        rotate(sin(i)*10);
+        scale(1 + sin(i+180)/7);
+        fill(245);
+        rect(-27, -27, 54, 54);
+        fill(45);
+        rect(-25, -25, 50, 50);
+        fill(colors[(i - 12) /65]);
+        rect(-25, -15, 50, 15);
+        fill(45);
+        rect(-9, -12, 10, 10);
+        rect(5, -12, 10, 10);
+        popMatrix();
+    }
+    }
+    
+    this.x1 /= 1.1;
+};
+system.menu = new Menu();
+
+var Game = function(){
+    this.shake = false;
+    this.shakeTimer = 0;
+};
+Game.prototype.draw = function() {
+    if(score >= highScore){
+        highScore = score;
+    }
+    if(frameCount % blockFrequency === 0){
+        Blocks.push(new Block());
+    }
+    if(frameCount % 30 === 0){
+        score ++;
+        score2 ++;
+    }
+    if(score2 === 20 && level < 5){
+        for(var i in Blocks){
+            Blocks[i].hit = true;
+        }
+        level ++;
+        score2 = 0;
+    }
+    if(frameCount % 60 === 0){
+        blockFrequency --;
+    }
+    
+    noStroke();
+    for(var i = 0; i < 600; i += height/(level+1)){
+        fill(colors[i/(height/(level+1))]);
+        rect(0, i, width, height/(level+1));
+    }
+    pushMatrix();
+    if(this.shake){
+        translate(random(-10, 10), random(-10, 10));
+        this.shakeTimer ++;
+        if(this.shakeTimer > 10){
+            this.shake = false;
+        }
+    }
+    for(var i = height/(level+1) - 5; i < height; i += height/(level+1)){
+        fill(45);
+        rect(0, i, width, 5);
+        fill(0, 0, 0, 30);
+        triangle(0, i - height/(level+1), width, i - height/(level+1), 0, i + height/(level+1));
+    }
+    for(var i in Ninjas[level]){
+        Ninjas[level][i].draw();
+    }
+    for(var i = 0; i < Blocks.length; i ++){
+        Blocks[i].draw();
+        if(Blocks[i].x < -50){
+            Blocks.splice(i, 1);
+            i --;
+        }
+    }
+    fill(45);
+    textSize(20);
+    text('Score: ' + score, 55, 50);
+    for(var i = 0; i < lives; i ++){
+        heart(30 + i * 30, 20);
+    }
+    popMatrix();
+    if(lives < 0){
+        system.nextScene = 'Lose';
+        system.switchingScenes = true;
+    }
+};
+system.game = new Game();
+
+var mousePressed = function(){
+    clicked = true;
+};
+var keyPressed = function(){
+    if(key.toString() === '1'){
+        Ninjas[level][0].jumping = true;
+    }
+    if(key.toString() === '2'){
+        Ninjas[level][1].jumping = true;
+    }
+    if(key.toString() === '3'){
+        Ninjas[level][2].jumping = true;
+    }
+    if(key.toString() === '4'){
+        Ninjas[level][3].jumping = true;
+    }
+    if(key.toString() === '5'){
+        Ninjas[level][4].jumping = true;
+    }
+    if(key.toString() === '6'){
+        Ninjas[level][5].jumping = true;
+    }
+};
+
+draw = function() {
+    if(system.scene === 'Logo'){
+        background(255, 255, 255);
+        for(var i = 0; i < 360; i += 24){
+            for(var j = 0; j < 360; j += 61){
+            pushMatrix();
+            noStroke();
+            translate(200, 300);
+            rotate(frameCount*2);
+            rotate(i);
+            fill(0, 187, 255, -j + 200);
+            arc(0, -325 + j, 100, 77, -307, 16);
+            popMatrix();
+            }
+        }
+        logo(200, 300, 1 + sin(frameCount*20)/40);
+        if(frameCount > 100){
+            system.scene = 'Menu';
+        }
+    }
+    if(system.scene === 'Menu'){
+        system.menu.draw();
+    }
+    if(system.scene === 'How'){
+        level = 5;
+        
+        noStroke();
+        for(var i = 0; i < 600; i += height/(level+1)){
+            fill(colors[i/(height/(level+1))]);
+            rect(0, i, width, height/(level+1));
+        }
+        pushMatrix();
+        for(var i = height/(level+1) - 5; i < height; i += height/(level+1)){
+            fill(45);
+            rect(0, i, width, 5);
+            fill(0, 0, 0, 30);
+            triangle(0, i - height/(level+1), width, i - height/(level+1), 0, i + height/(level+1));
+        }
+        for(var i in Ninjas[level]){
+            Ninjas[level][i].draw();
+        }
+        popMatrix();
+        
+        fill(45);
+        rect(340, 370, 25, 25);
+        
+        fill(255);
+        textSize(20);
+        text('Tap here to make Brick jump', 200, 50);
+        text('Tap here to make Coby jump', 200, 150);
+        text('Tap here to make Moss jump', 200, 250);
+        text('Tap here to make Goldo jump', 200, 350);
+        text('Tap here to make Raven jump', 200, 450);
+        text('Tap here to make Teal jump', 200, 550);
+        textSize(15);
+        text('Jump over the blocks', 285, 330);
+        text('OR PRESS 1', 150, 70);
+        text('OR PRESS 2', 150, 170);
+        text('OR PRESS 3', 150, 270);
+        text('OR PRESS 4', 150, 370);
+        text('OR PRESS 5', 150, 470);
+        text('OR PRESS 6', 150, 570);
+        
+        noFill();
+        stroke(255);
+        strokeWeight(3);
+        bezier(336, 340, 331, 346, 356, 340, 353, 360);
+        line(353, 360, 348, 355);
+        line(354, 360, 358, 355);
+        
+        textSize(20);
+        fill(0, 0, 0, 100);
+        if(mouseX > 20 && mouseX < 90 && mouseY > 20 && mouseY < 40){
+            fill(0, 0, 0, 150);
+            if(clicked){
+                system.nextScene = 'Menu';
+                system.switchingScenes = true;
+            }
+        }
+        text('B A C K', 50, 30);
+    }
+    if(system.scene === 'Ninjas'){
+        background(222, 222, 222);
+        
+        noStroke();
+        fill(45);
+        (rect)(100, 200, 200, 200, 20, 20, 0, 0);
+        fill(colors[ninja]);
+        rect(100, 250, 200, 50);
+        fill(45);
+        rect(180, 258, 35, 35, 5);
+        rect(232, 258, 35, 35, 5);
+        textSize(20);
+        fill(0, 0, 0, 30);
+        if(mouseX > 20 && mouseX < 90 && mouseY > 20 && mouseY < 40){
+            fill(0, 0, 0, 80);
+            if(clicked){
+                system.nextScene = 'Menu';
+                system.switchingScenes = true;
+            }
+        }
+        text('B A C K', 50, 30);
+        textSize(70);
+        fill(45);
+        text('N I N J A S', 200, 105);
+        fill(0, 0, 0, 30);
+        text(ninjaNames[ninja], 200, 465);
+        fill(colors[ninja]);
+        text(ninjaNames[ninja], 200, 460);
+        textSize(20);
+        if(ninja === 3){ fill(0, 0, 0, 50); }
+        text(ninjaBios[ninja], 10, 375, 380, 300);
+        
+        noStroke();
+        fill(0, 0, 0, 50);
+        if(ninja > 0){
+            if(mouseX > 30 && mouseX < 50 && mouseY > 280 && mouseY < 320){
+                fill(0, 0, 0, 100);
+                if(clicked){
+                    ninja --;
+                }
+            }
+            triangle(50, 280, 50, 320, 30, 300);
+        }
+        fill(0, 0, 0, 50);
+        if(ninja < ninjaNames.length - 1){
+            if(mouseX > 350 && mouseX < 370 && mouseY > 280 && mouseY < 320){
+                fill(0, 0, 0, 100);
+                if(clicked){
+                    ninja ++;
+                }
+            }
+            triangle(350, 280, 350, 320, 370, 300);
+        }
+    }
+    if(system.scene === 'Game'){
+        system.game.draw();
+    }
+    if(system.scene === 'Lose'){
+        for (var i = 0; i <= height; i ++) {
+            stroke(lerpColor(color(0, 25, 46), color(94, 120, 153), i/height));
+            line(0, i, height, i);
+        }
+        
+        noStroke();
+        pushMatrix();
+        translate(200, 505);
+        
+        var blues = [color(82, 142, 189), color(69, 121, 161)];
+        for(var i = 0; i < 360; i += 30){
+            pushMatrix();
+            rotate(i);
+            fill(blues[(i/30)%2]);
+            triangle(0, 0, 300, -114, 300, 50);
+            popMatrix();
+        }
+        rotate(-10 + sin(frameCount*10)*5);
+        scale(3.0 + sin(frameCount*5)/5);
+        fill(245);
+        rect(-27, -27, 54, 54);
+        fill(45);
+        rect(-25, -25, 50, 50);
+        fill(colors[1]);
+        rect(-25, -15, 50, 15);
+        fill(45);
+        rect(-9, -12, 10, 10);
+        rect(5, -12, 10, 10);
+        popMatrix();
+        
+        fill(255, 255, 255);
+        textSize(50);
+        text('#BlockNinja2', 200, 60);
+        textSize(30);
+        text('Y O U R   S C O R E :', 200, 215);
+        text('H I G H   S C O R E :', 200, 110);
+        textSize(40);
+        if(mouseY > 350 && mouseY < 390){
+            textSize(45);
+            if(clicked){
+                system.nextScene = 'Menu';
+                system.switchingScenes = true;
+            }
+        }
+        text('R E T R Y ?', 200, 370);
+        textSize(150);
+        text(score, 200, 285);
+        textSize(55);
+        text(highScore, 200, 150);
+        noStroke();
+    }
+    
+    if(system.switchingScenes){
+        noStroke();
+        pushMatrix();
+        translate(200, 300);
+        rotate(sin(frameCount*10)*20);
+        scale(system.ninjaScale);
+        fill(245);
+        rect(-27, -27, 54, 54);
+        fill(45);
+        rect(-25, -25, 50, 50);
+        fill(colors[system.which]);
+        rect(-25, -15, 50, 15);
+        fill(45);
+        rect(-9, -12, 10, 10);
+        rect(5, -12, 10, 10);
+        popMatrix();
+        
+        system.ninjaScale += system.ninjaSpeed;
+        if(system.ninjaScale > 15){
+            system.ninjaSpeed = -0.5;
+            system.scene = system.nextScene;
+        }
+        if(system.ninjaScale < 0){
+            system.which = floor(random(6));
+            system.ninjaSpeed = 0.5;
+            system.switchingScenes = false;
+        }
+    }
+    
+    clicked = false;
+};
+
