@@ -1,0 +1,356 @@
+/**
+ * Cover of Darkness
+ * Chester Banks
+ * October 18 2016
+ * 
+ * Made for Khantober!
+ * 
+ * This program's LUCKY SUBSCRIBER is PLATINUM! Check out his profile here: https://www.khanacademy.org/profile/FJBoss
+ * Thanks to my subscribers! Subscribe to me here: khanacademy.org/cs/subscribe/4790207744704512
+*/
+
+var scene = 'Menu';
+
+textFont(createFont("HelveticaNeue-CondensedBold")); // If you don't have this font, change it to Impact, I suppose
+textAlign(CENTER, CENTER);
+
+var mouse = { overButton: false, clicked: false};
+mouseClicked = function(){ mouse.clicked = true; };
+var keys = [];
+keyPressed = function(){keys[keyCode] = true;};
+keyReleased = function(){keys[keyCode] = false;};
+
+var images = {
+    bg: function(){
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(color(12, 37, 66), color(0, 0, 0), i / height));
+            rect(0, i, width, 20);
+        }
+        
+        for(var i = 0; i < 200; i ++){
+            fill(255, 255, 255, random(255));
+            ellipse(random(width), random(height), random(5), random(5));
+        }
+        
+        
+        fill(249, 252, 226);
+        pushMatrix();
+        translate(-10, -10);
+        beginShape();
+        vertex(319, 53);
+        bezierVertex(266, 101, 298, 153, 376, 114);
+        bezierVertex(317, 112, 307, 102, 321, 53);
+        endShape(CLOSE);
+        popMatrix();
+        
+        fill(15, 48, 13);
+        beginShape();
+        vertex(59, 400);
+        bezierVertex(280, 372, 272, 277, 445, 400);
+        endShape(CLOSE);
+        fill(23, 74, 21);
+        beginShape();
+        vertex(341, 400);
+        bezierVertex(40, 350, 32, 304, -40, 400);
+        endShape(CLOSE);
+        
+        noStroke();
+        fill(255, 255, 0, 50);
+        //triangle(50, 400, 250, 400, 500, 0);
+        //triangle(150, 400, 350, 400, -100, 0);
+        
+        filter(BLUR, 2);
+        
+        return get(0, 0, width, height);
+    },
+    light1: function(){
+        noStroke();
+        fill(255, 255, 0, 50);
+        triangle(50, 400, 250, 400, 500, 0);
+        
+        filter(BLUR, 2);
+        
+        return get(0, 0, width, height);
+    },
+    light2: function(){
+        noStroke();
+        fill(255, 255, 0, 50);
+        triangle(150, 400, 350, 400, -100, 0);
+        
+        filter(BLUR, 2);
+        
+        return get(0, 0, width, height);
+    },
+};
+
+var Light = function (){
+    this.y = 0;
+};
+Light.prototype.draw = function() {
+    noStroke();
+    for(var i = 0; i < 45; i += 5){
+        fill(175, 227, 20, 20);
+        rect(0, this.y, width, i);
+        rect(0, this.y, width, -i);
+    }
+    
+    this.y += 1;
+    if(this.y > height + 50){
+        this.y = -50;
+    }
+};
+var light = new Light();
+
+var score = 0;
+var gameTimer = 0;
+var reasonForDeath = 'You ran into a mine.';
+var player;
+
+var Mine = function(){
+    this.x = random(width);
+    this.y = random(height);
+    this.r = random(360);
+    this.sz = 20;
+    this.dontShow = false;
+};
+Mine.prototype.draw = function() {
+    pushMatrix();
+    translate(this.x, this.y);
+    rotate(this.r);
+    noStroke();
+    fill(0);
+    ellipse(0, 0, this.sz, this.sz);
+    stroke(0);
+    strokeWeight(5);
+    line(0, 0, 0, -12);
+    popMatrix();
+    
+    if(gameTimer < 30 && (dist(this.x, this.y, player.x, player.y) < 40 || dist(this.x, this.y, 207, 12) < 40)){
+        this.dontShow = true;
+    }
+};
+var howManyMines = 30;
+var mines = [];
+for(var i = 0; i < howManyMines; i ++){
+    mines.push(new Mine());
+}
+
+var Player = function(){
+    this.x = 200;
+    this.y = 350;
+    this.sz = 20;
+    this.hidden = false;
+};
+Player.prototype.draw = function() {
+    stroke(189, 158, 87);
+    fill(232, 195, 109);
+    strokeWeight(3);
+    ellipse(this.x, this.y, this.sz, this.sz);
+    stroke(12, 135, 33);
+    fill(48, 140, 63);
+    arc(this.x, this.y, this.sz + 5, this.sz + 5, -180, 0);
+    
+    if(keys[32]){
+        this.hidden = true;
+    } else {
+        this.hidden = false;
+    }
+    
+    if(this.hidden){
+        fill(0);
+        stroke(0);
+        ellipse(this.x, this.y, this.sz, this.sz);
+        arc(this.x, this.y, this.sz + 5, this.sz + 5, -180, 0);
+    }
+    
+    if(this.y > light.y - 35 && this.y < light.y + 35 && !this.hidden){
+        reasonForDeath = 'You were caught in the searchlight.';
+        scene = 'Lose';
+    }
+    
+    if(!this.hidden && gameTimer > 30){
+        if(keys[RIGHT]){ 
+            this.x += 3; 
+        }
+        if(keys[LEFT]){ 
+            this.x -= 3; 
+        }
+        if(keys[UP]){ 
+            this.y -= 3;
+        }
+        if(keys[DOWN]){ 
+            this.y += 3; 
+        }
+    }
+    
+    for(var i in mines){
+        if(dist(this.x, this.y, mines[i].x, mines[i].y) < 20 && !mines[i].dontShow){
+            reasonForDeath = 'You ran into a mine.';
+            scene = 'Lose';
+        }
+    }
+    
+    // x: 200, y: 20, w: 15, h: 25
+    if(this.x + (this.sz / 2) > 200 && this.x - (this.sz / 2) < 215 && this.y + (this.sz / 2) > 20 && this.y - (this.sz / 2) < 45){
+        scene = 'Level Up';
+    }
+};
+player = new Player();
+
+var button = function(x, y, sz, txt, next){
+    this.x = x; 
+    this.y = y;
+    this.sz = sz; 
+    this.txt = txt;
+    this.next = next;
+};
+button.prototype.draw = function() {
+    textSize(this.sz / 1.5);
+    strokeWeight(5);
+    stroke(255, 255, 255, 150);
+    fill(255, 255, 255, 100);
+    if(dist(mouseX, mouseY, this.x, this.y) < this.sz/2){
+        mouse.overButton = true;
+        fill(255, 255, 255, 150);
+        ellipse(this.x, this.y, this.sz + sin(frameCount*10)*3, this.sz + cos(frameCount*10)*3);
+        if(mouse.clicked){
+            scene = this.next;
+        }
+    } else {
+        ellipse(this.x, this.y, this.sz, this.sz);
+    }
+    fill(255);
+    if(this.txt === '.'){
+        noStroke();
+        fill(255);
+        triangle(this.x + 15, this.y, this.x - 10, this.y - 15, this.x - 10, this.y + 15);
+    } else {
+        text(this.txt.toUpperCase(), this.x, this.y);
+    }
+};
+var buttons = {
+    play: new button(160, 345, 70, '.', 'Game'),
+    how: new button(240, 345, 70, '?', 'How'),
+    back: new button(40, 360, 50, '\u2190', 'Menu'),
+};
+
+draw = function() {
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    if(scene === 'Menu'){
+        gameTimer = 0;
+        score = 0;
+        player.x = 200;
+        player.y = 350;
+        light.y = 0;
+        if(mines.length <= howManyMines){
+            mines.push(new Mine());
+        }
+        
+        image(images.bg, 0, 0);
+        image(images.light1, 30 + sin(frameCount*2)*30, 0);
+        image(images.light2, -30 + sin(-frameCount*2)*30, 0);
+        
+        pushMatrix();
+        translate(width / 2, height / 2);
+        fill(255, 255, 255);
+        textAlign(LEFT, CENTER);
+        textSize(70);
+        textLeading(50);
+        text('COVER\nOF\nDARKNESS', -165, 0);
+        textSize(15);
+        text('|| CHESTER BANKS || KHANTOBER 2016 ||', -162, 86);
+        textAlign(CENTER, CENTER);
+        popMatrix();
+        
+        buttons.play.draw();
+        buttons.how.draw();
+    }
+    if(scene === 'How'){
+        background(0);
+        textSize(40);
+        fill(255, 255, 255);
+        text('HOW TO PLAY', 200, 45);
+        stroke(255);
+        strokeWeight(10);
+        line(0, 65, width, 65);
+        
+        textSize(15);
+        text('Use the ARROW KEYS to move around.\n\nPress SPACE to hide yourself.\n\nIf you run into a MINE, you die.\n\nIf the SEARCHLIGHT falls on you and\nyou\'e not hidden, you die.\n\nYou can\'t see the MINES unless the\nSEARCHLIGHT is on them, so remember\nwhere they are!\n\nIf you get to the FLAG, you advance to\nthe next level!', 200, 230);
+        
+        buttons.back.draw();
+    }
+    if(scene === 'Game'){
+        gameTimer ++;
+        
+        background(0);
+    
+        // draw searchlight
+        light.draw();
+        
+        // draw mines
+        for(var i in mines){
+            if(!mines[i].dontShow){
+                mines[i].draw();
+            }
+        }
+        
+        // draw player
+        player.draw();
+        
+        // draw flag
+        noStroke();
+        fill(47, 212, 47);
+        rect(200, 20, 3, 25);
+        rect(200, 20, 15, 10);
+        
+        // draw score
+        textSize(15);
+        fill(47, 212, 47);
+        text(score, 24, 20);
+    }
+    if(scene === 'Level Up'){
+        gameTimer = 0;
+        player.x = 200;
+        player.y = 350;
+        mines = [];
+        light.y = 0;
+        score += 100;
+        howManyMines += 2;
+        for(var i = 0; i < howManyMines; i ++){
+            mines.push(new Mine());
+        }
+        scene = 'Game';
+    }
+    if(scene === 'Lose'){
+        gameTimer = 0;
+        mines = [];
+        
+        image(images.bg, 0, 0);
+        
+        fill(255);
+        textSize(75);
+        text('D E A T H', 200, 130);
+        textSize(18);
+        text('Your secret mission failed. Now your country will lose the war, and the world will sink into ruin.', 50, 90, 300, 200);
+        text('At least this is your score:', 200, 255);
+        textSize(14);
+        text(reasonForDeath, 200, 90);
+        textSize(70);
+        text(score, 200, 295);
+        
+        buttons.back.draw();
+    }
+    
+    cursor(mouse.overButton ? 'pointer' : 'default');
+    
+    mouse.overButton = false;
+    mouse.clicked = false;
+};
