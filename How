@@ -1,0 +1,853 @@
+/**
+ * How
+ * Chester Banks
+ * October 31 2017
+ * 
+ * There are no instructions on purpose - learn the game as you play! I will tell you this: getting rid of all your cards is the goal of the game.
+ * 
+ * My final program for Khantober 2017!
+ * 
+ * Okay here's the basics of how to play:
+    - You can play a card that's the same number, one below, one above, or the same suit.
+    - You win when you have no cards left
+    - Figure out the rest!
+*/
+
+/*
+    If you absolutely need help, all rules are below. I'd recommend trying to figure it out yourself first though!! 
+    {
+        - You can play a card that's the same number, one below, one above, or the same suit.
+        - You win when you have no cards left
+        - You must say "spades" when you change the suit to spades
+        - You must say "hail the chairman" after you play a king
+        - You must say "hail the chairwoman" after you play a queen
+        - You must say "use the force" after you play a 4
+        - You must say "thank you" after receiving a card
+        - No talking unless it's one of the above circumstances
+        
+        If you want to play this in real life there's a few more rules:
+        - No tattling
+        - No touching your cards before the judge says "Mao is now in session"
+        - A seven reverses the order
+        - "Point of order" pauses the game
+        - You must say "Diamonds is a girl's best friend" when an queen of diamonds is played
+        - No unnecessary noises
+        - When you win, you get to add a rule of your own
+    }
+*/
+
+/* Credit to 木 for this bit of code: https://www.khanacademy.org/computer-programming/hello-google-fonts/6633982602379264 */
+var loadGoogleFont = (function () {
+    return this.Function ( "gfName", "gfName = gfName.replace ( /\\s+/g, '+' );var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 ), url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ], gfs = document.querySelectorAll('link[href=\"'+url+'\"]');if(!gfs.length){var f=document.createElement('link');f.setAttribute('rel','stylesheet');f.setAttribute('type','text/css');f.onload=callback;f.setAttribute('href',url);document.head.appendChild(f);}else if ( typeof callback === 'function' ) { callback.call ( gfs [ 0 ] ); }");
+})();
+var fontloaded = false;
+
+if ( !fontloaded ) {
+    loadGoogleFont('Londrina Solid|Rokkitt', 'latin-ext', 'vietnamese');
+}
+
+var scene = 'Menu';
+
+textFont(createFont('Londrina Solid'));
+textAlign(CENTER, CENTER);
+
+var clicked = false, overButton = false;
+mouseClicked = function(){ clicked = true; };
+
+var myName = '';
+var winner = '';
+var reposition = false;
+var turn = 0;
+var saying = '', supposedToSay = '', sayTimer = 12;
+
+var wait = 5;
+
+var trans = {
+    sz: 500, 
+    active: false, 
+    nextScene: '', 
+    out: false
+};
+
+var button = function(x, y, sz, txt, next){
+    this.x = x; 
+    this.y = y;
+    this.sz = sz; 
+    this.txt = txt;
+    this.next = next;
+    this.y2 = 0;
+};
+button.prototype.draw = function() {
+    noStroke();
+    fill(0, 0, 0, 10);
+    for(var i = 0; i < 360; i += 30){
+        ellipse(this.x + sin(i)*5, 10 - this.y2 + this.y + cos(i)*5, this.sz * 1.15, this.sz * 1.15);
+    }
+    
+    textSize(this.sz / 1.5);
+    if(dist(mouseX, mouseY, this.x, this.y) < this.sz/2){
+        this.y2 /= 1.1;
+        
+        fill(255, 255, 255);
+        ellipse(this.x, this.y, this.sz * 1.15, this.sz * 1.15);
+        noFill();
+        strokeWeight(5);
+        stroke(128, 87, 64);
+        ellipse(this.x, this.y, this.sz, this.sz);
+        overButton = true;
+        if(clicked){
+            trans.active = true;
+            trans.nextScene = this.next;
+        }
+    } else {
+        if(this.y2 < 10){
+            this.y2 += 1;
+        }
+        noStroke();
+        fill(224, 224, 224);
+        ellipse(this.x, this.y, this.sz * 1.15, this.sz * 1.15);
+        noFill();
+        strokeWeight(5);
+        stroke(128, 87, 64);
+        ellipse(this.x, this.y, this.sz, this.sz);
+    }
+    fill(255);
+    if(this.txt === '.'){
+        noStroke();
+        fill(128, 87, 64);
+        if(this.sz < 100){
+            triangle(this.x + 20, this.y, this.x - 15, this.y - 20, this.x - 15, this.y + 20);
+        } else {
+            triangle(this.x + 30, this.y, this.x - 22, this.y - 30, this.x - 22, this.y + 30);
+        }
+    } else {
+        text(this.txt.toUpperCase(), this.x, this.y);
+    }
+};
+var buttons = {
+    start: new button(200, 340, 82, '.', 'Settings'),
+    start2: new button(200, 375, 90, '.', 'Game'),
+};
+
+
+var possibleNum = 'A,2,3,4,5,6,7,8,9,10,J,Q,K'.split(',');
+var possibleSuits = 'hearts,spades,clubs,diamonds'.split(',');
+
+var Card = function(num, suit, type){
+    this.x = 125;
+    this.y = 85;
+    this.w = 150;
+    this.h = 200;
+    this.num = num;
+    this.suit = suit;
+    this.type = type;
+    this.play = false;
+    this.plusY = 99;
+    this.positioned = false;
+};
+var tableCards = [];
+var myCards = [];
+Card.prototype.draw = function() {
+    strokeWeight(4);
+    pushMatrix();
+    translate(this.x, this.y);
+    if(this.type === 'mine'){ translate(0, this.plusY); }
+    scale(this.w / 150, this.h / 200);
+    noStroke();
+    fill(0, 0, 0, 50);
+    rect(0, 15, 150, 200);
+    stroke(205);
+    fill(255);
+    rect(0, 0, 150, 200);
+    noFill();
+    stroke(222, 44, 44);
+    translate(75, 100);
+    scale(1.2);
+    translate(-75, -100);
+    if(this.suit === 'hearts'){
+        bezier(75, 75, 25, 25, 0, 87, 75, 150);
+        bezier(74, 76, 125, 25, 150, 87, 75, 150);
+    }
+    if(this.suit === 'diamonds'){
+        line(75, 45, 40, 100);
+        line(75, 45, 110, 100);
+        line(75, 155, 40, 100);
+        line(75, 155, 110, 100);
+    }
+    stroke(0);
+    if(this.suit === 'spades'){
+        bezier(74, 50, 54, 63, 5, 172, 68, 126);
+        bezier(73, 50, 90, 45, 156, 172, 81, 126);
+        line(81, 126, 86, 145);
+        line(71, 126, 65, 145);
+        line(82, 148, 65, 145);
+    }
+    if(this.suit === 'clubs'){
+        arc(105, 114, 50, 50, -112, 145);
+        arc(75, 73, 50, 50, -227, 46);
+        arc(47, 114, 50, 50, 34, 301);
+        line(81, 126, 86, 145);
+        line(71, 126, 65, 145);
+        line(82, 148, 65, 145);
+    }
+    textSize(52);
+    fill(this.suit === 'hearts' || this.suit === 'diamonds' ? color(222, 40, 40) : color(0));
+    textSize(52);
+    text(this.num, 75, 100);
+    popMatrix();
+    
+    if(mouseX > this.x && mouseX < this.x + this.w && mouseY > this.y && mouseY < this.y + this.h && this.type === 'mine' && mouseX > 50 && mouseX < 350 && turn === 0){
+        overButton = true;
+        for(var i = 0; i < possibleNum.length; i ++){
+            if(this.num === possibleNum[i]){
+                var numOfMyCard = i;
+                if(clicked && (tableCards[tableCards.length - 1].num === possibleNum[numOfMyCard - 1] || tableCards[tableCards.length - 1].num === possibleNum[numOfMyCard + 1])){
+                    this.play = true;
+                }
+            }
+        }
+        if(clicked && (this.suit === tableCards[tableCards.length - 1].suit || this.num === tableCards[tableCards.length - 1].num) && turn === 0){
+            this.play = true;
+        }
+    }
+    
+    this.plusY /= 1.1;
+};
+
+tableCards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))], 'mine'));
+for(var i = 0; i < 6; i ++){
+    myCards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))], 'mine'));
+}
+
+var Notif = function(msg){
+    this.msg = msg;
+    this.trans = 355;
+    this.plusX = 300;
+};
+Notif.prototype.draw = function() {
+    pushMatrix();
+    translate(-this.plusX, 0);
+    strokeWeight(1);
+    stroke(0, 0, 0, this.trans);
+    fill(255, 255, 255, this.trans - 155);
+    textSize(14);
+    rect(0, 0, textWidth(this.msg) * 1.1, 18);
+    fill(0, 0, 0, this.trans);
+    textAlign(LEFT, CENTER);
+    text(this.msg, 4, 9);
+    textAlign(CENTER, CENTER);
+    popMatrix();
+    
+    this.plusX /= 1.1;
+    if(this.plusX < 0.005){
+        this.trans /= 1.01;
+    }
+};
+var Notifs = [];
+
+var Player = function(name, turn){
+    this.name = name;
+    this.turn = turn;
+    this.cards = [];
+    this.said = '';
+    this.sayTimer = 12;
+    this.supposedToSay = '';
+    this.sayTheRightThing = floor(random(10));
+    this.wait = 5;
+    
+    for(var i = 0; i < 6; i ++){
+        this.cards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))]));
+    }
+    this.alreadyPlayed = false;
+};
+Player.prototype.draw = function() {
+    if(this.cards.length < 1){
+        winner = this.name;
+        scene = 'Win';
+    }
+    
+    for(var i = this.cards.length - 1; i >= 0; i --){
+        if(turn === this.turn && wait < 0){
+            /*for(var j = 0; j < possibleNum.length; j ++){
+                if(this.cards[i].num === possibleNum[j]){
+                    if(j > 0 && j < possibleNum.length - 2){
+                    if(tableCards[tableCards.length - 1].num === possibleNum[j - 1] || tableCards[tableCards.length - 1].num === possibleNum[j + 1]){
+                        if(this.cards[i].num === 'Q'){
+                            this.sayTimer = 10;
+                            this.supposedToSay = 'hail the chairwoman';
+                        }
+                        if(this.cards[i].num === 'K'){
+                            this.sayTimer = 10;
+                            this.supposedToSay = 'hail the chairman';
+                        }
+                        if(this.cards[i].num === '4'){
+                            this.sayTimer = 10;
+                            this.supposedToSay = 'use the force';
+                        }
+                        if(tableCards[tableCards.length - 1].suit !== 'spades' && this.cards[i].suit === 'spades'){
+                            this.sayTimer = 10;
+                            this.supposedToSay = 'spades';
+                        }
+                        tableCards.push(new Card(this.cards[i].num, this.cards[i].suit, 'table'));
+                        Notifs.push(new Notif(this.name + ' played a ' + this.cards[i].num + ' of ' + this.cards[i].suit));
+                        this.cards.splice(i, 1);
+                        turn ++;
+                        wait = 5;
+                        this.alreadyPlayed = true;
+                    }
+                    }
+                }
+            }*/
+            if((this.cards[i].num === tableCards[tableCards.length - 1].num || this.cards[i].suit === tableCards[tableCards.length - 1].suit) && !this.alreadyPlayed){
+                if(this.cards[i].num === 'Q'){
+                    this.sayTimer = 10;
+                    this.supposedToSay = 'hail the chairwoman';
+                }
+                if(this.cards[i].num === 'K'){
+                    this.sayTimer = 10;
+                    this.supposedToSay = 'hail the chairman';
+                }
+                if(this.cards[i].num === '4'){
+                    this.sayTimer = 10;
+                    this.supposedToSay = 'use the force';
+                }
+                if(tableCards[tableCards.length - 1].suit !== 'spades' && this.cards[i].suit === 'spades'){
+                    this.sayTimer = 10;
+                    this.supposedToSay = 'spades';
+                }
+                tableCards.push(new Card(this.cards[i].num, this.cards[i].suit, 'table'));
+                Notifs.push(new Notif(this.name + ' played a ' + this.cards[i].num + ' of ' + this.cards[i].suit));
+                this.cards.splice(i, 1);
+                turn ++;
+                wait = 5;
+            }
+        }
+        if(turn === this.turn && wait < -1){
+            Notifs.push(new Notif(this.name + ' passed'));
+            turn ++;
+            wait = 5;
+        }
+    }
+    
+    this.sayTimer -= 0.1;
+    if(this.sayTimer < 0 && this.supposedToSay.length > 0){
+        if(this.sayTheRightThing < 4){
+            this.said = this.supposedToSay;
+            Notifs.push(new Notif(this.name + ' said ' + this.said));
+            this.supposedToSay = '';
+            this.sayTheRightThing = floor(random(10));
+            this.sayTimer = 5;
+        } else {
+            Notifs.push(new Notif(this.name + ' got a card for not saying ' + this.supposedToSay));
+            this.sayTheRightThing = floor(random(-2, 5));
+            this.supposedToSay = 'thank you';
+            this.sayTimer = 5;
+        }
+    }
+    
+    this.alreadyPlayed = false;
+};
+var Players = [
+    new Player('Julie', 1),
+    new Player('Ben', 2),
+    new Player('Thomas', 3),
+];
+
+keyPressed = function(){
+    if(scene === 'Settings'){
+        if(keyCode !== SHIFT && keyCode !== 20 && keyCode !== UP && keyCode !== DOWN && keyCode !== LEFT && keyCode !== RIGHT && keyCode !== CONTROL && keyCode !== ENTER){
+            if(keyCode === BACKSPACE){
+                myName = myName.substring(0, myName.length - 1);
+            } else if (keyCode.toString === '"'){
+                if (myName.length < 12){ myName += '\"'; }
+            } else {
+                if (myName.length < 12){ myName += key.toString().toUpperCase(); }
+            }
+        }
+    }
+    if(scene === 'Game'){
+        if(keyCode !== SHIFT && keyCode !== 20 && keyCode !== UP && keyCode !== DOWN && keyCode !== LEFT && keyCode !== RIGHT && keyCode !== CONTROL){
+            if(keyCode === BACKSPACE){
+                saying = saying.substring(0, saying.length - 1);
+            } else if (keyCode === ENTER){
+                Notifs.push(new Notif('You said "' + saying + '"'));
+                if(saying !== supposedToSay && saying !== 'khantober'){
+                    Notifs.push(new Notif('Card for talking'));
+                    myCards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))], 'mine'));
+                    sayTimer = 10;
+                    supposedToSay = 'thank you';
+                } else if (saying === 'khantober'){
+                    for(var i = 0; i < Players.length; i ++){
+                        for(var j = 0; j < 6; j ++){
+                            Players[i].cards.push(new Card(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))])));
+                        }
+                    }
+                    Notifs.push(new Notif('Thanks for subscribing!! ;D'));
+                    supposedToSay = '';
+                    sayTimer = 12;
+                } else {
+                    supposedToSay = '';
+                    sayTimer = 12;
+                }
+                saying = '';
+            } else if (keyCode.toString === '"'){
+                saying += '\"';
+            } else {
+                saying += key.toString().toLowerCase();
+            }
+        }
+    }
+};
+
+var menuCards = [];
+for(var i = 0; i < 5; i ++){
+    menuCards.push({x: i * 79, y: -24, r: random(-30, 30), num: possibleNum[floor(random(possibleNum.length))], suit: possibleSuits[floor(random(possibleSuits.length))]});
+    menuCards.push({x: i * 79, y: 418, r: random(-30, 30), num: possibleNum[floor(random(possibleNum.length))], suit: possibleSuits[floor(random(possibleSuits.length))]});
+}
+
+draw = function() {
+    if(scene === 'Menu'){
+        background(128, 87, 64);
+        
+        noStroke();
+        fill(0, 0, 0, 30);
+        for(var i = 0; i < 600; i += 100){
+            quad(0, i, 0, i + 50, 400, i + 87, 400, i + 61);
+            quad(0, i + 50, 0, i + 77, 400, i + 100, 400, i + 28);
+        }
+        
+        fill(0, 0, 0, 50);
+        textSize(130);
+        text('HOW', 200, 209);
+        textSize(30);
+        text('CHESTER BANKS', 200, 273);
+        text('KHANTOBER 2017', 200, 133);
+        fill(255, 255, 255);
+        textSize(130);
+        text('HOW', 200, 200);
+        textSize(30);
+        fill(25);
+        text('CHESTER BANKS', 200, 270);
+        text('KHANTOBER 2017', 200, 130);
+        
+        for(var i = 0; i < menuCards.length; i ++){
+            pushMatrix();
+            translate(menuCards[i].x, menuCards[i].y);
+            scale(0.5);
+            translate(75, 100);
+            scale(1.2);
+            rotate(menuCards[i].r);
+            translate(-75, -100);
+            noStroke();
+            fill(0, 0, 0, 100);
+            rect(-8, -8, 165, 216);
+            popMatrix();
+            popMatrix();
+        }
+        for(var i = 0; i < menuCards.length; i ++){
+            stroke(205);
+            strokeWeight(4);
+            pushMatrix();
+            translate(menuCards[i].x, menuCards[i].y);
+            scale(0.5);
+            translate(75, 100);
+            scale(1.2);
+            rotate(menuCards[i].r);
+            translate(-75, -100);
+            fill(255);
+            rect(0, 0, 150, 200);
+            noFill();
+            stroke(222, 44, 44);
+            if(menuCards[i].suit === 'hearts'){
+                bezier(75, 75, 25, 25, 0, 87, 75, 150);
+                bezier(74, 76, 125, 25, 150, 87, 75, 150);
+            }
+            if(menuCards[i].suit === 'diamonds'){
+                line(75, 45, 40, 100);
+                line(75, 45, 110, 100);
+                line(75, 155, 40, 100);
+                line(75, 155, 110, 100);
+            }
+            stroke(0);
+            if(menuCards[i].suit === 'spades'){
+                bezier(74, 50, 54, 63, 5, 172, 68, 126);
+                bezier(73, 50, 90, 45, 156, 172, 81, 126);
+                line(81, 126, 86, 145);
+                line(71, 126, 65, 145);
+                line(82, 148, 65, 145);
+            }
+            if(menuCards[i].suit === 'clubs'){
+                arc(105, 114, 50, 50, -112, 145);
+                arc(75, 73, 50, 50, -227, 46);
+                arc(47, 114, 50, 50, 34, 301);
+                line(81, 126, 86, 145);
+                line(71, 126, 65, 145);
+                line(82, 148, 65, 145);
+            }
+            textSize(52);
+            fill(menuCards[i].suit === 'hearts' || menuCards[i].suit === 'diamonds' ? color(222, 40, 40) : color(0));
+            textSize(52);
+            text(menuCards[i].num, 75, 100);
+            popMatrix();
+        }
+        
+        buttons.start.draw();
+    }
+    if(scene === 'Settings'){
+        background(128, 87, 64); 
+        
+        noStroke();
+        fill(0, 0, 0, 30);
+        for(var i = 0; i < 600; i += 100){
+            quad(0, i, 0, i + 50, 400, i + 87, 400, i + 61);
+            quad(0, i + 50, 0, i + 77, 400, i + 100, 400, i + 28);
+        }
+        
+        fill(255);
+        textSize(30);
+        text('Enter your name.', 200, 200);
+        
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(50, 248, 300, 20);
+        strokeWeight(3);
+        stroke(168, 168, 168);
+        fill(255);
+        rect(50, 230, 300, 30);
+        textSize(19);
+        textAlign(LEFT, CENTER);
+        if(myName.length <= 0){
+            fill(0, 0, 0, 50);
+            text('CHESTER', 59, 246);
+        }
+        fill(25);
+        text(myName, 59, 246);
+        textAlign(CENTER, CENTER);
+        
+        buttons.start2.draw();
+    }
+    if(scene === 'Game'){
+        background(128, 87, 64);
+        
+        noStroke();
+        fill(0);
+        switch(turn){
+            case 0: 
+                rectMode(CENTER); 
+                textSize(30);
+                rect(200, 470, textWidth(myName) * 1.2, 60); 
+                rectMode(CORNER); 
+            break;
+            case 1: rect(0, 150, 60, 105); break;
+            case 2: rect(150, 0, 105, 60); break;
+            case 3: rect(340, 135, 60, 130); break;
+        }
+        
+        fill(0, 0, 0, 50);
+        textSize(30);
+        fill(255);
+        pushMatrix();
+        translate(40, 200);
+        rotate(90);
+        text('JULIE', 0, 0);
+        textSize(20);
+        text(Players[0].cards.length + ' CARDS', 0, 24);
+        popMatrix();
+        pushMatrix();
+        translate(360, 200);
+        rotate(-90);
+        textSize(30);
+        text('THOMAS', 0, 0);
+        textSize(20);
+        text(Players[2].cards.length + ' CARDS', 0, 24);
+        popMatrix();
+        pushMatrix();
+        translate(200, 40);
+        textSize(30);
+        text('BEN', 0, 0);
+        textSize(20);
+        text(Players[1].cards.length + ' CARDS', 0, -22);
+        popMatrix();
+        
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(50, 395, 300, 20);
+        rect(150, 422, 100, 20);
+        strokeWeight(3);
+        stroke(168, 168, 168);
+        fill(255);
+        rect(50, 390, 300, 20);
+        fill(168);
+        stroke(110, 110, 110);
+        rect(309, 390, 43, 20);
+        rect(150, 417, 100, 20);
+        textSize(14);
+        fill(255);
+        text('Say', 331, 400);
+        text('Pass', 200, 427);
+        fill(25);
+        textAlign(LEFT, CENTER);
+        text(saying, 59, 400);
+        textAlign(CENTER, CENTER);
+        if(mouseX > 309 && mouseX < 353 && mouseY > 390 && mouseY < 410){
+            overButton = true;
+            if(clicked){
+                Notifs.push(new Notif('You said "' + saying + '"'));
+                if(saying !== supposedToSay && saying !== 'khantober'){
+                    Notifs.push(new Notif('Card for talking'));
+                    myCards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))], 'mine'));
+                    sayTimer = 10;
+                } else if (saying === 'khantober'){
+                    for(var i = 0; i < Players.length; i ++){
+                        for(var j = 0; j < 6; j ++){
+                            Players[i].cards.push(new Card(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))])));
+                        }
+                    }
+                    Notifs.push(new Notif('Thanks for subscribing!! ;D'));
+                    supposedToSay = '';
+                    sayTimer = 12;
+                } else {
+                    supposedToSay = '';
+                    sayTimer = 12;
+                }
+                saying = '';
+            }
+        }
+        
+        if(mouseX > 150 && mouseX < 250 && mouseY > 417 && mouseY < 437){
+            overButton = true;
+            if(clicked && turn === 0){
+                Notifs.push(new Notif('You passed'));
+                turn ++;
+                wait = 5;
+            }
+        }
+        
+        for(var i = 0; i < tableCards.length; i ++){
+            tableCards[i].draw();
+        }
+        
+        for(var i = Notifs.length - 1; i >= 0; i --){
+            pushMatrix();
+            translate(15, (Notifs.length * 20) - (i * 20));
+            Notifs[i].draw();
+            popMatrix();
+            if(Notifs[i].trans < 0){
+                Notifs.splice(i, 0);
+            }
+        }
+        
+        // AIs
+        for(var i = Players.length - 1; i >= 0; i--){
+            Players[i].draw();
+        }
+        
+        for(var i = myCards.length - 1; i >= 0; i --){
+            if(!myCards[i].positioned){
+                myCards[i].x = 55 + i * 50;
+                myCards[i].y = 315;
+                myCards[i].w = 150 / 4;
+                myCards[i].h = 200 / 4;
+                myCards[i].positioned = true;
+            }
+            
+            if(mouseX > 350 && mouseX < 370 && mouseY > 320 && mouseY < 360 && clicked){
+                myCards[i].x -= 50;
+            }
+            if(mouseX > 30 && mouseX < 50 && mouseY > 320 && mouseY < 360 && clicked){
+                myCards[i].x += 50;
+            }
+            myCards[i].draw();
+            if(myCards[i].play){
+                if(myCards[i].num === 'Q'){
+                    sayTimer = 10;
+                    supposedToSay = 'hail the chairwoman';
+                }
+                if(myCards[i].num === 'K'){
+                    sayTimer = 10;
+                    supposedToSay = 'hail the chairman';
+                }
+                if(myCards[i].num === '4'){
+                    sayTimer = 10;
+                    supposedToSay = 'use the force';
+                }
+                if(tableCards[tableCards.length - 1].suit !== 'spades' && myCards[i].suit === 'spades'){
+                    sayTimer = 10;
+                    supposedToSay = 'spades';
+                }
+                turn ++;
+                tableCards.push(new Card(myCards[i].num, myCards[i].suit, 'table'));
+                Notifs.push(new Notif('You played a ' + myCards[i].num + ' of ' + myCards[i].suit));
+                myCards.splice(i, 1);
+                reposition = true;
+                wait = 5;
+            }
+        }
+        if(reposition){
+            for(var i = myCards.length - 1; i >= 0; i --){
+                myCards[i].positioned = false;
+            }
+        }
+        
+        noStroke();
+        fill(128, 87, 64, 10);
+        for(var i = 50; i > 0; i --){
+            rect(0, 300, i, 80);
+            rect(350 + i, 300, 80, 80);
+        }
+        
+        fill(0, 0, 0, 100);
+        if(mouseX > 350 && mouseX < 370 && mouseY > 320 && mouseY < 360){
+            overButton = true;
+            fill(0, 0, 0, 200);
+        }
+        triangle(350, 320, 350, 360, 370, 340);
+        fill(0, 0, 0, 100);
+        if(mouseX > 30 && mouseX < 50 && mouseY > 320 && mouseY < 360){
+            overButton = true;
+            fill(0, 0, 0, 200);
+        }
+        triangle(50, 320, 50, 360, 30, 340);
+        
+        if(turn > 3){
+            turn = 0;
+        }
+        
+        wait -= 0.05;
+        if(sayTimer < 11){
+            sayTimer -= 0.03;
+        }
+        if(sayTimer < 0){
+            myCards.push(new Card(possibleNum[floor(random(possibleNum.length))], possibleSuits[floor(random(possibleSuits.length))], 'mine'));
+            Notifs.push(new Notif('Card for not saying ' + supposedToSay));
+            sayTimer = 10;
+            supposedToSay = 'thank you';
+        }
+        
+        fill(255);
+        textSize(30);
+        text(myName, 200, 460);
+        textSize(20);
+        text(myCards.length + ' CARDS', 200, 484);
+        fill(0);
+        //text('supposedToSay ' + supposedToSay, 50, 450);
+        //text('Julie: ' + Players[0].cards[0].num + Players[0].cards[0].suit + '\nBen: ' + Players[1].cards[0].num + Players[1].cards[0].suit + '\nThomas: ' + Players[2].cards[0].num + Players[2].cards[0].suit, 50, 50);
+        
+        reposition = false;
+        
+        if(myCards.length < 1){
+            scene = 'Win';
+            winner = myName;
+        }
+    }
+    if(scene === 'Win'){
+        background(128, 87, 64);
+        
+        fill(0, 0, 0, 50);
+        textSize(60);
+        text(winner.toUpperCase(), 200, 226);
+        textSize(80);
+        text('WINS!', 200, 285);
+        fill(255, 255, 255);
+        textSize(60);
+        text(winner.toUpperCase(), 200, 219);
+        textSize(80);
+        text('WINS!', 200, 276);
+        fill(0);
+        textSize(25);
+        text('G A M E   O V E R !', 200, 175);
+        
+        for(var i = 0; i < menuCards.length; i ++){
+            pushMatrix();
+            translate(menuCards[i].x, menuCards[i].y);
+            scale(0.5);
+            translate(75, 100);
+            scale(1.2);
+            rotate(menuCards[i].r);
+            translate(-75, -100);
+            noStroke();
+            fill(0, 0, 0, 100);
+            rect(-8, -8, 165, 216);
+            popMatrix();
+            popMatrix();
+        }
+        for(var i = 0; i < menuCards.length; i ++){
+            stroke(205);
+            strokeWeight(4);
+            pushMatrix();
+            translate(menuCards[i].x, menuCards[i].y);
+            scale(0.5);
+            translate(75, 100);
+            scale(1.2);
+            rotate(menuCards[i].r);
+            translate(-75, -100);
+            fill(255);
+            rect(0, 0, 150, 200);
+            noFill();
+            stroke(222, 44, 44);
+            if(menuCards[i].suit === 'hearts'){
+                bezier(75, 75, 25, 25, 0, 87, 75, 150);
+                bezier(74, 76, 125, 25, 150, 87, 75, 150);
+            }
+            if(menuCards[i].suit === 'diamonds'){
+                line(75, 45, 40, 100);
+                line(75, 45, 110, 100);
+                line(75, 155, 40, 100);
+                line(75, 155, 110, 100);
+            }
+            stroke(0);
+            if(menuCards[i].suit === 'spades'){
+                bezier(74, 50, 54, 63, 5, 172, 68, 126);
+                bezier(73, 50, 90, 45, 156, 172, 81, 126);
+                line(81, 126, 86, 145);
+                line(71, 126, 65, 145);
+                line(82, 148, 65, 145);
+            }
+            if(menuCards[i].suit === 'clubs'){
+                arc(105, 114, 50, 50, -112, 145);
+                arc(75, 73, 50, 50, -227, 46);
+                arc(47, 114, 50, 50, 34, 301);
+                line(81, 126, 86, 145);
+                line(71, 126, 65, 145);
+                line(82, 148, 65, 145);
+            }
+            textSize(52);
+            fill(menuCards[i].suit === 'hearts' || menuCards[i].suit === 'diamonds' ? color(222, 40, 40) : color(0));
+            textSize(52);
+            text(menuCards[i].num, 75, 100);
+            popMatrix();
+        }
+    }
+    
+    rectMode(CENTER);
+    if(trans.active){
+        noFill();
+        stroke(255);
+        if(trans.out){
+            strokeWeight(trans.sz);
+        } else {
+            strokeWeight(600 - trans.sz);
+        }
+        pushMatrix();
+        translate(200, 250);
+        rect(0, 0, width, height);
+        popMatrix();
+        trans.sz /= 1.2;
+        if(trans.sz < 100 && !trans.out){
+            trans.sz = 500;
+            trans.out = true;
+            scene = trans.nextScene;
+        }
+        if(trans.out && trans.sz < 0.1){
+            trans.active = false;
+            trans.sz = 500;
+            trans.out = false;
+        }
+    }
+    rectMode(CORNER);
+    
+    cursor(overButton ? 'pointer' : 'default');
+    
+    overButton = false;
+    clicked = false;
+};
