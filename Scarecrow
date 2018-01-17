@@ -1,0 +1,1075 @@
+/**
+ * Scarecrow
+ * Chester Banks
+ * October 24 2017
+ * 
+ * My fourth project for Khantober. I only had about one day to make this xO
+ * 
+ * NOTE: You must be facing the crows to scare them away
+ * 
+ * I really wish I could add music to this :/
+*/
+
+var scene = 'Menu';
+
+var howButton = {h: 1, hS: 0, bounce: false};
+var playButton = {h: 1, hS: 0, bounce: false};
+
+var crowSpeed = 3, crowDensity = 120;
+var score = 0;
+
+var rectCollide = function(one, two){
+    if(one.x+one.w > two.x &&
+        one.y+one.h > two.y &&
+        one.x < two.x+two.w &&
+        one.y < two.y+two.h){
+        return true;
+    }
+};
+
+var clicked = false, overButton = false;
+var keys = [];
+keyPressed = function(){ 
+    keys[keyCode] = true; 
+};
+keyReleased = function(){ 
+    keys[keyCode] = false; 
+};
+mouseClicked = function(){
+    clicked = true;
+};
+
+var tree = function(x, y, sz){
+    pushMatrix();
+    translate(x, y);
+    ellipse(0, 0, sz, sz);
+    for(var i = 0; i < 360; i += (sz / 20)){
+        ellipse(sin(i) * (sz / 2), cos(i) * (sz / 2), random(30, 50), random(30, 50));
+    }
+    popMatrix();
+    beginShape();
+    vertex(x - 15, 356);
+    vertex(x + 15, 351);
+    bezierVertex(x + -3, 335, x + 17, 300, x + 12, 199);
+    vertex(x - 15, 199);
+    bezierVertex(x + 3, 248, x + -8, 326, x - 15, 356);
+    endShape();
+};
+
+var images = {
+    bg: function(){
+        background(79, 35, 4);
+        
+        noStroke();
+        fill(87, 50, 28);
+        tree(156, 221, 215);
+        tree(363, 181, 249);
+        tree(13, 240, 160);
+        tree(472, 240, 160);
+        tree(272, 240, 160);
+        tree(568, 240, 160);
+        fill(145, 82, 45);
+        tree(156, 184, 215);
+        tree(339, 156, 275);
+        tree(13, 215, 160);
+        tree(551, 187, 213);
+        fill(186, 96, 39);
+        tree(191, 126, 215);
+        tree(425, 106, 275);
+        tree(57, 159, 160);
+        fill(207, 110, 41);
+        tree(100, 96, 241);
+        tree(307, 63, 275);
+        tree(535, 92, 187);
+        
+        return get(0, 0, width, height);
+    },
+    scarecrow: function(){
+        pushMatrix();
+        translate(65, 44);
+        scale(0.6);
+        rectMode(CENTER);
+        strokeWeight(20);
+        stroke(99, 68, 21);
+        line(0, 52, 0, 250);
+        line(0, 71, -95, 92);
+        line(4, 73, 89, 106);
+        stroke(0, 0, 0, 50);
+        line(0, 52, 0, 41);
+        line(0, 113, 0, 189);
+        point(-64, 85);
+        point(71, 100);
+        noStroke();
+        fill(201, 161, 60);
+        beginShape();
+        vertex(-69, 74);
+        bezierVertex(-44, 78, -12, 38, 68, 87);
+        bezierVertex(88, 111, 44, 130, 48, 127);
+        bezierVertex(30, 89, 23, 138, 24, 181);
+        bezierVertex(5, 189, -11, 193, -31, 181);
+        bezierVertex(-36, 189, -11, 82, -57, 110);
+        bezierVertex(-63, 98, -58, 82, -72, 75);
+        endShape();
+        fill(0, 0, 0, 50);
+        beginShape();
+        vertex(-37, 101);
+        bezierVertex(-14, 89, -32, 182, 24, 181);
+        bezierVertex(6, 189, -11, 193, -31, 181);
+        bezierVertex(-36, 189, -11, 82, -57, 110);
+        endShape();
+        pushMatrix();
+        translate(0, 0);
+        rotate(-15);
+        fill(163, 82, 24);
+        ellipse(0, -10, 130, 30);
+        endShape();
+        popMatrix();
+        fill(214, 185, 105);
+        rect(0, 0, 110, 109, 200);
+        fill(240, 232, 211);
+        rect(3, -3, 104, 89, 200);
+        fill(235, 215, 159);
+        rect(2, 0, 100, 88, 200);
+        fill(52, 114, 143);
+        ellipse(-16, 1, 20, 20);
+        ellipse(13, 1, 20, 20);
+        fill(64, 151, 194);
+        ellipse(-15, 0, 20, 20);
+        ellipse(15, 0, 20, 20);
+        fill(135, 127, 106);
+        ellipse(0, 25, 54, 12);
+        fill(235, 215, 159);
+        ellipse(0, 23, 59, 12);
+        strokeWeight(2);
+        stroke(235, 215, 159);
+        line(-19, -2, -11, 4);
+        line(11, -4, 18, 4);
+        line(-17, 4, -13, -4);
+        line(11, 4, 18, -4);
+        noStroke();
+        pushMatrix();
+        translate(0, 0);
+        rotate(-15);
+        fill(227, 179, 68);
+        beginShape();
+        vertex(-65, -10);
+        bezierVertex(0, -18, 0, -18, 67, -10);
+        bezierVertex(67, -18, 58, -18, 52, -26);
+        bezierVertex(40, -44, 51, -41, 43, -56);
+        bezierVertex(25, -76, 12, -57, 1, -63);
+        bezierVertex(-12, -68, -35, -82, -40, -56);
+        bezierVertex(-50, -27, -43, -37, -65, -10);
+        endShape();
+        fill(201, 154, 60);
+        beginShape();
+        vertex(-65, -10);
+        bezierVertex(-49, -18, -42, -18, -39, -28);
+        bezierVertex(-43, -90, -7, -58, 4, -63);
+        bezierVertex(-15, -68, -35, -82, -41, -56);
+        bezierVertex(-49, -27, -43, -37, -65, -10);
+        endShape();
+        stroke(189, 73, 34);
+        strokeWeight(6);
+        bezier(-48, -30, -21, -36, 16, -37, 48, -29);
+        popMatrix();
+        popMatrix();
+        
+        return get(0, 0, 130, 205);
+    },
+    crow: function(){
+        pushMatrix();
+        translate(35, 48);
+        scale(1, 1);
+        noStroke();
+        fill(230, 104, 51);
+        bezier(60, -30, 27, -57, -14, 14, 60, -30);
+        fill(0, 0, 0);
+        ellipse(30, -30, 30, 30);
+        bezier(-31, 13, 27, -103, 78, 45, -30, 13);
+        bezier(7, 26, -38, 16, 10, 8, 7, 26);
+        bezier(26, 26, -21, 5, 31, 8, 25, 26);
+        fill(255);
+        ellipse(30, -30, 18, 18);
+        fill(0, 0, 0);
+        ellipse(32, -31, 13, 13);
+        fill(255);
+        ellipse(29, -34, 5, 5);
+        popMatrix();
+        
+        return get(0, 0, 96, 74);
+    },
+    pumpkin: function(){
+        pushMatrix();
+        translate(26, 27);
+        scale(0.5);
+        stroke(176, 113, 61);
+        fill(235, 157, 0);
+        beginShape();
+        vertex(30, -30);
+        bezierVertex(92, -56, 77, 96, 30, 80);
+        bezierVertex(21, 87, 1, 88, -6, 80);
+        bezierVertex(-52, 117, -65, -56, -13, -23);
+        bezierVertex(-4, -34, 14, -38, 32, -29);
+        endShape();
+        noStroke();
+        fill(0, 0, 0, 30);
+        beginShape();
+        vertex(-14, -23);
+        bezierVertex(-61, 3, -39, 94, -6, 80);
+        bezierVertex(-52, 117, -65, -55, -13, -23);
+        endShape();
+        beginShape();
+        vertex(-9, -27);
+        bezierVertex(15, -28, -39, 94, 30, 80);
+        bezierVertex(-42, 117, -14, -39, -9, -26);
+        endShape();
+        beginShape();
+        vertex(42, -31);
+        bezierVertex(28, -28, 4, 94, 56, 70);
+        bezierVertex(9, 121, -2, -30, 40, -30);
+        endShape();
+        strokeWeight(10);
+        stroke(42, 222, 42);
+        bezier(9, -19, 0, -42, 0, -52, 11, -44);
+        popMatrix();
+        
+        return get(0, 0, 63, 70);
+    },
+};
+
+var Scarecrow = function(){
+    this.x = 249;
+    this.y = 154;
+    this.w = 80;
+    this.h = 195;
+    this.speed = 5;
+    this.shirtX = 0;
+};
+Scarecrow.prototype.draw = function() {
+    rectMode(CORNER);
+    fill(255, 255, 255, 50);
+    noStroke();
+    //rect(this.x, this.y, this.w, this.h);
+    
+    pushMatrix();
+    translate(this.x - 24, this.y);
+        translate(65, 44);
+        scale(0.6);
+        rectMode(CENTER);
+        strokeWeight(20);
+        stroke(99, 68, 21);
+        line(0, 52, 0, 250);
+        line(0, 71, -95, 92);
+        line(4, 73, 89, 106);
+        stroke(0, 0, 0, 50);
+        line(0, 52, 0, 41);
+        line(0, 113, 0, 189);
+        point(-64, 85);
+        point(71, 100);
+        noStroke();
+        fill(201, 161, 60);
+        pushMatrix();
+        translate(this.shirtX, 0);
+        beginShape();
+        vertex(-69, 74);
+        bezierVertex(-44, 78, -12, 38, 60, 77);
+        bezierVertex(88, 111, 44, 130, 48, 127);
+        bezierVertex(30, 89, 23, 138, 30, 181);
+        bezierVertex(12, 189, -11, 193, -31, 181);
+        bezierVertex(-36, 189, -11, 82, -57, 110);
+        if(keys[LEFT]){
+            //bezierVertex(-72 + sin(frameCount * 5) * 10, 98, -58, 82, -72, 75);
+        } else {
+            //bezierVertex(-72, 98, -58, 82, -72, 75);
+        }
+        bezierVertex(-72, 98, -58, 82, -72, 75);
+        endShape();
+        fill(0, 0, 0, 50);
+        beginShape();
+        vertex(-37, 101);
+        bezierVertex(-14, 89, -32, 182, 24, 181);
+        bezierVertex(6, 189, -11, 193, -31, 181);
+        bezierVertex(-36, 189, -11, 82, -57, 110);
+        endShape();
+        popMatrix();
+        pushMatrix();
+        translate(0, 0);
+        rotate(-15);
+        fill(163, 82, 24);
+        ellipse(0, -10, 130, 30);
+        endShape();
+        popMatrix();
+        fill(214, 185, 105);
+        rect(0, 0, 110, 109, 200);
+        fill(240, 232, 211);
+        rect(3, -3, 104, 89, 200);
+        fill(235, 215, 159);
+        rect(2, 0, 100, 88, 200);
+        pushMatrix();
+        if(keys[LEFT]){
+            translate(-10, 0);
+        }
+        if(keys[RIGHT]){
+            translate(10, 0);
+        }
+        fill(52, 114, 143);
+        ellipse(-16, 1, 20, 20);
+        ellipse(13, 1, 20, 20);
+        fill(64, 151, 194);
+        ellipse(-15, 0, 20, 20);
+        ellipse(15, 0, 20, 20);
+        fill(135, 127, 106);
+        ellipse(0, 25, 54, 12);
+        fill(235, 215, 159);
+        ellipse(0, 23, 59, 12);
+        strokeWeight(2);
+        stroke(235, 215, 159);
+        line(-19, -2, -11, 4);
+        line(11, -4, 18, 4);
+        line(-17, 4, -13, -4);
+        line(11, 4, 18, -4);
+        popMatrix();
+        noStroke();
+        pushMatrix();
+        translate(0, 0);
+        rotate(-15);
+        fill(227, 179, 68);
+        beginShape();
+        vertex(-65, -10);
+        bezierVertex(0, -18, 0, -18, 67, -10);
+        bezierVertex(67, -18, 58, -18, 52, -26);
+        bezierVertex(40, -44, 51, -41, 43, -56);
+        bezierVertex(25, -76, 12, -57, 1, -63);
+        bezierVertex(-12, -68, -35, -82, -40, -56);
+        bezierVertex(-50, -27, -43, -37, -65, -10);
+        endShape();
+        fill(201, 154, 60);
+        beginShape();
+        vertex(-65, -10);
+        bezierVertex(-49, -18, -42, -18, -39, -28);
+        bezierVertex(-43, -90, -7, -58, 4, -63);
+        bezierVertex(-15, -68, -35, -82, -41, -56);
+        bezierVertex(-49, -27, -43, -37, -65, -10);
+        endShape();
+        stroke(189, 73, 34);
+        strokeWeight(6);
+        bezier(-48, -30, -21, -36, 16, -37, 48, -29);
+        popMatrix();
+        popMatrix();
+        
+    popMatrix();
+    
+    if(keys[RIGHT]){
+        this.x += this.speed;
+    }
+    if(keys[LEFT]){
+        this.x -= this.speed;
+    }
+    
+    if(keys[LEFT]){
+        this.shirtX += (10 - this.shirtX) / 5;
+    } else if (keys[RIGHT]){
+        this.shirtX += (-15 - this.shirtX) / 5;
+    } else {
+        this.shirtX += (0 - this.shirtX) / 5;
+    }
+};
+var scarecrow = new Scarecrow();
+
+var Pumpkin = function(x, y){
+    this.x = x;
+    this.y = y;
+    this.w = 63;
+    this.h = 70;
+};
+Pumpkin.prototype.draw = function() {
+    image(images.pumpkin, this.x, this.y);
+};
+var Pumpkins = [new Pumpkin (169, 282), new Pumpkin (249, 282), new Pumpkin (328, 282)];
+
+var Crow = function(){
+    this.y = 275;
+    this.dir = floor(random(2));
+    this.speed = crowSpeed;
+    if(this.dir === 0){
+        this.x = -100;
+        this.changeDir = 1;
+    } else {
+        this.x = 700;
+        this.changeDir = 0;
+    }
+    this.w = 82;
+    this.h = 75;
+    this.flying = false;
+};
+Crow.prototype.draw = function() {
+    
+    rectMode(CORNER);
+    fill(255, 255, 255, 50);
+    noStroke();
+    //rect(this.x, this.y, this.w, this.h);
+    
+    if(!this.flying){
+        pushMatrix();
+        translate(this.x + 36, this.y + 39);
+        if(this.dir === 1){
+            scale(-1, 1);
+        }
+        image(images.crow, -49, -38);
+        popMatrix();
+    } else {
+        pushMatrix();
+        translate(this.x + 36, this.y + 39);
+        if(this.dir === 1){
+            scale(-1, 1);
+        }
+        noStroke();
+        fill(230, 104, 51);
+        bezier(60, -30, 27, -57, -14, 14, 60, -30);
+        fill(0, 0, 0);
+        ellipse(30, -30, 30, 30);
+        //bezier(-31, 13, 27, -103, 78, 45, -30, 13);
+        fill(25);
+        bezier(-31, 13 + sin(-frameCount * 10) * 10, 27, -103, 78, 45, -30, 13 + sin(-frameCount * 10) * 10);
+        fill(18, 18, 18);
+        bezier(-31, 3 + sin(frameCount * 10) * 10, 27, -103, 78, 45, -30, 3 + sin(frameCount * 10) * 10);
+        pushMatrix();
+        rotate(sin(frameCount * 15) * 10);
+        bezier(7, 26, -38, 16, 10, 8, 7, 25);
+        bezier(26, 26, -21, 5, 31, 8, 25, 25);
+        popMatrix();
+        fill(255);
+        ellipse(30, -30, 18, 18);
+        fill(0, 0, 0);
+        ellipse(32, -31, 13, 13);
+        fill(255);
+        ellipse(29, -34, 5, 5);
+        popMatrix();
+    }
+    
+    if(this.dir === 0){
+        this.x += this.speed;
+    } else {
+        this.x -= this.speed;
+    }
+    
+    if(this.flying){
+        this.dir = this.changeDir;
+        this.y -= 3;
+    }
+    
+    if(rectCollide(this, scarecrow) && ((keys[LEFT] && this.dir === 0) || (keys[RIGHT] && this.dir === 1))){
+        this.flying = true;
+    }
+    for(var i = Pumpkins.length - 1; i >= 0; i --){
+        if(rectCollide(this, Pumpkins[i])){
+            this.flying = true;
+            Pumpkins[i].x = this.x;
+            Pumpkins[i].y = this.y;
+        }
+    }
+};
+var Crows = [];
+
+var leaves = [];
+for(var i = 0; i < 50; i ++){
+    leaves.push({x: random(600), y: random(50, 150), sz: random(10, 30)});
+}
+
+var ad = {
+    timer: 5,
+    title: 'Skydiving',
+    creator: 'WillTheProgrammer',
+    link: 'https://www.khanacademy.org/computer-programming/bop-it-khantober/5569511235977216',
+};
+
+draw = function() {
+    for(var i in images){
+        if(typeof images[i] !== 'object'){
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    image(images.bg, 0, 0);
+    
+    for(var i = leaves.length - 1; i >= 0; i --){
+        noStroke();
+        fill(207, 110, 41);
+        pushMatrix();
+        translate(leaves[i].x, leaves[i].y);
+        rotate(sin(i+frameCount)*360);
+        scale(sin(frameCount*10), 1);
+        ellipse(0, 0, leaves[i].sz, leaves[i].sz);
+        fill(0, 0, 0, 30);
+        arc(0, 0, leaves[i].sz, leaves[i].sz, -90, 90);
+        popMatrix();
+        
+        leaves[i].y += leaves[i].sz / 5;
+        if(leaves[i].y > 400){
+            leaves[i].sz = random(10, 30);
+            leaves[i].x = random(600);
+            leaves[i].y = 100;
+        }
+    }
+    
+    if(scene === 'Menu'){
+        image(images.scarecrow, 245, 157);
+        
+        rectMode(CORNER);
+        noStroke();
+        fill(156, 111, 59);
+        rect(0, 350, width, 50);
+        fill(0, 0, 0, 30);
+        rect(0, 354, width, 11);
+        fill(219, 154, 68);
+        rect(0, 349, width, 11);
+        
+        // SCARECROW
+        stroke(255);
+        strokeWeight(5);
+        noFill();
+        pushMatrix();
+        translate(0, 15);
+        beginShape();
+        vertex(81, 41);
+        bezierVertex(51, 29, 38, 52, 63, 80);
+        bezierVertex(94, 109, 89, 164, 36, 135);
+        endShape();
+        popMatrix();
+        pushMatrix();
+        translate(-1, 8);
+        bezier(127, 137, 82, 152, 81, 81, 128, 90);
+        popMatrix();
+        pushMatrix();
+        translate(0, 4);
+        bezier(170, 94, 159, 196, 102, 81, 169, 92);
+        bezier(170, 94, 172, 89, 171, 127, 174, 138);
+        popMatrix();
+        bezier(185, 91, 185, 89, 189, 127, 189, 138);
+        bezier(216, 96, 183, 65, 191, 127, 189, 138);
+        bezier(249, 110, 228, 44, 196, 163, 250, 133);
+        bezier(247, 110, 236, 111, 230, 118, 220, 114);
+        bezier(293, 132, 257, 146, 240, 88, 293, 88);
+        pushMatrix();
+        translate(119, 0);
+        bezier(185, 91, 185, 89, 189, 127, 189, 138);
+        bezier(216, 96, 185, 65, 191, 127, 189, 138);
+        popMatrix();
+        ellipse(360, 113, 40, 46);
+        bezier(387, 89, 395, 127, 399, 166, 411, 99);
+        bezier(436, 89, 428, 127, 423, 166, 411, 99);
+        strokeWeight(3);
+        bezier(50, 177, 200, 146, 300, 142, 439, 146);
+        strokeWeight(2);
+        bezier(58, 181, 200, 150, 300, 147, 429, 150);
+        
+        // "PLAY"
+        pushMatrix();
+        translate(200, 191);
+        scale(1, playButton.h);
+        bezier(-29, -13, -25, -14, -11, -3, -29, 14);
+        line(-29, -13, -29, 30);
+        line(-14, -13, -14, 30);
+        line(-5, 30, -12, 30);
+        line(0, 30, 6, -13);
+        line(16, 30, 6, -13);
+        line(12, 14, 3, 14);
+        line(29, -13, 23, 14);
+        line(15, -12, 23, 14);
+        line(23, 30, 23, 14);
+        popMatrix();
+        
+        // "HOW"
+        pushMatrix();
+        translate(193, 243);        scale(1, howButton.h);
+        line(-22, -13, -22, 30);
+        line(-22, 5, -11, 5);
+        line(-11, -13, -11, 30);
+        bezier(0, -13, -17, 39, 17, 49, 1, -12);
+        line(9, -12, 14, 29);
+        line(18, -3, 14, 29);
+        line(18, -3, 24, 29);
+        line(28, -12, 24, 29);
+        popMatrix();
+        
+        // Wow this is a mess... should have definitely done OOP
+        howButton.h += howButton.hS; 
+        playButton.h += playButton.hS;
+        howButton.hS -= 0.01; 
+        playButton.hS -= 0.01;
+        if(howButton.h < 1){
+            howButton.h = 1;
+        }
+        if(playButton.h < 1){
+            playButton.h = 1;
+        }
+        
+        if(mouseX > 163 && mouseX < 230 && mouseY > 170 && mouseY < 220){
+            overButton = true;
+            if(!playButton.bounce){
+                playButton.bounce = true;
+                playButton.hS = 0.1;
+            }
+            if(clicked){
+                scene = 'Game';
+                clicked = false;
+            }
+        } else {
+            playButton.bounce = false;
+        }
+        if(mouseX > 163 && mouseX < 230 && mouseY > 220 && mouseY < 280){
+            overButton = true;
+            if(!howButton.bounce){
+                howButton.bounce = true;
+                howButton.hS = 0.1;
+            }
+            if(clicked){
+                scene = ad.timer > 1 ? 'Ad' : 'How';
+                clicked = false;
+            }
+        } else {
+            howButton.bounce = false;
+        }
+    }
+    if(scene === 'Snapshot'){
+        pushMatrix();
+        scale(1.5, 1);
+        image(images.bg, 0, 0);
+        
+        pushMatrix();
+        scale(0.8);
+        stroke(255);
+        strokeWeight(5);
+        noFill();
+        pushMatrix();
+        translate(0, 15);
+        beginShape();
+        vertex(81, 41);
+        bezierVertex(51, 29, 38, 52, 63, 80);
+        bezierVertex(94, 109, 89, 164, 36, 135);
+        endShape();
+        popMatrix();
+        pushMatrix();
+        translate(-1, 8);
+        bezier(127, 137, 82, 152, 81, 81, 128, 90);
+        popMatrix();
+        pushMatrix();
+        translate(0, 4);
+        bezier(170, 94, 159, 196, 102, 81, 169, 92);
+        bezier(170, 94, 172, 89, 171, 127, 174, 138);
+        popMatrix();
+        bezier(185, 91, 185, 89, 189, 127, 189, 138);
+        bezier(216, 96, 183, 65, 191, 127, 189, 138);
+        bezier(249, 110, 228, 44, 196, 163, 250, 133);
+        bezier(247, 110, 236, 111, 230, 118, 220, 114);
+        bezier(293, 132, 257, 146, 240, 88, 293, 88);
+        pushMatrix();
+        translate(119, 0);
+        bezier(185, 91, 185, 89, 189, 127, 189, 138);
+        bezier(216, 96, 185, 65, 191, 127, 189, 138);
+        popMatrix();
+        ellipse(360, 113, 40, 46);
+        bezier(387, 89, 395, 127, 399, 166, 411, 99);
+        bezier(436, 89, 428, 127, 423, 166, 411, 99);
+        strokeWeight(3);
+        bezier(50, 177, 200, 146, 300, 142, 439, 146);
+        strokeWeight(2);
+        bezier(58, 181, 200, 150, 300, 147, 429, 150);
+        popMatrix();
+        
+        image(images.scarecrow, 226, 155);
+        image(images.crow, 46, 177);
+        image(images.crow, 140, 158);
+        popMatrix();
+    }
+    if(scene === 'How'){
+        if(keys[UP]){
+            scene = 'Snapshot';
+        }
+        
+        noStroke();
+        fill(0, 0, 0, 50);
+        rect(0, 0, width, height);
+        
+        // "HOW"
+        stroke(255);
+        noFill();
+        strokeWeight(2);
+        pushMatrix();
+        translate(110, 65);
+        scale(2);
+        line(-22, -13, -22, 30);
+        line(-22, 5, -11, 5);
+        line(-11, -13, -11, 30);
+        bezier(0, -13, -17, 39, 17, 49, 1, -12);
+        line(9, -12, 14, 29);
+        line(18, -3, 14, 29);
+        line(18, -3, 24, 29);
+        line(28, -12, 24, 29);
+        popMatrix();
+        
+        // "USE --> & <-- TO MOVE"
+        pushMatrix();
+        translate(0, 15);
+        beginShape();
+        vertex(79, 138);
+        vertex(79, 156);
+        bezierVertex(79, 170, 87, 170,88, 159);
+        vertex(88, 138);
+        endShape();
+        bezier(96, 159,101, 159, 111, 167, 92, 166);
+        bezier(96, 159,94, 161, 88, 151, 102, 153);
+        bezier(116, 166,95, 167, 111, 138, 115, 160);
+        line(112, 160, 107, 160);
+        pushMatrix();
+        translate(6, -2);
+        rect(120,142,30, 30);
+        rect(120,142,30, 32);
+        line(128, 157, 143, 157);
+        line(127, 157, 134, 152);
+        line(127, 157, 134, 162);
+        popMatrix();
+        pushMatrix();
+        translate(340, -2);
+        scale(-1, 1);
+        rect(120,142,30, 30);
+        rect(120,142,30, 32);
+        line(128, 157, 143, 157);
+        line(127, 157, 134, 152);
+        line(127, 157, 134, 162);
+        popMatrix();
+        pushMatrix();
+        translate(0, -2);
+        beginShape();
+        vertex(179, 170);
+        bezierVertex(159, 161, 170, 133, 175, 150);
+        bezierVertex(178, 159, 159, 160, 165, 169);
+        bezierVertex(172, 173, 181, 164, 175, 160);
+        endShape();
+        popMatrix();
+        line(235, 144, 235, 167);
+        line(231, 154, 238, 154);
+        ellipse(243, 161, 5,14);
+        line(256, 155, 256, 167);
+        bezier(256, 155, 255, 157, 261, 145, 261, 167);
+        bezier(267, 169, 267, 153, 263, 145, 261, 167);
+        ellipse(273, 161, 5,14);
+        line(282,167, 279, 154);
+        line(282,167, 285, 154);
+        pushMatrix();
+        translate(183, 0);
+        bezier(112, 166,97, 170, 111, 141, 112, 161);
+        line(110, 161, 107, 161);
+        popMatrix();
+        
+        // "DON'T LET THE CROWS TOUCH THE PUMPKINS"
+        
+        translate(0, 15);
+        beginShape();
+        vertex(79, 180);
+        vertex(79, 205);
+        bezierVertex(92, 205, 87, 180,79, 180);
+        endShape();
+        ellipse(93, 197, 5, 14);
+        pushMatrix();
+        translate(-156, 37);
+        line(256, 155, 256, 167);
+        bezier(256, 155, 255, 157, 261, 145, 261, 167);
+        popMatrix();
+        arc(107, 188, 4, 5, -25, 90);
+        pushMatrix();
+        translate(-121, 37);
+        line(235, 144, 235, 167);
+        line(232, 154, 238, 154);
+        popMatrix();
+        line(125, 181, 126, 203);
+        pushMatrix();
+        translate(25, 37);
+        bezier(112, 166,97, 170, 111, 141, 112, 161);
+        line(110, 161, 107, 161);
+        popMatrix();
+        pushMatrix();
+        translate(-93, 37);
+        line(235, 144, 235, 167);
+        line(232, 154, 238, 154);
+        popMatrix();
+        pushMatrix();
+        translate(-32, 37);
+        line(235, 144, 235, 167);
+        line(232, 154, 238, 154);
+        popMatrix();
+        ellipse(210, 197, 5, 14);
+        bezier(216, 190, 216, 210, 223, 206, 222, 190);
+        bezier(231, 191, 221, 192, 226, 208, 231, 202);
+        line(235, 182, 235, 203);
+        bezier(241, 204, 244, 188, 238, 191, 235, 195);
+        
+        
+        
+        pushMatrix();
+        scale(0.5);
+        image(images.crow, 300, 350);
+        popMatrix();
+        pushMatrix();
+        scale(0.5);
+        image(images.pumpkin, 500, 350);
+        popMatrix();
+        popMatrix();
+        
+        // <--
+        strokeWeight(2);
+        if(mouseX > 20 && mouseX < 92 && mouseY > 300 && mouseY < 340){
+            overButton = true;
+            strokeWeight(5);
+            if(clicked){
+                scene = 'Menu';
+            }
+        }
+        line(30, 320, 72, 320);
+        line(30, 320, 40, 310);
+        line(30, 320, 40, 330);
+    }
+    if(scene === 'Game'){
+        for(var i = Pumpkins.length - 1; i >= 0; i --){
+            Pumpkins[i].draw();
+        }
+        
+        if(frameCount % crowDensity === 0){
+            Crows.push(new Crow());
+        }
+        
+        scarecrow.draw();
+        for(var i = Crows.length - 1; i >= 0; i --){
+            Crows[i].draw();
+            if(Crows[i].y < -150){
+                Crows.splice(i, 1);
+            }
+        }
+
+        
+        if(frameCount % 30 === 0){
+            crowDensity -= 1;
+            crowSpeed += 0.001;
+        }
+        
+        textFont(createFont('Avenir'), 30);
+        fill(0, 0, 0, 50);
+        text(score.toFixed(0), 20, 50);
+        
+        score += 0.05;
+        
+        if(Pumpkins[0].y < 0 && Pumpkins[1].y < 0 && Pumpkins[2].y < 0){
+            scene = 'Lose';
+        }
+    }
+    if(scene === 'Lose'){
+        stroke(255);
+        noFill();
+        strokeWeight(3);
+        pushMatrix();
+        translate(212, 185);
+        line(0, 50, 0, 10);
+        line(-20, -50, 0, 10);
+        line(20, -50, 0, 10);
+        pushMatrix();
+        translate(30, -13);
+        scale(2);
+        strokeWeight(1.5);
+        bezier(0, -13, -17, 39, 17, 49, 0, -12);
+        popMatrix();
+        bezier(48, -34, 46, 87, 74, 63, 70, -35);
+        line(100, 50, 100, -50);
+        line(116, 50, 100, 50);
+        pushMatrix();
+        translate(128, -13);
+        scale(2);
+        strokeWeight(1.5);
+        bezier(0, -13, -17, 39, 17, 49, 0, -12);
+        popMatrix();
+        bezier(167, 39, 181, 15, 147, -4, 147, -32);
+        bezier(165, -14, 169, -48, 147, -49, 147, -33);
+        bezier(167, 39, 162, 50, 147, 51, 148, 23);
+        line(186, -40, 186, 50);
+        line(175, -40, 195, -40);
+        popMatrix();
+        
+        textFont(createFont('Avenir'), 40);
+        fill(0, 0, 0, 50);
+        text(score.toFixed(0), 20, 60);
+        
+        // <--
+        strokeWeight(2);
+        if(mouseX > 20 && mouseX < 92 && mouseY > 300 && mouseY < 340){
+            overButton = true;
+            strokeWeight(5);
+            if(clicked){
+                score = 0;
+                Crows = [];
+                crowSpeed = 3;
+                crowDensity = 120;
+                Pumpkins = [new Pumpkin (169, 282), new Pumpkin (249, 282), new Pumpkin (328, 282)];
+                scene = 'Menu';
+                scarecrow = new Scarecrow();
+                clicked = false;
+            }
+        }
+        line(30, 320, 72, 320);
+        line(30, 320, 40, 310);
+        line(30, 320, 40, 330);
+    }
+    
+    rectMode(CORNER);
+    noStroke();
+    fill(156, 111, 59);
+    rect(0, 350, width, 50);
+    fill(0, 0, 0, 30);
+    rect(0, 354, width, 11);
+    fill(230, 143, 71);
+    rect(0, 349, width, 11);
+    
+    noFill();
+    for(var i = 30; i > 0; i --){
+        stroke(224, 165, 123, 15);
+        strokeWeight(i);
+        line(0, 0, 600, 0);
+        line(0, 0, 0, 400);
+        stroke(133, 78, 41, 15);
+        line(600, 0, 600, 400);
+        line(0, 400, 600, 400);
+    }
+    
+    
+    if(scene === 'Ad'){
+        pushStyle();
+        noStroke();
+        for(var i = 0; i < height; i += 20){
+            fill(lerpColor(
+                color(87, 87, 87), color(38, 38, 38), i / height));
+            rect(0, i, width, 20);
+        }
+        
+        noStroke();
+        for (var i = 0; i < 50; i++) {
+            fill(lerpColor(
+                color(163, 194, 214),
+                color(105, 158, 190),
+                i / 50));
+            rect(0, i * 12, 600, 12);
+        }
+        
+        pushMatrix();
+        translate(495, 80);
+        scale(1.5);
+        translate(-250, -225);
+        fill(245, 252, 255, 120);
+        beginShape();
+        vertex(200, 200);
+        vertex(172, 228);
+        vertex(115, 228);
+        vertex(91, 256);
+        vertex(115, 284);
+        vertex(152, 284);
+        vertex(179, 312);
+        vertex(239, 312);
+        vertex(265, 284);
+        vertex(387, 284);
+        vertex(411, 256);
+        vertex(387, 228);
+        vertex(367, 228);
+        vertex(339, 200);
+        vertex(316, 200);
+        vertex(287, 172);
+        vertex(248, 172);
+        vertex(220, 200);
+        endShape(CLOSE);
+        popMatrix();
+        
+        pushMatrix();
+        translate(sin(frameCount * 2) * 50 + (width / 2), height - height / 2.5);
+        scale(2);
+        rotate(-25 + sin(frameCount * 5) * 20);
+        translate(-205, -220);
+        // Legs / feet
+        pushMatrix();
+        translate(200, 202);
+        scale(0.9);
+        rotate(45);
+        translate(-200, -200);
+        noFill();
+        stroke(98, 95, 90);
+        strokeWeight(15);
+        strokeCap(SQUARE);
+        arc(198, 209, 36, 36, 45, 180);
+        noStroke();
+        fill(98, 95, 90);
+        arc(176, 200, 30, 25, 90, 180);
+        rect(174, 200, 13, 14);
+        popMatrix();
+
+        // Torso
+        fill(color(0, 138, 156));
+        rect(192, 216, 40, 14);
+
+        // Arm
+        fill(color(0, 171, 192));
+        rect(224, 216, 34, 14);
+        ellipse(229, 223, 15, 15);
+
+        // Face and hand
+        fill(237, 210, 147);
+        arc(258, 230, 26, 26, 270, 360);
+        arc(237, 230, 20, 15, 0, 180);
+
+        // Parachute
+        fill(color(0, 120, 139));
+        arc(214, 216, 26, 21, 180, 360);
+        popMatrix();
+        
+        textFont(createFont('Avenir Bold'));
+        textAlign(CENTER, CENTER);
+        
+        fill(25);
+        textSize(40);
+        text(ad.title.toUpperCase(), width / 2, 50);
+        textSize(18);
+        text('PLAY THIS GAME BY ' + ad.creator.toUpperCase() +  '!', width / 2, 80);
+        textSize(15);
+        text('(Click anywhere for link)', width / 2, 375);
+        
+        pushStyle();
+        textFont(createFont(''), 15);
+        strokeWeight(1);
+        stroke(255);
+        fill(0);
+        rect(width - 102, 340, 100, 40);
+        fill(255);
+        if(ad.timer < 1){
+            textSize(20);
+            text('Skip Ad', width - 50, 360);
+        } else {
+            textSize(15);
+            text('Skip Ad in ' + ad.timer.toFixed(0), width - 50, 360);
+        }
+        popStyle();
+        
+        ad.timer -= 0.02;
+        
+        if(mouseX > width - 100 && mouseY > 340 && mouseY < 380 && ad.timer < 1){
+            overButton = true;
+            if(clicked){
+                scene = 'How';
+            }
+        } else {
+            if(clicked){
+                println(ad.link);
+            }
+        }
+        popStyle();
+    }
+    
+    cursor(overButton ? 'pointer' : 'default');
+    
+    clicked = false;
+    overButton = false;
+};
