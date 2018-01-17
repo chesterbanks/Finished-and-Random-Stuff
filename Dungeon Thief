@@ -1,0 +1,1178 @@
+/** 
+ * Dungeon Thief
+ * Chester Banks
+ * October 3 2017
+ * 
+ * This was made for Khantober 2017!
+*/
+
+textAlign(CENTER, CENTER);
+
+var scene = 'Menu';
+
+var trans = {
+    active: false,
+    nextScene: 'Game',
+    out: false,
+    sz: 1500,
+};
+
+var coins = 0, coinGoal;
+var lives = 0;
+var switchingLevel = false;
+var nextLevel = 'next';
+
+var clicked = false;
+var overButton = false;
+var keys = [];
+
+mouseClicked = function(){
+    clicked = true;
+};
+keyPressed = function(){
+    keys[keyCode] = true;
+};
+keyReleased = function(){
+    keys[keyCode] = false;
+};
+
+var rectCollide = function(one, two){
+    if(one.x+one.w > two.x && one.y+one.h > two.y && one.x < two.x+two.w && one.y < two.y+two.h){
+        return true;
+    }
+};
+
+var myBezierSetting = 0, myBezier = function(x1, y1, x2, y2, x3, y3, x4, y4){
+    //bezier(x1, y1, x2, y2, x3, y3, x4, y4);
+    
+    if(myBezierSetting === 0){
+        beginShape();
+        vertex(x1, y1);
+        bezierVertex(x2, y2, x3, y3, x4, y4);
+        bezierVertex(x3+-5, y3 + 23, x2-5, y2 - 14, x1  + 0, y1 + 1);
+        endShape();
+    } else {
+        beginShape();
+        vertex(x1, y1);
+        bezierVertex(x2, y2, x3, y3, x4, y4);
+        bezierVertex(x3+-3, y3 + 14, x2-7, y2 - 14, x1  + 0, y1 + 1);
+        endShape();
+    }
+};
+var title = function(x, y, sz, rot){
+    pushMatrix();
+    translate(x, y);
+    rotate(rot);
+    scale(sz / 100);
+    strokeWeight(5);
+    
+    myBezierSetting = 0;
+    myBezier(-186, -68, -187, -49, -188, -10, -185, -6);
+    myBezier(-201, -62, -187, -85, -98, -77, -187, -4);
+    myBezier(-134, -67, -128, -45, -152, 17, -115, -23);
+    myBezier(-105, -75, -104, -45, -105, -33, -115, -23);
+    myBezier(-105, -75, -104, -45, -108, -8, -98, -8);
+    
+    myBezier(-83, -65, -81, -27, -85, -18, -86, -4);
+    myBezier(-83, -65, -67, -27, -56, -18, -53, -17);
+    myBezier(-48, -76, -39, -27, -51, -12, -52, -19);
+    
+    myBezier(-4, -67, -56, -12, -20, 31, 8, -29);
+    myBezier(40, -39, -3, -29, -3, -26, -21, -24);
+    
+    myBezier(36, -71, 39, -29, 13, 33, 63, -15);
+    myBezier(26, -57, 39, -50, 18, -68, 83, -79);
+    myBezier(26, -30, 39, -10, 18, -45, 63, -43);
+    
+    myBezier(132, -30, 115, 13, 54, -9, 111, -68);
+    myBezier(132, -30, 153, -63, 90, -76, 111, -67);
+    
+    myBezier(150, -63, 153, -63, 157, -76, 145, -2);
+    myBezier(150, -63, 153, -63, 195, 45, 185, -77);
+    
+    // thief
+    myBezierSetting = 1;
+    strokeWeight(5);
+    myBezier(-142, 29, -143, 25, -91, 27, -91, 19);               myBezier(-124, 26, -118, 88, -125, 27, -122, 48);
+    
+    myBezier(-65, 17, -63, 55, -60, 45, -62, 58);
+    myBezier(-45, 17, -41, 55, -38, 47, -42, 58);
+    myBezier(-78, 41, -41, 39, -38, 26, -36, 30);
+    
+    pushMatrix();
+    translate(40, 0);
+    myBezier(-2, 22, -10, 65, 3, 69, 18, 47);
+    myBezier(-2, 22, 17, 28, -27, 15, 24, 20);
+    myBezier(-4, 39, 5, 50, -29, 35, 12, 37);
+    popMatrix();
+    
+    pushMatrix();
+    translate(-60, 0);
+    myBezier(59, 50, 65, 50, 57, 35, 60, 22);
+    popMatrix();
+    
+    myBezier(103, 68, 99, 50, 101, 35, 102, 22);
+    myBezier(140, 21, 141, 23, 110, 16, 93, 30);
+    myBezier(136, 38, 125, 52, 105, 39, 93, 46);
+    popMatrix();
+};
+
+var Button = function(x, y, h, txt, nxt){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.txt = txt;
+    this.nxt = nxt;
+    
+    this.trans = 0;
+};
+Button.prototype.draw = function() {
+    textSize(40);
+    noStroke();
+    fill(255, 255, 255, (this.trans - 20) / 10);
+    for(var i = 0; i < 50; i += 5){
+        rect(0, this.y, 600, this.h + (i/4));
+    }
+    fill(255, 255, 255, this.trans - 20);
+    rect(0, this.y, 600, this.h);
+    fill(255 - this.trans);
+    text(this.txt, this.x + (this.trans / 10), this.y + (this.h / 2));
+    
+    if(mouseY > this.y && mouseY < this.y + this.h){
+        this.trans *= 1.2;
+        overButton = true;
+        if(clicked){
+            trans.active = true;
+            trans.nextScene = this.nxt;
+        }
+    } else {
+        this.trans /= 1.2;
+    }
+    
+    if(this.trans < 20){
+        this.trans = 20;
+    }
+    if(this.trans > 255){
+        this.trans = 255;
+    }
+};
+var Buttons = {
+    play: new Button(340, 290, 50, 'PLAY', 'Game'),
+    how: new Button(347, 342, 50, 'HOW', 'How'),
+    about: new Button(361, 394, 50, 'ABOUT', 'About'),
+    back: new Button(100, 500, 50, 'BACK', 'Menu'),
+};
+
+var images = {
+    bg: function(){
+        background(94, 85, 80);
+        
+        noStroke();
+        
+        for(var i = -300; i < 307; i += 46){
+            stroke(0);
+            strokeWeight(0);
+            fill(33, 29, 28, 50);
+            quad(280 + i, 300, 320 + i, 300,
+            360 + (i * 3), 600, 240 + (i * 3), 600);
+            
+            noStroke();
+            quad(281 + i, 300, 282 + i, 300,
+            260 + (i * 3), 600, 240 + (i * 3), 600);
+            
+            fill(255, 255, 255, 30);
+            quad(313 + i, 300, 320 + i, 300,
+            360 + (i * 3), 600, 351 + (i * 3), 600);
+        }
+        
+        strokeWeight(7);
+        stroke(0, 0, 0);
+        line(0, 322, 600, 322);
+        line(0, 354, 600, 354);
+        strokeWeight(8);
+        line(0, 394, 600, 394);
+        line(0, 449, 600, 450);
+        strokeWeight(12);
+        line(0, 516, 600, 516);
+        
+        var tiles = get(0, 0, 600, 600);
+        
+        background(0, 0, 0);
+        
+        noStroke();
+        fill(255, 255, 255);
+        rect(0, 300, 600, 20);
+        rect(0, 325, 600, 27);
+        rect(0, 357, 600, 34);
+        rect(0, 397, 600, 49);
+        rect(0, 452, 600, 59);
+        rect(0, 520, 600, 84);
+        
+        noStroke();
+        for(var i = -300; i < 307; i += 46){
+            fill(0);
+            quad(280 + i, 300, 274 + i, 300,
+            227 + (i * 3), 600, 240 + (i * 3), 600);
+        }
+        
+        var tileFront = get(0, 0, 600, 600);
+        
+        tiles.mask(tileFront);
+        
+        noStroke();
+        background(94, 85, 80);
+        for(var i = 19; i < 600; i += 46){
+            fill(105, 98, 93);
+            rect(i, 0, 5, 304);
+        }
+        image(tiles, 0, 0);
+        
+        for(var i = 0; i < 600; i += 20){
+    for(var j = 0; j < 600; j += 40){
+        fill(0, 0, 0, dist(400, 300, i, j) / 1.5);
+        rect(i, j, 20, 40);
+    }
+}
+        
+        filter(BLUR, 2);
+        
+        return get(0, 0, width, height);
+    },
+};
+
+var eyesAboveAll = false;
+
+var overSquares = [];
+for(var i = 0; i < 600; i += 20){
+    for(var j = 0; j < 600; j += 40){
+        overSquares.push({
+            x: i,
+            y: j,
+            trans: 255,
+        });
+    }
+}
+
+var level = 0;
+var levels = [
+    [
+        '....................',
+        '.!                 .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.        **        .',
+        '.        **        .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  @',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.       ***        .',
+        '.       ***        .',
+        '.       ***        .',
+        '.                  .',
+        '.                  .',
+        '. *                .',
+        '. *                @',
+        '. *                .',
+        '. ****             .',
+        '.                  .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '................   .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.  ****************.',
+        '.  .................',
+        '.  ****************.',
+        '.                  .',
+        '@                  .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.                  .',
+        '.    *.            .',
+        '.   **.            .',
+        '................   .',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '.       .....      .',
+        '.         .        .',
+        '.        *.        .',
+        '.  .................',
+        '.         .        .',
+        '.         .        .',
+        '.         .        .',
+        '.         .        .',
+        '.       .....      @',
+        '.               ***.',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.  .               .',
+        '.   .              .',
+        '.    .             .',
+        '.     .            .',
+        '.      .           .',
+        '.       .          .',
+        '. *      .**       .',
+        '. *       .*       .',
+        '. *        .       .',
+        '.                  .',
+        '.                  .',
+        '.     .            .',
+        '.      .           .',
+        '.       .          .',
+        '.        .......   .',
+        '.*                 .',
+        '.**                .',
+        '......@.............',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.  .               .',
+        '.   .              .',
+        '.    .             .',
+        '.     .            .',
+        '.      .           .',
+        '.       .          .',
+        '. *      .**       .',
+        '. *       .*       .',
+        '. *        .       .',
+        '.                  .',
+        '.                  .',
+        '.     .            .',
+        '.      .           .',
+        '.       .          .',
+        '.        .......   .',
+        '.*                 .',
+        '.**                .',
+        '......@.............',
+    ],
+    [
+        '....................',
+        '.   !.*       .  .*.',
+        '.    .*      .  .**.',
+        '.    .*     .  .***.',
+        '.    .*    .  .****.',
+        '.    .*   .  .*****.',
+        '.    .*        .....',
+        '.              .***.',
+        '.              .   .',
+        '...........        .',
+        '.***.              .',
+        '.   .      .       .',
+        '.   .      .       .',
+        '@   ...    .       .',
+        '.   . .    .........',
+        '.   .          .   .',
+        '.   .          .   .',
+        '.              *   .',
+        '.                  .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.    .      .  . **.',
+        '. !  .         .   .',
+        '.    .             .',
+        '.  ...           ...',
+        '.                  .',
+        '.          .       @',
+        '.          .       .',
+        '      .... .......  ',
+        '        ** .        ',
+        ' ....   ** .        ',
+        '.                  .',
+        '.  .......         .',
+        '.  .*  . .  ..     .',
+        '.  .*    .  .      .',
+        '.  . .   ....      .',
+        '.  ...   .  .   ....',
+        '.        .   .     .',
+        '.        .         .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!                 .',
+        '.                  .',
+        '.      .....       .',
+        '. *     .  .       .',
+        '.........          .',
+        '.                  .',
+        '....               .',
+        '.  .               .',
+        '.  .*      *........',
+        '.  .            .  .',
+        '.               .  .',
+        '.               .  .',
+        '.    ....       .  .',
+        '.    .             .',
+        '.    .             @',
+        '......             .',
+        '.                  .',
+        '.*****             .',
+        '....................',
+    ],
+    [
+        '....................',
+        '.!*****************.',
+        '.******************.',
+        '.******..... ******.',
+        '.*******.**.*******.',
+        '.........**********.',
+        '.******************.',
+        '....               .',
+        '.**.               .',
+        '.**.*      *........',
+        '.**.************.**.',
+        '.                  .',
+        '.                  .',
+        '.    .  .          .',
+        '.    .  .          .',
+        '.    .  .          @',
+        '.                  .',
+        '.                  .',
+        '.                  .',
+        '....................',
+    ],
+];
+
+var Block = function(x, y, door){
+    this.x = x;
+    this.y = y;
+    this.w = 30;
+    this.h = 30;
+    this.type = door || 'normal';
+    if(this.type === 'door'){
+        this.x --;
+        this.y --;
+        this.w = 32;
+        this.h = 32;
+    }
+};
+Block.prototype.draw = function() {
+    if(this.type === 'normal'){
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(this.x, this.y + 11, 30, 30);
+        stroke(15, 13, 13);
+        fill(36, 31, 30);
+        rect(this.x, this.y, 30, 30);
+        stroke(28, 23, 21);
+        fill(59, 53, 51);
+        rect(this.x, this.y - 15, 30, 30);
+        noStroke();
+        fill(255, 255, 255, 34);
+        rect(this.x, this.y - 15, 30, 5);
+    } else {
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(this.x, this.y + 11, 30, 30);
+        stroke(15, 13, 13);
+        fill(99, 57, 6);
+        rect(this.x, this.y, 30, 30);
+        stroke(79, 46, 3);
+        fill(128, 82, 8);
+        rect(this.x, this.y - 15, 30, 30);
+        noStroke();
+        fill(255, 255, 255, 34);
+        rect(this.x, this.y - 15, 30, 5);
+        fill(189, 189, 53);
+        ellipse(this.x + 22, this.y + 3, 7, 7);
+        
+        fill(0, 0, 0, 100);
+        text('→', this.x + 15, this.y + 19);
+    }
+};
+var Blocks = [];
+
+var Coin = function(x, y){
+    this.x = x;
+    this.y = y;
+    this.w = 30;
+    this.h = 30;
+    
+    this.trans = 255;
+    this.fade = false;
+};
+Coin.prototype.draw = function() {
+    pushStyle();
+    pushMatrix();
+    rectMode(CENTER);
+    translate(this.x + (this.w / 2), this.y + this.h / 2);
+    scale(this.w / 45, this.h / 45);
+    noStroke();
+    strokeWeight(2);
+    stroke(197, 207, 87, this.trans);
+    fill(222, 235, 101, this.trans);
+    rect(0, 0, (-sin(this.x+frameCount*2)*25), 30);
+    noFill();
+    line((-sin(this.x+frameCount*2)*5), -8, (-sin(this.x+frameCount*2)*5), 8);
+    line((-sin(this.x+frameCount*2)*5), -8, (-sin(this.x+frameCount*2)*-3), -8);
+    line((-sin(this.x+frameCount*2)*5), 8, (-sin(this.x+frameCount*2)*-3), 8);
+    stroke(197, 207, 87, this.trans);
+    fill(197, 207, 87, this.trans);
+    rect(sin(this.x+frameCount*2)*13, 0, (-sin(this.x+frameCount*2)*5), 30);
+    noStroke();
+    fill(0, 0, 0, this.trans / 8);
+    rect(1, 12, (-sin(this.x+frameCount*2)*29), 8);
+    fill(255, 255, 255, this.trans / 2);
+    rect(1, -11, (-sin(this.x+frameCount*2)*29), 8);
+    popMatrix();
+    popStyle();
+    
+    if(this.fade){
+        this.w ++;
+        this.h ++;
+        this.trans /= 1.1;
+    }
+};
+var Coins = [];
+
+var Enemy = function(x, y, path){
+    x = x * 30;
+    y = y * 30;
+    
+    this.path = path || [];
+    
+    this.x = x; this.originalX = x; this.xvel = 0;
+    this.y = y; this.originalY = y; this.yvel = 0;
+    this.w = 30;
+    this.h = 20;
+    
+    this.plusX = 0;
+    this.plusY = 0;
+    
+    this.pathPlace = 0;
+    
+    this.collidable = true;
+};
+Enemy.prototype.draw = function() {
+    for(var i = 0; i < overSquares.length; i++){
+        for(var k = 50; k < 150; k += 15){
+        if(dist(this.x + this.plusX, this.y + this.plusY, overSquares[i].x, overSquares[i].y) < k && overSquares[i].trans > k){
+            overSquares[i].trans = (k * 3) - 225;
+        }
+        }
+    }
+    
+    pushMatrix();
+    translate(this.plusX, this.plusY);
+    noStroke();
+    fill(0, 0, 0, 30);
+    rect(this.x, this.y + 4, 30, 20);
+    stroke(135, 109, 69);
+    fill(179, 144, 91);
+    rect(this.x, this.y, 30, 20);
+    stroke(0, 6, 10);
+    fill(40, 74, 73);
+    rect(this.x, this.y + 14, 30, 6);
+    stroke(179, 145, 93);
+    fill(227, 184, 116);
+    rect(this.x, this.y - 15, 30, 20);
+    noStroke();
+    fill(255, 255, 255, 34);
+    rect(this.x, this.y - 15, 30, 5);
+    
+    fill(0);
+    ellipse(this.x + 11, this.y + 10, 4, 4);
+    ellipse(this.x + 18, this.y + 10, 4, 4);
+    popMatrix();
+    
+    if(this.path[this.pathPlace] === 'L'){
+        this.plusX --;
+        if(this.plusX < -30){
+            this.pathPlace ++;
+            this.x = this.x + this.plusX;
+            this.plusX = 0;
+        }
+    }
+    if(this.path[this.pathPlace] === 'R'){
+        this.plusX ++;
+        if(this.plusX > 30){
+            this.pathPlace ++;
+            this.x = this.x + this.plusX;
+            this.plusX = 0;
+        }
+    }
+    if(this.path[this.pathPlace] === 'U'){
+        this.plusY --;
+        if(this.plusY < -30){
+            this.pathPlace ++;
+            this.y = this.y + this.plusY;
+            this.plusY = 0;
+        }
+    }
+    if(this.path[this.pathPlace] === 'D'){
+        this.plusY ++;
+        if(this.plusY > 30){
+            this.pathPlace ++;
+            this.y = this.y + this.plusY;
+            this.plusY = 0;
+        }
+    }
+    if(this.pathPlace >= this.path.length){
+        this.x = this.originalX;
+        this.y = this.originalY;
+        this.pathPlace = 0;
+    }
+};
+var Enemies = [
+    [
+        new Enemy(8, 10, 'UURRRDDDDLLLUU'),
+        new Enemy(16, 15, 'UUUUUUUUUUULLLLLLLLLLLLLDDDDDDDDDDDRRRRRRRRRRRRR'),
+    ],
+    [
+        new Enemy(16, 15, 'UUUUUUUUUUULLLLLLLLLLLLLDDDDDDDDDDDRRRRRRRRRRRRR'),
+    ],
+    [
+        new Enemy(4, 9, 'RRRRRRRRRRRRRLLLLLLLLLLLLL'),
+        new Enemy(16, 15, 'LLLLLLLLLLLLLRRRRRRRRRRRRR'),
+    ],
+    [
+        new Enemy(4, 10, 'UUURRRLLLDDD'),
+        new Enemy(16, 17, 'UUULLLRRRDDD'),
+    ],
+    [
+        new Enemy(12, 7, 'DDDRRRLLLUUU'),
+        new Enemy(5, 12, 'DDDDDDRRRLLLUUUUUU'),
+    ],
+    [
+        new Enemy(12, 7, 'DDDDDRRUUUUULL'),
+    ],
+    [
+        new Enemy(12, 7, 'DDDDDRRUUUUULL'),
+        new Enemy(1, 12, 'RRDLLDRRDLLDRRUUUULL'),
+        new Enemy(15, 18, 'RRRLLLLLLLLLRRRRRR'),
+    ],
+    [
+        new Enemy(9, 4, 'RRRUUDDRRRRLLLLLLDDUULLLRR'),
+        new Enemy(10, 10, 'UUULLRRDDD'),
+        new Enemy(17, 14, 'UUUULLLDDDDRRR'),
+        new Enemy(2, 12, 'DDDDDDRRRRUUURRDDDLLLLLLUUUUUU'),
+    ],
+    [
+        new Enemy(14, 4, 'DDDDLLLLLDDDRUUURRRRUUUU'),
+        new Enemy(4, 8, 'RL'),
+        new Enemy(5, 9, 'RRLL'),
+    ],
+    [
+        new Enemy(14, 4, 'DDDDLLLLLDDDRUUURRRRUUUU'),
+        new Enemy(14, 15, 'RL'),
+        new Enemy(5, 9, 'RRRRLLLL'),
+    ]
+];
+
+var Player = function(x, y){
+    this.x = x; this.xvel = 0;
+    this.y = y; this.yvel = 0;
+    this.w = 30;
+    this.h = 20;
+    
+    this.speed = 3;
+};
+var player;
+Player.prototype.move = function(){
+    
+    if(!keys[LEFT] && !keys[RIGHT]){
+        this.xvel /= 1.1;
+    }
+    if(!keys[UP] && !keys[DOWN]){
+        this.yvel /= 1.1;
+    }
+    if(keys[UP]){
+        this.yvel --;
+    }
+    if(keys[DOWN]){
+        this.yvel ++;
+    } 
+    if(keys[LEFT]){
+        this.xvel --;
+    }
+    if(keys[RIGHT]){
+        this.xvel ++;
+    }
+    
+    this.x += this.xvel;
+    
+    for(var i = 0; i < Blocks.length; i ++){
+        if(rectCollide(this, Blocks[i]) && Blocks[i].type === 'door' && coins >= coinGoal){
+            trans.active = true;
+            if(level >= 9){
+                trans.nextScene = 'Win';
+            } else {
+                trans.nextScene = 'Game';
+                nextLevel = 'next';
+            }
+        }
+        if(rectCollide(this, Blocks[i]) && this.xvel > 0){
+            this.xvel = 0;
+            this.x = Blocks[i].x - this.w;
+        }
+        if(rectCollide(this, Blocks[i]) && this.xvel < 0){
+            this.xvel = 0;
+            this.x = Blocks[i].x + Blocks[i].w;
+        }
+    }
+    
+    this.xvel = constrain(this.xvel, -this.speed, this.speed);
+    this.yvel = constrain(this.yvel, -this.speed, this.speed);
+    
+    this.y += this.yvel;
+    for(var i = 0; i < Blocks.length; i ++){
+        if(rectCollide(this, Blocks[i]) && Blocks[i].type === 'door' && coins >= coinGoal){
+            trans.active = true;
+            if(level >= 9){
+                trans.nextScene = 'Win';
+            } else {
+                trans.nextScene = 'Game';
+                nextLevel = 'next';
+            }
+        }
+        if(rectCollide(this, Blocks[i]) && this.yvel > 0){
+            this.yvel = 0;
+            this.y = Blocks[i].y - this.h;
+        }
+        if(rectCollide(this, Blocks[i]) && this.yvel < 0){
+            this.yvel = 0;
+            this.y = Blocks[i].y + Blocks[i].h;
+        }
+    }
+};
+Player.prototype.draw = function() {
+    noStroke();
+    fill(0, 0, 0, 30);
+    rect(this.x, this.y + 11, 30, 14);
+    stroke(135, 109, 69);
+    fill(179, 144, 91);
+    rect(this.x, this.y, 30, 20);
+    stroke(201, 201, 201);
+    fill(222, 222, 222);
+    rect(this.x, this.y + 14, 30, 6);
+    stroke(28, 26, 24);
+    fill(69, 67, 65);
+    rect(this.x, this.y + 16, 30, 2);
+    rect(this.x, this.y - 15, 30, 20);
+    rect(this.x, this.y + 5, 30, 4);
+    noStroke();
+    fill(255, 255, 255, 34);
+    rect(this.x, this.y - 15, 30, 5);
+    
+    fill(0);
+    ellipse(this.x + 11, this.y + 12, 4, 4);
+    ellipse(this.x + 18, this.y + 12, 4, 4);
+    
+    for(var i = Coins.length - 1; i >= 0; i --){
+        if(rectCollide(this, Coins[i]) && !Coins[i].fade){
+            coins ++;
+            Coins[i].fade = true;
+        }
+    }
+    
+    for(var i = Enemies[level].length - 1; i >= 0; i --){
+        if(!rectCollide(Enemies[level][i], this)){
+            Enemies[level][i].collidable = true;
+        }
+        if(rectCollide(Enemies[level][i], this) && Enemies[level][i].collidable){
+            trans.active = true;
+            trans.nextScene = 'Game';
+            nextLevel = 'same';
+            Enemies[level][i].collidable = false;
+        }
+    }
+};
+
+var getLevel = function(which){
+    coins = 0;
+    Blocks = [];
+    Coins = [];
+    
+    for(var i = which.length - 1; i >= 0; i --){
+        for(var j in which[i]){
+            switch(which[i].charAt(j)){
+                case '.':
+                    Blocks.push(new Block(j * 30, i * 30));
+                    break;
+                case '!':
+                    player = new Player(j * 30, i * 30);
+                    break;
+                case '*':
+                    Coins.push(new Coin(j * 30, i * 30));
+                    break;
+                case '@':
+                    Blocks.push(new Block(j * 30, i * 30, 'door'));
+                    break;
+            }
+        }
+    }
+    coinGoal = Coins.length;
+};
+
+getLevel(levels[level]);
+
+draw = function() {
+    for(var i in images){
+        if (typeof images[i] !== "object") {
+            colorMode(RGB, 255);
+            background(0, 0, 0, 0);
+            images[i] = images[i]();
+        }
+    }
+    
+    // secret thumbnail scene
+    if(keys[ENTER]){
+        scene = 'Snap';
+    }
+    
+    textFont(createFont('Century Gothic'));
+    
+    if(scene === 'Menu'){
+        background(26, 20, 19);
+        image(images.bg, 0, 0);
+        
+        stroke(255, 255, 255, 30);
+        fill(255, 255, 255, 100);
+        title(300, 177, 100);
+        title(300, 177, 102);
+        title(300, 175, 103);
+        stroke(255, 255, 255);
+        fill(255);
+        title(300, 171, 100);
+        
+        Buttons.play.draw();
+        Buttons.how.draw();
+        Buttons.about.draw();
+        
+        fill(255);
+        textSize(15);
+        text('C H E S T E R   B A N K S      K H A N T O B E R   2 0 1 7', 300, 556);
+        
+        strokeWeight(1);
+        pushMatrix();
+        translate(65, 330);
+        scale(5);
+        rotate(15);
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(0, 11, 30, 14);
+        stroke(135, 109, 69);
+        fill(179, 144, 91);
+        rect(0, 0, 30, 20);
+        stroke(201, 201, 201);
+        fill(222, 222, 222);
+        rect(0, 14, 30, 6);
+        stroke(28, 26, 24);
+        fill(69, 67, 65);
+        rect(0, 16, 30, 2);
+        rect(0, -15, 30, 20);
+        rect(0, 5, 30, 4);
+        noStroke();
+        fill(255, 255, 255, 34);
+        rect(0, -15, 30, 5);
+        
+        fill(0);
+        ellipse(11, 12, 4, 4);
+        ellipse(18, 12, 4, 4);
+        popMatrix();
+    }
+    if(scene === 'Snap'){
+        image(images.bg, 0, 0);
+        
+        strokeWeight(1);
+        pushMatrix();
+        translate(375, 440);
+        scale(6);
+        rotate(0);
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(0, 11, 30, 14);
+        stroke(135, 109, 69);
+        fill(179, 144, 91);
+        rect(0, 0, 30, 20);
+        stroke(201, 201, 201);
+        fill(222, 222, 222);
+        rect(0, 14, 30, 6);
+        stroke(28, 26, 24);
+        fill(69, 67, 65);
+        rect(0, 16, 30, 2);
+        rect(0, -15, 30, 20);
+        rect(0, 5, 30, 4);
+        noStroke();
+        fill(255, 255, 255, 34);
+        rect(0, -15, 30, 5);
+        
+        fill(0);
+        ellipse(11, 12, 4, 4);
+        ellipse(18, 12, 4, 4);
+        popMatrix();
+        
+        stroke(255, 255, 255, 30);
+        fill(255, 255, 255, 10);
+        for(var i = 0; i < 30; i += 5){
+            title(325 + i, 260 + i, 168, -31);
+        }
+        fill(255);
+        stroke(255, 255, 255);
+        title(330, 270, 168, -31);
+        
+        noFill();
+        strokeWeight(30);
+        rect(0, 0, width, height);
+    }
+    if(scene === 'How'){
+        background(26, 20, 19);
+        
+        textSize(45);
+        fill(255);
+        text('I N S T R U C T I O N S', 300, 100);
+        textSize(20);
+        fill(255);
+        text('Move around with the arrow keys.\n\nTry to find and collect all the coins.\n\nThe guards are your worst enemy - avoid them at all costs.\n\nOnce you\'ve collected all the coins, find the door and leave the room.', 50, 50, 500, 500);
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'About'){
+        background(26, 20, 19);
+        
+        textSize(45);
+        fill(255);
+        text('A B O U T', 300, 100);
+        textSize(20);
+        fill(255);
+        text('You are a thief on your biggest mission yet - to infiltrate the dungeon of the Duke of Destia and steal his riches.\n\nThe dungeon is dark and danger is at all sides, but your stealth should be able to get you past the guards.\n\nIf you can succesfully steal all the coins, you will be rich!\n\nIf a guard catches you, you will be spending every last day in the dark halls of the duke\'s dungeon.\n\nWhat will be your fate? It\'s up to you.', 50, 50, 500, 500);
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'Game'){
+        // The tiled floor background.
+        background(148, 134, 127);
+        strokeWeight(1);
+        for(var i = 0; i < 600; i += 60){
+            for(var j = 0; j < 600; j += 30){
+                stroke(128, 115, 110);
+                fill(33, 29, 28, 30);
+                rect(i + ((j/30)%2)*30, j, 30, 30);
+                noStroke();
+                fill(87, 79, 76, 30);
+                rect(i + ((j/30)%2)*30, j + 23, 60, 7);
+            }
+        }
+        
+        // Draw the player, blocks, coins, and enemies.
+        player.move();
+        
+        for(var i = Enemies[level].length - 1; i >= 0; i --){
+            if(player.y >= Enemies[level][i].y){
+                Enemies[level][i].draw();
+            }
+            if(dist(Enemies[level][i].x, Enemies[level][i].y, player.x, player.y) < 140){
+                eyesAboveAll = false;
+            }
+        }
+        for(var i = Coins.length - 1; i >= 0; i --){
+            if(player.y >= Coins[i].y){
+                Coins[i].draw();
+            }
+            if(Coins[i].trans < 10){
+                Coins.splice(i, 1);
+            }
+        }
+        for(var i = Blocks.length - 1; i >= 0; i --){
+            if(player.y >= Blocks[i].y){
+                Blocks[i].draw();
+            }
+        }
+        player.draw();
+        for(var i = Enemies[level].length - 1; i >= 0; i --){
+            if(player.y < Enemies[level][i].y){
+                Enemies[level][i].draw();
+            }
+        }
+        for(var i = Coins.length - 1; i >= 0; i --){
+            if(player.y < Coins[i].y){
+                Coins[i].draw();
+            }
+        }
+        for(var i = Blocks.length - 1; i >= 0; i --){
+            if(player.y < Blocks[i].y){
+                Blocks[i].draw();
+            }
+        }
+        
+        // The lighting effect
+        noStroke();
+        for(var i = 0; i < overSquares.length; i++){
+            fill(0, 0, 0, overSquares[i].trans);
+            rect(overSquares[i].x, overSquares[i].y, 20, 40);
+            
+            overSquares[i].trans = 255;
+        }
+        
+        // The glowing eyes of the robber
+        if(eyesAboveAll){
+            fill(255, 255, 255);
+            ellipse(player.x + 11, player.y + 12, 4, 4);
+            ellipse(player.x + 18, player.y + 12, 4, 4);
+        }
+        
+        // coin stats
+        /*fill(255, 255, 255, 50);
+        rect(270, -5, 60, 60, 10);
+        fill(255);
+        rect(285, 14, 30, 5);
+        rect(285, 25, 30, 5);
+        rect(285, 36, 30, 5);
+        if(mouseX > 270 && mouseX < 330 && mouseY < 55){
+            overButton = true;
+        }*/
+        
+        fill(255, 255, 255, 50);
+        rect(490, -10, 120, 71, 24);
+        fill(222, 235, 101);
+        textSize(18);
+        text(coins + ' / ' + coinGoal, 525, 30);
+        pushStyle();
+        pushMatrix();
+        rectMode(CENTER);
+        translate(570, 30);
+        noStroke();
+        strokeWeight(2);
+        stroke(197, 207, 87);
+        fill(222, 235, 101);
+        rect(0, 0, (-sin(frameCount*2)*25), 30);
+        noFill();
+        line((-sin(frameCount*2)*5), -8, (-sin(frameCount*2)*5), 8);
+        line((-sin(frameCount*2)*5), -8, (-sin(frameCount*2)*-3), -8);
+        line((-sin(frameCount*2)*5), 8, (-sin(frameCount*2)*-3), 8);
+        stroke(197, 207, 87);
+        fill(197, 207, 87);
+        rect(sin(frameCount*2)*13, 0, (-sin(frameCount*2)*5), 30);
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(1, 12, (-sin(frameCount*2)*29), 8);
+        fill(255, 255, 255, 70);
+        rect(1, -11, (-sin(frameCount*2)*29), 8);
+        popMatrix();
+        popStyle();
+        
+        eyesAboveAll = true;
+    }
+    if(scene === 'Win'){
+        background(26, 20, 19);
+        image(images.bg, 0, 0);
+        
+        fill(255);
+        textSize(100);
+        text('YOU\nWON!', 400, 300);
+        
+        fill(255);
+        textSize(15);
+        text('C H E S T E R   B A N K S      K H A N T O B E R   2 0 1 7', 300, 556);
+        
+        strokeWeight(1);
+        pushMatrix();
+        translate(65, 260);
+        scale(5);
+        rotate(15);
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(0, 11, 30, 14);
+        stroke(135, 109, 69);
+        fill(179, 144, 91);
+        rect(0, 0, 30, 20);
+        stroke(201, 201, 201);
+        fill(222, 222, 222);
+        rect(0, 14, 30, 6);
+        stroke(28, 26, 24);
+        fill(69, 67, 65);
+        rect(0, 16, 30, 2);
+        rect(0, -15, 30, 20);
+        rect(0, 5, 30, 4);
+        noStroke();
+        fill(255, 255, 255, 34);
+        rect(0, -15, 30, 5);
+        
+        fill(0);
+        ellipse(11, 12, 4, 4);
+        ellipse(18, 12, 4, 4);
+        popMatrix();
+    }
+
+    cursor(overButton ? 'pointer' : 'default');
+    
+    if(trans.active){
+        noStroke();
+        if(!trans.out){
+            fill(255, 255, 255, 255 - (trans.sz / 5));
+            for(var i = 1; i < 10; i ++){
+                ellipse(300, 300, (1500 - trans.sz) / i, (1500 - trans.sz) / i);
+            }
+            if(trans.sz < 50){
+                if(scene === 'Game' && trans.nextScene === 'Game'){
+                    if(nextLevel === 'next'){
+                        level ++;
+                    }
+                    getLevel(levels[level]);
+                }
+                scene = trans.nextScene;
+                trans.sz = 1500;
+                trans.out = true;
+            }
+        } else {
+            fill(255, 255, 255, trans.sz / 5);
+            for(var i = 1; i < 10; i ++){
+                ellipse(300, 300, trans.sz / i, trans.sz / i);
+            }
+            if(trans.sz < 10){
+                trans.active = false;
+                trans.sz = 1500;
+                trans.out = false;
+            }
+        }
+        
+        trans.sz /= 1.1;
+    }
+    
+    clicked = false;
+    overButton = false;
+};
