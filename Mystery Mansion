@@ -1,0 +1,919 @@
+/**
+ * Mystery Mansion
+ * Chester Banks @chesterbanks
+ * Team Gray Leaf
+*/
+
+// Scene
+var scene = 'Menu';
+
+// Transition
+var trans = {
+    active: false,
+    out: false,
+    nextScene: '',
+    w: 400
+};
+
+// Settings
+textAlign(CENTER, CENTER);
+textFont(createFont('Times New Roman Bold'));
+
+// Mouse stuff
+var clicked = false;
+var overButton = false;
+mouseClicked = function(){
+    clicked = true;
+};
+
+// Stuff for the keys
+var keys = [false, false, false];
+var keysIn = [false, false, false];
+
+// Which room are we in
+var whichRoom = 'Lobby';
+
+// The Room OOP!
+var Room = function(label, leftDoor, centerDoor, rightDoor, backDoor){
+    this.label = label;
+    this.leftDoor = leftDoor;
+    this.centerDoor = centerDoor;
+    this.rightDoor = rightDoor;
+    this.backDoor = backDoor;
+    
+    this.x = 300;
+    
+    this.transitionOut = 'none';
+    this.transitionIn = 'none';
+    
+    this.doorWidth = 1;
+    this.roomSz = 1;
+    this.plusX = 300;
+    
+    if(this.label === 'Study'){
+        this.panelW = 200;
+        this.movePanel = false;
+    }
+    if(this.label === 'Lounge'){
+        this.rugY = 70;
+        this.moveRug = false;
+    }
+    if(this.label === 'Library'){
+        this.moveShelf = false;
+        this.shelfY = 115;
+        
+        this.books = [];
+        for(var i = 0; i < 290; i += 5){
+            this.books.push({x: i + 160, h: random(30, 45), hue: random(255)});
+        }
+        for(var i = 0; i < 290; i += 5){
+            this.books.push({x: i + 160, h: random(10, 25), hue: random(255)});
+        }
+        for(var i = 0; i < 290; i += 5){
+            this.books.push({x: i + 160, h: random(20, 35), hue: random(255)});
+        }
+        for(var i = 0; i < 290; i += 5){
+            this.books.push({x: i + 160, h: random(25, 35), hue: random(255)});
+        }
+    }
+    
+    if(this.label === 'Gallery'){
+        this.moveFrame = false;
+        this.frameY = 30;
+        
+        this.frame = function(x, y, w, h, bg){
+            strokeWeight(2);
+            stroke(255, 255, 255, 50);
+            noFill();
+            triangle(x + 5, y, x + w - 5, y, x + (w / 2), y - 30);
+            strokeWeight(5);
+            stroke(0, 0, 0, 30);
+            rect(x, y + 5, w, h);
+            stroke(25);
+            fill(bg);
+            rect(x, y, w, h);
+            noStroke();
+            fill(255, 255, 255 ,30);
+            triangle(x, y, x + w, y, x, y + h);
+        };
+    }
+    
+    this.cranes = [];
+    for(var i = 0; i < 10; i ++){
+        this.cranes.push({
+            x: random(100, 500),
+            sz: random(0.3, 1),
+        });
+    }
+};
+var Rooms = [
+    new Room('Lobby', 'Ballroom', 'Front Room', 'Library', ''),
+    new Room('Ballroom', '', 'Lounge', 'Lobby', ''),
+    new Room('Lounge', 'Origami', 'Dining Room', 'Front Room', 'Ballroom'),
+    new Room('Origami', '', 'Kitchen', 'Lounge', ''),
+    new Room('Kitchen', '', 'Study', 'Dining Room', 'Origami'),
+    new Room('Library', 'Lobby', '', '', ''),
+    new Room('Front Room', 'Lounge', 'Gallery', '', 'Lobby'),
+    new Room('Gallery', 'Dining Room', 'Music', '', 'Front Room'),
+    new Room('Dining Room', 'Kitchen', 'Billiard Room', 'Gallery', 'Lounge'),
+    new Room('Music', 'Billiard Room', 'Garden', 'Pool', 'Gallery'),
+    new Room('Study', '', '', 'Billiard Room', 'Kitchen'),
+    new Room('Billiard Room', 'Study', '', 'Music', 'Dining Room'),
+    new Room('Garden', '', '', '', 'Music'),
+    new Room('Pool', 'Music', '', '', ''),
+];
+Room.prototype.draw = function() {
+    pushMatrix();
+    if(this.transitionIn === 'left'){
+        translate(300 - this.plusX, 400);
+        scale(this.roomSz);
+        translate(-300 - this.plusX, -400);
+    } else if (this.transitionIn === 'right'){
+        translate(300 + this.plusX, 400);
+        scale(this.roomSz);
+        translate(-300 + this.plusX, -400);
+    } else {
+        translate(this.x, 400);
+        scale(this.roomSz);
+        translate(-300, -400);
+    }
+    
+    fill(201, 110, 65);
+    rect(-100, 0, 100, 600);
+    rect(600, 0, 100, 600);
+    
+    strokeWeight(2);
+    for(var i = 0; i < 140; i ++){
+        stroke(lerpColor(
+            color(201, 110, 65),
+            color(71, 29, 1),
+            i / 140
+        ));
+        line(i, i, width - i, i);
+    }
+    
+    if(this.label === 'Kitchen'){
+        for(var i = 0; i < 140; i ++){
+            stroke(lerpColor(
+                color(255, 255, 255),
+                color(71, 71, 71),
+                i / 140
+            ));
+            line(i, height - i, width - i, height - i);
+        }
+        noFill();
+        strokeWeight(5);
+        stroke(0, 0, 0, 30);
+        for(var j = 459; j < 620; j += 21){
+            beginShape();
+            for(var i = 0; i < 600; i += 50){
+                vertex(i, j + ((j / 15) - 20));
+                vertex(i + 25, j);
+            }
+            endShape();
+        }
+    } else if (this.label === 'Pool'){
+        for(var i = 0; i < 140; i ++){
+            stroke(lerpColor(
+                color(107, 107, 107),
+                color(38, 38, 38),
+                i / 140
+            ));
+            line(i, height - i, width - i, height - i);
+        }
+        for(var i = 0; i < 96; i ++){
+            stroke(lerpColor(
+                color(80, 191, 222),
+                color(19, 140, 240),
+                i / 140
+            ));
+            line((i / 1.1) + 85, 580 - i, 520 - (i / 1.1), 580 - i);
+        }
+        stroke(255);
+        noFill();
+        strokeWeight(8);
+        quad(85, 580, 520, 580, 434, 483, 170, 483);
+        stroke(0, 0, 0, 30);
+        noFill();
+        strokeWeight(4);
+        quad(85, 580, 520, 580, 434, 483, 170, 483);
+    } else {
+        for(var i = 0; i < 140; i ++){
+            stroke(lerpColor(
+                color(26, 103, 145),
+                color(7, 28, 66),
+                i / 140
+            ));
+            line(i, height - i, width - i, height - i);
+        }
+        noFill();
+        strokeWeight(5);
+        stroke(0, 0, 0, 30);
+        for(var j = 459; j < 620; j += 21){
+            beginShape();
+            for(var i = 0; i < 600; i += 50){
+                vertex(i, j + ((j / 15) - 20));
+                vertex(i + 25, j);
+            }
+            endShape();
+        }
+    }
+    
+    strokeWeight(2);
+    
+    for(var i = 0; i < 140; i ++){
+        stroke(lerpColor(
+            color(140, 71, 25),
+            color(74, 26, 6),
+            i / 140
+        ));
+        line(i, height - i, i, i);
+    }
+    
+    for(var i = 0; i < 140; i ++){
+        stroke(lerpColor(
+            color(140, 71, 25),
+            color(74, 26, 6),
+            i / 140
+        ));
+        line(width - i, height - i, width - i, i);
+    }
+    noStroke();
+    fill(71, 29, 1);
+    rect(140, 140, 199, 174);
+    rect(140, 140, 115, 322);
+    rect(335, 140, 126, 322);
+    if(this.centerDoor === ''){
+        rect(140, 140, 322, 322);
+    }
+    
+    noFill();
+    stroke(0, 0, 0, 60);
+    strokeWeight(10);
+    quad(-39, 630, 142, 457, 463, 457, 639, 630);
+    
+    /* Graphics that are shown for just specific rooms. */
+    
+    // Music art for Music Room
+    if(this.label === 'Music'){
+        strokeWeight(2);
+        stroke(255, 255, 255, 50);
+        noFill();
+        triangle(179, 285, 215, 285, 197, 271);
+        triangle(374, 264, 415, 264, 394, 233);
+        stroke(25);
+        strokeWeight(5);
+        fill(79, 79, 79);
+        rect(171, 285, 50, 70);
+        rect(369, 260, 50, 70);
+        fill(217, 217, 217);
+        textSize(60);
+        text('\u2669', 198, 321);
+        textSize(30);
+        text('\u266C', 395, 297);
+    }
+    
+    // art for gallery
+    if(this.label === 'Gallery'){
+        // Key ;)
+        if(!keys[0]){
+            pushMatrix();
+            translate(432, 318);
+            rotate(-45);
+            scale(0.4);
+            noFill();
+            strokeWeight(7);
+            stroke(224, 224, 40);
+            ellipse(-31, 0, 20, 20);
+            line(-20, 0, 20, 0);
+            line(20, 0, 20, 5);
+            line(10, 0, 10, 5);
+            popMatrix();
+        }
+        
+        this.frame(210, 380, 30, 50, color(184, 46, 46));
+        this.frame(173, 393, 30, 50, color(46, 124, 184));
+        this.frame(145, 313, 20, 100, color(46, 184, 46));
+        this.frame(173, 352, 30, 30, color(230, 138, 25));
+        this.frame(173, 313, 70, 30, color(171, 171, 171));
+        this.frame(151, 253, 50, 50, color(151, 56, 189));
+        
+        
+        this.frame(220, 263, 145, 33, color(110, 110, 110));
+        this.frame(360, 423, 83, 18, color(79, 177, 219));
+        this.frame(360, 365, 42, 48, color(76, 212, 106));
+        this.frame(414, 343, 30, 70, color(166, 184, 46));
+        this.frame(353, 305, 50, 50, color(188, 116, 227));
+        this.frame(414, 305 - 30 + this.frameY, 30, 30, color(250, 15, 15));
+        
+        if(mouseX > 414 && mouseX < 444 && mouseY > 305 && mouseY < 335 && !this.moveFrame){
+            overButton = true;
+            if(clicked){
+                this.moveFrame = true;
+                clicked = false;
+            }
+        }
+        if(this.moveFrame){
+            this.frameY /= 1.1;
+        }
+        if(mouseX > 414 && mouseX < 444 && mouseY > 305 && mouseY < 335 && this.moveFrame && !keys[0]){
+            overButton = true;
+            if(clicked){
+                keys[0] = true;
+            }
+        }
+    }
+    
+    if(this.label === 'Study'){
+        // Key ;)
+        if(!keys[2]){
+            pushMatrix();
+            translate(300, 175);
+            rotate(-45);
+            scale(0.7);
+            noFill();
+            strokeWeight(7);
+            stroke(191, 123, 34);
+            ellipse(-31, 0, 20, 20);
+            line(-20, 0, 20, 0);
+            line(20, 0, 20, 5);
+            line(10, 0, 10, 5);
+            popMatrix();
+        }
+        
+        noStroke();
+        fill(71, 38, 16);
+        rect(200, 155, this.panelW, 50);
+        
+        if(mouseX > 200 && mouseX < 400 && mouseY > 155 && mouseY < 205 && !this.movePanel){
+            overButton = true;
+            if(clicked){
+                this.movePanel = true;
+                clicked = false;
+            }
+        }
+        if(this.movePanel){
+            this.panelW /= 1.1;
+            if(mouseX > 200 && mouseX < 400 && mouseY > 155 && mouseY < 205 && !keys[2]){
+                overButton = true;
+                if(clicked){
+                    keys[2] = true;
+                }
+            }
+        }
+    }
+    if(this.label === 'Lounge'){
+        // Key ;)
+        if(!keys[1]){
+            pushMatrix();
+            translate(300, 500);
+            rotate(-45);
+            scale(0.7);
+            noFill();
+            strokeWeight(7);
+            stroke(189, 189, 189);
+            ellipse(-31, 0, 20, 20);
+            line(-20, 0, 20, 0);
+            line(20, 0, 20, 5);
+            line(10, 0, 10, 5);
+            popMatrix();
+        }
+        
+        pushMatrix();
+        translate(0, 70 - this.rugY);
+        noStroke();
+        fill(145, 40, 40);
+        ellipse(300, 534, 300, 100);
+        fill(166, 40, 40);
+        ellipse(300, 530, 300, 100);
+        fill(0, 0, 0, 30);
+        ellipse(300, 523, 250, 80);
+        ellipse(300, 523, 180, 60);
+        ellipse(300, 520, 130, 40);
+        popMatrix();
+        if(dist(300, 534, mouseX, mouseY) < 50 && !this.moveRug){
+            overButton = true;
+            if(clicked){
+                this.moveRug = true;
+                clicked = false;
+            }
+        }
+        if(this.moveRug){
+            this.rugY /= 1.1;
+            if(dist(mouseX, mouseY, 300, 500) < 25 && !keys[1]){
+                overButton = true;
+                if(clicked){
+                    keys[1] = true;
+                }
+            }
+        }
+    }
+    
+    noStroke();
+    // straightforward door
+    if(this.centerDoor !== ''){
+        pushMatrix();
+        translate(255, 312);
+        scale(this.doorWidth, 1);
+        noStroke();
+        fill(0, 0, 0, 30);
+        rect(-8, -10, 98, 150);
+        fill(140, 97, 49);
+        rect(0, 0, 80, 150);
+        fill(0, 0, 0, 40);
+        ellipse(60, 83, 15, 15);
+        fill(232, 232, 232);
+        ellipse(63, 80, 15, 15);
+        popMatrix();
+    }
+    
+    // left door
+    if(this.leftDoor !== ''){
+        fill(0, 0, 0, 30);
+        quad(46, 542, 44, 339, 109, 303, 105, 494);
+        fill(140, 97, 49);
+        quad(50, 552, 50, 345, 105, 312, 105, 497);
+        fill(0, 0, 0, 40);
+        ellipse(90, 436, 12, 15);
+        fill(232, 232, 232);
+        ellipse(93, 433, 12, 15);
+    }
+    
+    // right door
+    if(this.rightDoor !== ''){
+        fill(0, 0, 0, 30);
+        quad(557, 543, 558, 335, 490, 316, 491, 476);
+        fill(140, 97, 49);
+        quad(550, 552, 550, 345, 495, 325, 495, 497);
+        fill(0, 0, 0, 40);
+        ellipse(505, 435, 12, 15);
+        fill(232, 232, 232);
+        ellipse(507, 433, 12, 15);
+    }
+    
+    fill(43, 18, 1);
+    textSize(40);
+    text(this.label.toUpperCase(), 300, 234);
+    fill(94, 40, 4);
+    text(this.label.toUpperCase(), 300, 230);
+    
+    // cranes for Origami Room
+    if(this.label === 'Origami'){
+        for(var i in this.cranes){
+            pushMatrix();
+            translate(this.cranes[i].x + sin(i + frameCount) * 10, 200 + this.cranes[i].sz * 200);
+            scale(this.cranes[i].sz);
+            rotate(0);
+            stroke(255, 255, 255, 50);
+            strokeWeight(1);
+            line(0, 0, 0, -600);
+            noStroke();
+            fill(181, 181, 181);
+            triangle(-31, 0, 30, 0, -11, -60);
+            triangle(-57, -54, -36, -60, -47, -67);
+            fill(219, 219, 219);
+            quad(-32, 0, -14, 0, -36, -60, -47, -67);
+            triangle(0, 0, 30, 0, 46, -47);
+            fill(255);
+            triangle(-30, 0, 30, 0, 0, -60);
+            popMatrix();
+        }
+    }
+    
+    if(this.backDoor !== ''){
+        /**
+         * The following line of code removes any form of line, otherwise known as a stroke, from surrounding all following shapes, such as (but not limited to), rect(), ellipse(), arc(), and quad(). 
+         * If you would like to know more on this intriguing function, check the very helpful documentation.
+        */
+        noStroke();
+        
+        /**
+         * The following line of code inputs the red, green, and blue values by which the following shapes will be "colored" with. These shapes could be, but are not limited to, rect(), ellipse(), arc() and quad(). The rgb values can be any number between 0 and 255. If a fourth parameter is added to the fill() call, it will determine the transparency of the following shapes. When all of the colors are at their full value (255), all of the colors will be combined into the culmination of all colors - white.
+         * If you would like to learn more about this command, check the helpful documentation.
+        */
+        fill(255, 255, 255, 50);
+        
+        ellipse(300, 565, 50, 40);
+        
+        fill(255, 255, 255, 100);
+        beginShape();
+        vertex(291, 550);
+        vertex(308, 550);
+        vertex(313, 565);
+        vertex(321, 565);
+        vertex(300, 580);
+        vertex(279, 565);
+        vertex(288, 565);
+        endShape();
+    }
+    popMatrix();
+    
+    // Bookshelves for library
+    if(this.label === 'Library'){
+        // treasure chest ;)
+        strokeWeight(5);
+        stroke(168, 97, 42);
+        fill(199, 123, 69);
+        quad(260, 470, 340, 470, 350, 420, 250, 420);
+        arc(300, 418, 100, 50, -180, 0);
+        noStroke();
+        fill(0, 0, 0, 10);
+        quad(260, 470, 300, 470, 300, 420, 250, 420);
+        arc(300, 418, 100, 50, -180, -90);
+        
+        // keyholes to treasure chest
+        strokeCap(SQUARE);
+        stroke(217, 217, 35);
+        strokeWeight(15);
+        point(280, 434);
+        stroke(212, 212, 212);
+        point(300, 434);
+        stroke(145, 99, 51);
+        point(320, 434);
+        strokeWeight(5);
+        stroke(217, 217, 35);
+        line(280, 434, 280, 445);
+        stroke(212, 212, 212);
+        line(300, 434, 300, 445);
+        stroke(145, 99, 51);
+        line(320, 434, 320, 445);
+        
+        stroke(199, 123, 69);
+        strokeWeight(11);
+        if(!keysIn[0]){ point(280, 434); }
+        if(!keysIn[1]){ point(300, 434); }
+        if(!keysIn[2]){ point(320, 434); }
+        strokeWeight(2);
+        if(!keysIn[0]){ line(280, 434, 280, 444); }
+        if(!keysIn[1]){ line(300, 434, 300, 444); }
+        if(!keysIn[2]){ line(320, 434, 320, 444); }
+        
+        pushMatrix();
+        translate(this.x - 300, -115 + this.shelfY);
+        strokeWeight(10);
+        stroke(128, 73, 31);
+        fill(107, 61, 28);
+        (rect)(155, 275, 300, 200, 10, 10, 0, 0);
+        line(160, 330, 450, 330);
+        line(160, 370, 450, 370);
+        line(160, 420, 450, 420);
+        
+        noStroke();
+        pushStyle();
+        colorMode(HSB);
+        for(var i = 0; i < this.books.length; i ++){
+            fill(this.books[i].hue, 150, 160);
+            if(i > 173){
+               rect(this.books[i].x, 470 - this.books[i].h, 5, this.books[i].h);
+            } else if (i > 115){
+                rect(this.books[i].x, 415 - this.books[i].h, 5, this.books[i].h);
+            } else if (i > 57){
+                 rect(this.books[i].x, 365 - this.books[i].h, 5, this.books[i].h);
+            }else{
+                rect(this.books[i].x, 325 - this.books[i].h, 5, this.books[i].h);
+            }
+        }
+        popMatrix();
+        popStyle();
+        
+        if(mouseX > 300 && mouseX < 330 && mouseY > 435 && mouseY < 470 && !this.moveShelf){
+            overButton = true;
+            if(clicked){
+                this.moveShelf = true;
+            }
+        }
+        if(this.moveShelf){
+            this.shelfY /= 1.1;
+            if(dist(mouseX, mouseY, 280, 434) < 5){
+                overButton = true;
+                if(clicked && keys[0]){
+                    keysIn[0] = true;
+                }
+            }
+            if(dist(mouseX, mouseY, 300, 434) < 5){
+                overButton = true;
+                if(clicked && keys[1]){
+                    keysIn[1] = true;
+                }
+            }
+            if(dist(mouseX, mouseY, 320, 434) < 5){
+                overButton = true;
+                if(clicked && keys[2]){
+                    keysIn[2] = true;
+                }
+            }
+        }
+        if(keysIn[0] && keysIn[1] && keysIn[2]){
+            trans.active = true;
+            trans.nextScene = 'Win';
+        }
+    }
+    
+    // Collisions over doors
+    if(mouseX > 255 && mouseX < 335 && mouseY > 312 && mouseY < 462 && this.centerDoor !== ''){
+        overButton = true;
+        if(clicked){
+            this.transitionOut = 'forward';
+            whichRoom = this.centerDoor;
+            clicked = false;
+        }
+    }
+    if(mouseX > 50 && mouseX < 105 && mouseY > 345 && mouseY < 497 && this.leftDoor !== ''){
+        overButton = true;
+        if(clicked){
+            this.transitionOut = 'left';
+            for(var i = Rooms.length - 1; i >= 0; i --){
+                if(Rooms[i].label === this.leftDoor){
+                    Rooms[i].transitionIn = 'left';
+                }
+            }
+            whichRoom = this.leftDoor;
+            clicked = false;
+        }
+    }
+    if(mouseX > 495 && mouseX < 550 && mouseY > 345 && mouseY < 497 && this.rightDoor !== ''){
+        overButton = true;
+        if(clicked){
+            this.x = 300;
+            for(var i = Rooms.length - 1; i >= 0; i --){
+                if(Rooms[i].label === this.rightDoor){
+                    Rooms[i].plusX = 300;
+                    Rooms[i].transitionIn = 'right';
+                }
+            }
+            this.transitionOut = 'right';
+            whichRoom = this.rightDoor;
+            clicked = false;
+        }
+    }
+    if(dist(mouseX, mouseY, 300, 565) < 20 && this.backDoor !== ''){
+        overButton = true;
+        if(clicked){
+            this.transitionOut = 'none';
+            for(var i = Rooms.length - 1; i >= 0; i --){
+                if(Rooms[i].label === this.backDoor){
+                    Rooms[i].roomSz = 1;
+                    Rooms[i].doorWidth = 1;
+                    Rooms[i].transitionOut = '';
+                }
+            }
+            whichRoom = this.backDoor;
+            clicked = false;
+        }
+    }
+    
+    if(this.transitionOut === 'left'){
+        this.x += (1000 - this.x)/10;
+    }
+    if(this.transitionOut === 'right'){
+        this.x += (-405 - this.x)/10;
+    }
+    if(this.transitionOut === 'forward'){
+        this.doorWidth /= 1.1;
+        if(this.doorWidth < 0.1){
+            this.roomSz *= 1.1;
+        }
+    }
+    if(this.transitionIn === 'left' || this.transitionIn === 'right'){
+        this.plusX /= 1.1;
+    }
+    
+    if(this.plusX < 1 || this.x < -390 || this.x > 990 || this.roomSz > 10){
+        this.x = 300;
+        this.plusX = 300;
+        this.transitionIn = 'none';
+        this.transitionOut = 'none';
+    }
+    
+    // If there's no transitions happening, reset all the values relating to translating and scaling.
+    if(this.transitionIn === 'none' && this.transitionOut === 'none'){
+        this.x = 300;
+        this.doorWidth = 1;
+        this.roomSz = 1;
+        this.plusX = 300;
+    }
+};
+
+// For the chevron background
+var menuTexture = [];
+for(var j = -100; j < 620; j += 25){
+    menuTexture.push({weight: random(30), y: j});
+}
+
+// Button function
+var Button = function(x, y, txt, nxt){
+    this.x = x;
+    this.y = y;
+    this.txt = txt;
+    this.nxt = nxt;
+    
+    this.plusW = 50;
+};
+Button.prototype.draw = function() {
+    pushStyle();
+    rectMode(CENTER);
+    noStroke();
+    fill(215, 215, 215, 150 - this.plusW);
+    rect(this.x, this.y + 5, 300 - this.plusW, 50, 30);
+    fill(255, 255, 255, 150 - this.plusW);
+    rect(this.x, this.y, 300 - this.plusW, 50, 30);
+    noFill();
+    stroke(255, 255, 255);
+    strokeWeight(2);
+    rect(this.x, this.y, 290 - this.plusW, 40, 30);
+    
+    fill(30);
+    textSize(20);
+    text(this.txt, this.x, this.y);
+    
+    if(mouseX > this.x - 125 && mouseX < this.x + 125 && mouseY > this.y - 20 && mouseY < this.y + 20){
+        overButton = true;
+        this.plusW /= 1.5;
+        if(clicked){
+            trans.active = true;
+            trans.nextScene = this.nxt;
+        }
+    } else {
+        this.plusW *= 1.5;
+    }
+    
+    this.plusW = constrain(this.plusW, 1, 50);
+    popStyle();
+};
+var Buttons = {
+    play: new Button(300, 360, 'Enter the mansion.', 'Game'),
+    how: new Button(300, 420, 'Instructions for playing.', 'How'),
+    story: new Button(300, 480, 'Info about the mystery.', 'Story'),
+    about: new Button(300, 540, 'About the game.', 'About'),
+    back: new Button(300, 540, 'To the menu.', 'Menu'),
+};
+
+// Background function!
+var chevronBG = function(){
+    background(33, 33, 33);
+        
+    pushMatrix();
+    rotate(10);
+    noFill();
+    stroke(255, 255, 255, 20);
+    for(var j in menuTexture){
+        strokeWeight(menuTexture[j].weight);
+        beginShape();
+        for(var i = 0; i <= 700; i += 40){
+            vertex(i, menuTexture[j].y + 25);
+            vertex(i + 20, menuTexture[j].y);
+        }
+        endShape();
+    }
+    popMatrix();
+};
+
+// Draw function!
+draw = function() {
+    // Scenes
+    if(scene === 'Menu'){
+        chevronBG();
+        
+        noStroke();
+        fill(0, 0, 0, 50);
+        rect(40, 75, 520, 250, 20);
+        fill(255, 255, 255, 50);
+        rect(40, 65, 520, 250, 20);
+        
+        fill(0, 0, 0, 90);
+        textSize(90);
+        text('MANSION', 300, 238);
+        textSize(100);
+        text('MYSTERY', 300, 159);
+        fill(150);
+        textSize(90);
+        text('MANSION', 300, 232);
+        textSize(100);
+        text('MYSTERY', 300, 152);
+        fill(245);
+        textSize(90);
+        text('MANSION', 300, 230);
+        textSize(100);
+        text('MYSTERY', 300, 150);
+        
+        pushStyle();
+        textFont(createFont('Times New Roman'), 19);
+        text('-- CHESTER J. BANKS | AUGUST SIXTH 2017 --', 300, 95);
+        text('-- KAO 2017 | TEAM GRAY LEAF | JS (OOD) ROUND 2 --', 300, 283);
+        popStyle();
+        
+        Buttons.play.draw();
+        Buttons.about.draw();
+        Buttons.how.draw();
+        Buttons.story.draw();
+    }
+    if(scene === 'How'){
+        chevronBG();
+        
+        fill(255);
+        textSize(70);
+        text('instructions.', 300, 100);
+        
+        pushStyle();
+        textFont(createFont('Times New Roman'), 19);
+        fill(255);
+        textSize(20);
+        text('This game can be played entirely with your mouse! There will be many things to click along the way, such as doors, secret passageways, and more!\n\nThe game is pretty self-explanatory, you can learn the rest by just clicking the play button!', 50, 50, 500, 500);
+        popStyle();
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'Story'){
+        chevronBG();
+        
+        fill(255);
+        textSize(70);
+        text('story.', 300, 100);
+        
+        pushStyle();
+        textFont(createFont('Times New Roman'), 19);
+        fill(255);
+        textSize(20);
+        text('You have arrived at Mystery Mansion! Tales and rumors tell of a fortune hidden somewhere in the mansion by the millionaire Sir Winston Donutson III, who died around three centuries ago.\n\nWill you be able to find the long-lost treasure?', 50, 50, 500, 500);
+        popStyle();
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'About'){
+        chevronBG();
+        
+        fill(255);
+        textSize(70);
+        text('about.', 300, 100);
+        
+        pushStyle();
+        textFont(createFont('Times New Roman'), 19);
+        fill(255);
+        textSize(20);
+        text('I made this game as an entry to the Khan Academy Olympics 2017! The event I entered this in is JS (OOD) Round 2. The challenge for this round was to create a room-based adventure game!', 50, 50, 500, 500);
+        popStyle();
+        
+        Buttons.back.draw();
+    }
+    if(scene === 'Game'){
+        background(0);
+        
+        for(var i = Rooms.length - 1; i >= 0; i --){
+            if(Rooms[i].label === whichRoom){
+                Rooms[i].draw();
+            }
+            if(Rooms[i].transitionOut !== 'none'){
+                Rooms[i].draw();
+            }
+        }
+    }
+    if(scene === 'Win'){
+        chevronBG();
+        
+        fill(255);
+        textSize(70);
+        text('congratulations!', 300, 100);
+        
+        pushStyle();
+        textFont(createFont('Times New Roman'), 19);
+        fill(255);
+        textSize(20);
+        text('Yay, you found the treasure of Mystery Mansion!\n\nYou are now a billionaire for life!', 50, 50, 500, 500);
+        popStyle();
+    }
+    
+    // Transitions
+    pushStyle();
+    rectMode(CENTER);
+    noStroke();
+    fill(255);
+    if(trans.active){ // If the transition is running...
+        if(!trans.out){ // ... and the transition is coming in
+            rect(300, 300, 600 - trans.w, 600);
+            
+            if(trans.w < 1){
+                scene = trans.nextScene;
+                trans.w = 400;
+                trans.out = true;
+            }
+            
+        } else {
+            rect(300, 300, 600, trans.w);
+            if(trans.w < 1){
+                trans.active = false;
+                trans.out = false;
+                trans.w = 400;
+            }
+        }
+        
+        trans.w /= 1.2; // Slowly decrease trans.w.
+    }
+    popStyle();
+    
+    // Cursor
+    cursor(overButton ? 'pointer' : 'default');
+    
+    // Reset mouse variables
+    clicked = false;
+    overButton = false;
+};
