@@ -1,0 +1,977 @@
+/**
+ * Texting
+ * Chester Banks
+ * May 29 2017
+ * 
+ * A simple game with a unique twist!
+ * 
+ * Want to see more games like this? Subscribe to me here: khanacademy.org/cs/sub/4790207744704512
+*/
+
+textAlign(CENTER, CENTER);
+textFont(createFont('HelveticaNeue-Thin'));
+
+var speed = 1;
+var score = 0;
+var causeOfDeath = '';
+var snap = false;
+
+var overButton = false;
+var clicked = false;
+mouseClicked = function(){ clicked = true; };
+
+var keys = [];
+var keyPressed = function(){ keys[keyCode] = true; };
+var keyReleased = function(){ keys[keyCode] = false; };
+
+// The rectangle collision function
+var rectCollide = function(one, two){
+    return one.x+one.w > two.x &&
+        one.y+one.h > two.y &&
+        one.x < two.x+two.w &&
+        one.y < two.y+two.h;
+};
+
+var scene = 'Lock';
+
+var logo = function(x, y, sz){
+    var logoColors = [
+        color(19, 87, 138),
+        color(87, 156, 217),
+        color(56, 179, 255),
+        color(69, 192, 230),
+    ];
+    
+    pushMatrix();
+    translate(x, y);
+    scale(sz);
+    noFill();
+    strokeCap(SQUARE);
+    stroke(0, 0, 0, 30);
+    strokeWeight(30);
+    arc(10, 20, 160, 160, 30, 330);
+    strokeWeight(11);
+    // Outer layer
+    stroke(logoColors[0]);
+    arc(0, 0, 200, 200, -85, -30);
+    arc(0, 0, 180, 180, -75, -30);
+    arc(0, 0, 200, 200, -300, -240);
+    arc(0, 0, 180, 180, -285, -250);
+    stroke(logoColors[1]);
+    arc(0, 0, 200, 200, -125, -85);
+    arc(0, 0, 180, 180, -115, -75);
+    arc(0, 0, 200, 200, -200, -160);
+    arc(0, 0, 180, 180, -200, -150);
+    stroke(logoColors[2]);
+    arc(0, 0, 200, 200, -160, -125);
+    arc(0, 0, 180, 180, -150, -116);
+    arc(0, 0, 200, 200, -330, -300);
+    arc(0, 0, 180, 180, -330, -286);
+    stroke(logoColors[3]);
+    arc(0, 0, 200, 200, -240, -200);
+    arc(0, 0, 180, 180, -250, -200);
+    
+    // Inner layer
+    stroke(logoColors[0]);
+    arc(0, 0, 160, 160, -200, -160);
+    arc(0, 0, 140, 140, -200, -150);
+    stroke(logoColors[1]);
+    arc(0, 0, 160, 160, -300, -240);
+    arc(0, 0, 140, 140, -285, -250);
+    stroke(logoColors[2]);
+    arc(0, 0, 160, 160, -240, -200);
+    arc(0, 0, 140, 140, -250, -200);
+    arc(0, 0, 160, 160, -125, -85);
+    arc(0, 0, 140, 140, -115, -75);
+    stroke(logoColors[3]);
+    arc(0, 0, 160, 160, -85, -30);
+    arc(0, 0, 140, 140, -75, -30);
+    arc(0, 0, 160, 160, -330, -300);
+    arc(0, 0, 140, 140, -330, -286);
+    arc(0, 0, 160, 160, -160, -125);
+    arc(0, 0, 140, 140, -150, -116);
+    
+    stroke(0, 0, 0, 50);
+    strokeWeight(20);
+    arc(0, 0, 150, 150, 30, 330);
+    popMatrix();
+};
+
+var appButton = function(x, y, sz, name, scene){
+    this.x = x;
+    this.y = y;
+    this.sz = sz;
+    this.name = name;
+    this.scene = scene;
+};
+appButton.prototype.draw = function() {
+    pushStyle();
+    pushMatrix();
+    translate(this.x, this.y);
+    if(mouseX > this.x - (this.sz / 2) && mouseX < this.x + (this.sz / 2) && mouseY > this.y - (this.sz / 2) && mouseY < this.y + (this.sz / 2)){
+        scale(1.1);
+        overButton = true;
+        if(clicked){
+            scene = this.scene;
+        }
+    }
+    noStroke();
+    rectMode(CENTER);
+    if(this.name === 'play'){
+        fill(227, 227, 227);
+    } else if (this.name === 'how'){
+        fill(217, 67, 95);
+    } else if (this.name === 'creds'){
+        fill(69, 193, 199);
+    } else if (this.name === 'chester'){
+        fill(23, 23, 23);
+    }
+    rect(0, 0, this.sz, this.sz, 15);
+    if(this.name === 'play'){
+        fill(52, 166, 207);
+        pushMatrix();
+        translate(-2, 0);
+        scale(0.15);
+        rotate(90);
+        triangle(0, -100, 86, 50, -86, 50); // thx to Aqua
+        popMatrix();
+    } else if (this.name === 'how'){
+        fill(255, 255, 255);
+        textSize(30);
+        text('?', 0, 0);
+    } else if (this.name === 'creds'){
+        fill(69, 193, 199);
+        fill(255, 255, 255);
+        textSize(50);
+        textLeading(10);
+        text('_\n_\n_', 0, -22);
+    } else if (this.name === 'chester'){
+        fill(245, 245, 245);
+        textSize(30);
+        text('C', 0, 0);
+    }
+    popMatrix();
+    popStyle();
+};
+var appButtons = {
+    play: new appButton(165, 500, 50, 'play', 'Game'),
+    how: new appButton(95, 500, 50, 'how', 'How'),
+    creds: new appButton(235, 500, 50, 'creds', 'Creds'),
+    chester: new appButton(305, 500, 50, 'chester', 'Chester'),
+};
+
+var block = function(){
+    textSize(17);
+    this.texts = [
+        'Hi',
+        'What\'s up?',
+        'Hello there',
+        'How are you?',
+        'I got new shoes!',
+        'I love KA',
+        'What are u doing today?',
+        'Wait what?',
+        'I\'m so awesome!',
+        'Um, okay...',
+        'I\'m going to go skydiving',
+        'Noice!',
+        'Nice!',
+        'ideka',
+        'What are u talking about?',
+        'Can you come tomorrow?',
+        'I love pizza <3',
+        'That is awesome',
+        'Seriously?',
+        'Duuude!',
+        'Really?!?!?!',
+        '*jawdrop*',
+        'Mr. Pink = My favorite avatar',
+        'I love this game!',
+        'Wow!! Congrats, man!!!',
+        'Chester Banks rocks',
+        'dat roast thooooo',
+        'I\'m eating chicken wings rn',
+        'Wassup??',
+        'Sounds good, see ya then!',
+        '>:) >:) >:) >:) >:)',
+        'Are you there??',
+        'I don\'t understand...',
+        'I worry about you sometimes',
+        'I forgot what to do...',
+        'I literally just screamed',
+        'Are. You. Serious.',
+        'Did you see my new game?',
+        '*mindblown*',
+        'That is super exciting!!',
+        'Want to play soccer?',
+        'We should do something today',
+        'YES!',
+        'You\'ve got to be kidding me',
+        'IT WAS THE SKUNK',
+        'Wow! That\'s great!!', 
+    ];
+    this.text = this.texts[floor(random(this.texts.length))];
+    this.w = textWidth(this.text) + 10;
+    this.xs = [70, 330 - this.w];
+    this.x = this.xs[floor(random(this.xs.length))];
+    this.y = 530;
+    this.h = 30;
+    this.trans = 255;
+    this.switchThat = false;
+};
+block.prototype.draw = function() {
+    noStroke();
+    if(this.x === this.xs[1]){
+        fill(48, 177, 217, 255);
+    } else {
+        fill(46, 219, 90, 255);
+    }
+    rect(this.x, this.y, this.w, this.h, 10);
+    fill(255);
+    textSize(17);
+    text(this.text, this.x + this.w / 2, this.y + this.h / 2);
+    
+    this.y -= speed;
+};
+
+var blox = [];
+
+var Player = function(x, y, w, h){
+    this.x = x; this.originalX = x;
+    this.y = y; this.originalY = y;
+    this.w = w;
+    this.h = h;
+    
+    this.xvel = 0;
+    this.yvel = 0;
+    this.speed = 5;
+    
+    this.jumping = false;
+    this.r = 0;
+    this.squash = false;
+};
+Player.prototype.applyCollisions = function(xvel, yvel) {
+    for (var i = 0; i < blox.length; i++) {
+        if (!rectCollide(this, blox[i])) { continue; }
+        if (xvel < 0) {
+            this.x = blox[i].x + blox[i].w;
+            this.xvel = 0;
+        }
+        if (xvel > 0) {
+            this.x = blox[i].x - this.w;
+            this.xvel = 0;
+        }
+        if (yvel < 0) {
+            this.y = blox[i].y + blox[i].h;
+            this.yvel = 0;
+        }
+        if (yvel > 0) {
+            this.y = blox[i].y - this.h;
+            this.yvel = 0;
+            this.jumping = false;
+        }
+    }
+    if (this.y >= 500 && this.yvel > 0) {
+        this.jumping = false;
+        this.yvel = 0;
+        this.y = 500;
+    }
+};
+Player.prototype.draw = function() {
+    for(var i in this.particles){
+        this.particles[i].draw();
+        if(this.particles[i].trans < 0){
+            this.particles.splice(i, 1);
+        }
+    }
+    
+    // The actual player
+    noStroke();
+    fill(212, 212, 68);
+    pushMatrix();
+    rectMode(CENTER);
+    translate(this.x + (this.w / 2), this.y + (this.h / 2));
+    rotate(this.r);
+    (rect)(0, 0, this.w, this.h, 20);
+    fill(255,255, 255, 100);
+    (rect)(0, -4, this.w - 5, this.h - 5, 20);
+    fill(0);
+    ellipse(-5, -2, 5, 6);
+    ellipse(5, -2, 5, 6);
+    noFill();
+    stroke(0);
+    strokeWeight(1);
+    arc(0, 2, 12, 8, 30, 150);
+    rectMode(CORNER);
+    popMatrix();
+    
+    // Player movement
+    if(keys[LEFT] || keys[65]){
+        this.xvel -= 2;
+        this.r -= 10;
+    }
+    if(keys[RIGHT] || keys[68]){
+        this.xvel += 2;
+        this.r += 10;
+    }
+    if(!keys[LEFT] && !keys[RIGHT] && !keys[65] && !keys[68]){
+        this.r /= 1.5;
+        this.xvel = 0;
+    }
+    
+    if(this.r > 360 || this.r < -360){
+        this.r = 0;
+    }
+    
+    if ((keys[UP] || keys[87]) && !this.jumping) {
+        this.yvel -= 10;
+        this.jumping = true;
+    }
+    if(this.xvel > this.speed){
+        this.xvel = this.speed;
+    }
+    if(this.xvel < -this.speed){
+        this.xvel = -this.speed;
+    }
+    this.jumping = true;
+    this.y += this.yvel;
+    this.yvel += 0.6;
+    this.applyCollisions(0, this.yvel);
+    this.x += this.xvel;
+    this.applyCollisions(this.xvel, 0);
+    
+    if(this.slow){
+        this.speed = 1;
+        this.slowTimer ++;
+    } else {
+        this.speed = 5;
+    }
+    if(this.slowTimer > 160){
+        this.slow = false;
+        this.slowTimer = 0;
+    }
+    
+    this.x = constrain(this.x, 55, 315);
+    
+    if(this.y < 70){
+        this.squash = true;
+    }
+    if(this.squash){
+        this.h -= speed;
+    }
+    if(this.h < 1){
+        causeOfDeath = 'went off the screen';
+        scene = 'Lose';
+    }
+};
+var player = new Player(200, 200, 30, 30);
+
+var Emoji = function(){
+    this.x = random(60, 320);
+    this.y = random(100, 500);
+    this.w = 30;
+    this.h = 30;
+    this.r = 0;
+    this.speed = speed + random(-1);
+    this.trans = 255;
+    this.s = 1;
+    this.fade = false;
+    this.timer = random(200, 250);
+};
+Emoji.prototype.draw = function() {
+    // The actual emoji
+    noStroke();
+    pushMatrix();
+    rectMode(CENTER);
+    translate(this.x + (this.w / 2), this.y + (this.h / 2));
+    scale(this.s + sin(frameCount*10)/10);
+    rotate(this.r);
+    fill(240, 240, 45, this.trans - 210);
+    for(var i = this.w; i < this.w * 2; i += 5){
+        (rect)(0, 0, i, i, 20);
+    }
+    fill(194, 194, 45, this.trans);
+    (rect)(0, 0, this.w, this.h, 20);
+    fill(255,255, 255, this.trans - 150);
+    (rect)(0, -4, this.w - 5, this.h - 5, 20);
+    fill(0, 0, 0, this.trans);
+    ellipse(-5, -2, 5, 6);
+    ellipse(5, -2, 5, 6);
+    noFill();
+    stroke(0, 0, 0, this.trans);
+    strokeWeight(1);
+    arc(0, 2, 12, 8, 30, 150);
+    rectMode(CORNER);
+    popMatrix();
+    
+    this.r += 5;
+    this.timer --;
+    
+    if(rectCollide(this, player) && !this.fade){
+        this.fade = true;
+        score += 10;
+    }
+    if(this.timer < 0 && !this.fade){
+        this.fade = true;
+    }
+    if(this.fade){
+        this.trans -= 10;
+    }
+};
+var Emojis = [];
+
+var Anger = function(){
+    this.x = random(60, 320);
+    this.y = 80;
+    this.w = 30;
+    this.h = 30;
+    this.r = 0;
+    this.speed = speed;
+};
+Anger.prototype.draw = function() {
+    // The actual emoji
+    noStroke();
+    pushMatrix();
+    rectMode(CENTER);
+    translate(this.x + (this.w / 2), this.y + (this.h / 2));
+    scale(1 + sin(frameCount*10)/10);
+    rotate(this.r);
+    fill(240, 45, 45, 30);
+    for(var i = this.w; i < this.w * 2; i += 5){
+        (rect)(0, 0, i, i, 20);
+    }
+    fill(194, 46, 46);
+    (rect)(0, 0, 30, 30, 20);
+    fill(255,255, 255, 100);
+    (rect)(0, -3, 25, 25, 20);
+    fill(0);
+    ellipse(-5, -2, 5, 6);
+    ellipse(5, -2, 5, 6);
+    noFill();
+    stroke(0);
+    strokeWeight(1);
+    arc(1, -9, 15, 7, 30, 80);
+    arc(-1, -9, 15, 7, 100, 150);
+    arc(0, 8, 12, -8, 30, 150);
+    rectMode(CORNER);
+    popMatrix();
+    
+    this.r += 5;
+    this.y += 2;
+    
+    if(rectCollide(this, player)){
+        causeOfDeath = 'ran into an angry emoji';
+        scene = 'Lose';
+    }
+};
+var Angers = [];
+
+draw = function() {
+    pushMatrix();
+    
+    if(scene === 'Lock'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        if(keys[ENTER]){
+            snap = true;
+        }
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(207, 72, 72);
+        rect(0, 0, 290, 460);
+        for(var i = -230; i < 235; i += 10){
+            fill(lerpColor(
+                color(201, 201, 201), color(105, 105, 105), i / 460));
+            rect(0, i, 290, 10);
+        }
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        fill(25);
+        textSize(91);
+        text('texting', 0, 30);
+        textSize(30);
+        text('chester banks', -20, 75);
+        
+        logo(0, -110, 0.7);
+        
+        fill(255, 255, 255, 100 + sin(frameCount*5)*100);
+        text('> click to unlock', 0, 170);
+        
+        popMatrix();
+        popStyle();
+        
+        if(clicked){
+            scene = 'Home';
+            clicked = false;
+        }
+        
+        if(snap){
+            pushStyle();
+            pushMatrix();
+            scale(1, 1.5);
+            noStroke();
+            for(var i = 0; i < height; i += 5){
+                fill(lerpColor(color(94, 255, 112), color(24, 172, 26), i / height));
+                rect(0, i, 400, 6);
+            }
+            
+            fill(255);
+            ellipse(200, 200, 190, 160);
+            
+            beginShape();
+            vertex(144, 260);
+            bezierVertex(146, 274, 143, 277, 129, 290);
+            bezierVertex(178, 289, 160, 261, 200, 273);
+            endShape();
+            
+            noFill();
+            stroke(255);
+            strokeWeight(140);
+            rect(0, 0, 400, 400, 150);
+            
+            noStroke();
+            pushMatrix();
+            rectMode(CENTER);
+            translate(320, 80);
+            scale(4);
+            rotate(11);
+            fill(240, 240, 45, 30);
+            for(var i = 30; i < 48; i += 5){
+                (rect)(0, 0, i, i, 20);
+            }
+            fill(194, 194, 45, 255);
+            (rect)(0, 0, 30, 30, 20);
+            fill(255,255, 255, 150);
+            (rect)(0, -3, 25, 25, 20);
+            fill(0, 0, 0);
+            ellipse(-5, -2, 5, 6);
+            ellipse(5, -2, 5, 6);
+            noFill();
+            stroke(0, 0, 0);
+            strokeWeight(1);
+            arc(0, 2, 12, 8, 30, 150);
+            rectMode(CORNER);
+            popMatrix();
+            
+            noStroke();
+            pushMatrix();
+            rectMode(CENTER);
+            translate(76, 340);
+            scale(3);
+            rotate(-31);
+            fill(240, 45, 45, 30);
+            for(var i = 30; i < 46; i += 5){
+                (rect)(0, 0, i, i, 20);
+            }
+            fill(194, 46, 46);
+            (rect)(0, 0, 30, 30, 20);
+            fill(255,255, 255, 100);
+            (rect)(0, -3, 25, 25, 20);
+            fill(0);
+            ellipse(-5, -2, 5, 6);
+            ellipse(5, -2, 5, 6);
+            noFill();
+            stroke(0);
+            strokeWeight(1);
+            arc(1, -9, 15, 7, 30, 80);
+            arc(-1, -9, 15, 7, 100, 150);
+            arc(0, 8, 12, -8, 30, 150);
+            rectMode(CORNER);
+            popMatrix();
+            popMatrix();
+            popStyle();
+        }
+    }
+    if(scene === 'Home'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(207, 72, 72);
+        rect(0, 0, 290, 460);
+        for(var i = -230; i < 235; i += 10){
+            fill(lerpColor(
+                color(55, 128, 179), color(1, 13, 26), i / 460));
+            rect(0, i, 290, 10);
+        }
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        noStroke();
+        fill(255, 255, 255, 30);
+        rect(0, 199, 290, 70);
+        
+        fill(255, 255, 255);
+        textSize(55);
+        text('welcome.', 0, -10);
+        
+        popMatrix();
+        popStyle();
+        
+        appButtons.play.draw();
+        appButtons.how.draw();
+        appButtons.creds.draw();
+        appButtons.chester.draw();
+    }
+    if(scene === 'How'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(217, 67, 95);
+        rect(0, 0, 290, 460);
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        fill(255, 255, 255);
+        textSize(50);
+        text('instructions.', 0, -180);
+        
+        textSize(23);
+        text('• You are an emoji\n\n• Try to stay on the screen for as long as possible by jumping on the texts\n\n• Collect smiling emojis for 10 extra points\n\n• Avoid angry emojis, they kill you', -120, -235, 245, 500);
+        
+        textSize(15);
+        text('click to go back', 60, 213);
+        strokeWeight(1);
+        noFill();
+        stroke(255);
+        arc(8, 224, 20, 20, -190, -96);
+        line(-2, 226, 5, 222);
+        line(-2, 226, -8, 222);
+        
+        popMatrix();
+        popStyle();
+        
+        if(dist(mouseX, mouseY, 200, 560) < 35){
+            overButton = true;
+            if(clicked){
+                scene = 'Home';
+            }
+        }
+    }
+    if(scene === 'Creds'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(69, 193, 199);
+        rect(0, 0, 290, 460);
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        fill(255, 255, 255);
+        textSize(50);
+        text('credits.', 0, -180);
+        
+        textSize(27);
+        text('All of this game was coded by Chester Banks!', -120, -240, 245, 500);
+        
+        textSize(15);
+        text('click to go back', 60, 213);
+        strokeWeight(1);
+        noFill();
+        stroke(255);
+        arc(8, 224, 20, 20, -190, -96);
+        line(-2, 226, 5, 222);
+        line(-2, 226, -8, 222);
+        
+        popMatrix();
+        popStyle();
+        
+        if(dist(mouseX, mouseY, 200, 560) < 35){
+            overButton = true;
+            if(clicked){
+                scene = 'Home';
+            }
+        }
+    }
+    if(scene === 'Chester'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(0, 18, 48);
+        rect(0, 0, 290, 460);
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        fill(255, 255, 255);
+        textSize(50);
+        text('chester', 0, -180);
+        
+        textSize(21);
+        text('Hey! I\'m Chester Banks, a Christian young man that likes coding & art! On KA, I\'ve made over 25 games! If you want to see more games like Monsters University, Frost, Doctors vs. Burgers, or this one right away, subscribe to me (there\'s a link in the Tips & Thanks)! :)\n\nThanks for reading, now go play the game!', -120, -230, 245, 500);
+        
+        textSize(15);
+        text('click to go back', 60, 213);
+        strokeWeight(1);
+        noFill();
+        stroke(255);
+        arc(8, 224, 20, 20, -190, -96);
+        line(-2, 226, 5, 222);
+        line(-2, 226, -8, 222);
+        
+        popMatrix();
+        popStyle();
+        
+        if(dist(mouseX, mouseY, 200, 560) < 35){
+            overButton = true;
+            if(clicked){
+                scene = 'Home';
+            }
+        }
+    }
+    
+    if(scene === 'Game'){
+        if(frameCount % 60 === 0){
+            blox.push(new block());
+        }
+        if(frameCount % 300 === 0){
+            Emojis.push(new Emoji());
+        }
+        if(frameCount % 250 === 0){
+            Angers.push(new Anger());
+        }
+        if(frameCount % 30 === 0){
+            score ++;
+        }
+        
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(255, 255, 255);
+        rect(0, 0, 290, 460);
+        fill(0, 0, 0, 50);
+        textSize(100);
+        text(score, 0, 0);
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        popMatrix();
+        popStyle();
+        
+        for(var i = blox.length - 1; i >= 0; i --){
+            blox[i].draw();
+            if(blox[i].y < 70){
+                blox.splice(i, 1);
+            }
+        }
+        for(var i = Angers.length - 1; i >= 0; i --){
+            Angers[i].draw();
+            if(Angers[i].y > 530){
+                Angers.splice(i, 1);
+            }
+        }
+        
+        noStroke();
+        fill(31, 31, 31);
+        rect(35, 530, 330, 30);
+        
+        fill(255, 255, 255, 100);
+        ellipse(200, 560, 35, 35);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(200, 560, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(200, 560, 30, 30, -268, -101);
+        noStroke();
+        
+        for(var i = Emojis.length - 1; i >= 0; i --){
+            Emojis[i].draw();
+            if(Emojis[i].trans < 10 || Emojis[i].y < 70){
+                Emojis.splice(i, 1);
+            }
+        }
+        
+        noStroke();
+        fill(255, 255, 255, 10);
+        for(var i = 100; i > 0; i -= 2){
+            rect(55, 70, 290, i);
+        }
+        for(var i = 100; i > 0; i -= 5){
+            rect(55, 430 + i, 290, 100 - i);
+        }
+        
+        player.draw();
+        
+        speed += 0.001;
+    }
+    
+    if(scene === 'Lose'){
+        background(255, 255, 255);
+        
+        pushStyle();
+        rectMode(CENTER);
+        pushMatrix();
+        translate(width / 2, height / 2);
+        noStroke();
+        fill(31, 31, 31);
+        rect(0, 0, 330, 580, 40);
+        fill(158, 33, 33);
+        rect(0, 0, 290, 460);
+        fill(0, 0, 0);
+        ellipse(0, -265, 10, 10);
+        fill(255, 255, 255, 100);
+        ellipse(0, 260, 35, 35);
+        fill(255, 255, 255, 50);
+        rect(0, -247, 70, 8, 5);
+        noFill();
+        stroke(255, 255, 255, 50);
+        strokeWeight(5);
+        arc(0, 260, 30, 30, -90, 90);
+        stroke(0, 0, 0, 50);
+        arc(0, 260, 30, 30, -268, -101);
+        
+        fill(255, 255, 255);
+        textSize(50);
+        text('game over', 0, 0);
+        
+        textSize(27);
+        text('You ' + causeOfDeath + ', but at least you ended with a score of ' + score + '! Not bad!', -120, -155, 245, 500);
+        
+        textSize(15);
+        text('click to try again', 60, 213);
+        strokeWeight(1);
+        noFill();
+        stroke(255);
+        arc(8, 224, 20, 20, -190, -96);
+        line(-2, 226, 5, 222);
+        line(-2, 226, -8, 222);
+        
+        popMatrix();
+        popStyle();
+        
+        noStroke();
+        fill(212, 212, 68);
+        pushMatrix();
+        rectMode(CENTER);
+        translate(200, 190);
+        scale(5);
+        (rect)(0, 0, 30, 30, 20);
+        fill(255,255, 255, 100);
+        (rect)(0, -3, 25, 25, 20);
+        fill(0);
+        ellipse(-5, -2, 5, 6);
+        ellipse(5, -2, 5, 6);
+        noFill();
+        stroke(0);
+        strokeWeight(1);
+        arc(0, 8, 12, -8, 30, 150);
+        rectMode(CORNER);
+        popMatrix();
+        
+        if(dist(mouseX, mouseY, 200, 560) < 35){
+            overButton = true;
+            if(clicked){
+                // Reset everything
+                player = new Player(200, 200, 30, 30);
+                blox = [];
+                Emojis = [];
+                Angers = [];
+                speed = 1;
+                score = 0;
+                scene = 'Home';
+            }
+        }
+    }
+    
+    noStroke();
+    fill(255, 255, 255, 20);
+    triangle(0, 0, width, height, width, 0);
+    
+    fill(255, 255, 255, 3);
+    for(var i = 100; i > 0; i -= 2){
+        rect(35, 10, 330, i);
+    }
+    
+    popMatrix();
+    
+    cursor(overButton? 'pointer': 'default');
+    
+    clicked = false;
+    overButton = false;
+};
