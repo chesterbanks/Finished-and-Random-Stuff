@@ -1,0 +1,1545 @@
+/**
+ * Descent
+ * Chester Banks
+ * October 25 2016
+ * 
+ * Made for Khantober!
+ * 
+ * This program's LUCKY SUBSCRIBER is LEGOLAS GREENLEAF! Check out his awesome graphics here: https://www.khanacademy.org/profile/Indeluin/projects
+ * Thanks to my subscribers! Subscribe to me here: khanacademy.org/cs/subscribe/4790207744704512
+*/
+
+var reduceLag = false; // <-- Change that if you have lag
+
+// If this game doesn't seem too good to you, don't worry!! I plan on adding a shop and more mountains, I just needed to release this for Khantober.
+
+rectMode(CENTER);
+textAlign(CENTER, CENTER);
+textFont(createFont('Avenir Bold'));
+
+var mouse = {
+    clicked: false,
+    overButton: false,
+};
+var system = {
+    active: true,
+    scene: 'Menu',
+    nextScene: 'Story',
+    switchingScenes: false,
+    blackness: 0,
+    blackSpeed: 0,
+    collide: function(a, b){
+        return a.x + (a.w / 2) > b.x - (b.w / 2) && a.y + (a.h / 2) > b.y - (b.h / 2) && a.x - (a.w / 2) < b.x + (b.w / 2) && a.y - (a.h / 2) < b.y + (b.h / 2);
+    },
+    level: 0,
+    switchingLevels: true,
+    time: 0,
+    bestTimes: [1000, 1000, 1000, 1000, 1000],
+    watchedStory: false,
+    skis: 'Wooden'
+};
+
+var keys = [];
+keyPressed = function(){ keys[keyCode] = true; };
+keyReleased = function(){ keys[keyCode] = false; };
+mouseClicked = function(){ mouse.clicked = true; };
+
+var Rock = function(x, y, type){
+    this.x = x;
+    this.y = y; this.originalY = y;
+    this.w = 50;
+    this.h = 50;
+    
+    this.type = type;
+};
+var Rocks = [];
+Rock.prototype.draw = function() {
+    if(this.y > -100 && this.y < 700){
+        switch(this.type){
+            case 'Rock':
+                fill(163, 163, 163);
+                (rect)(this.x, this.y+12, 50, 25, 0, 0, 30, 30);
+                arc(this.x, this.y, 50, 50, -180, 0);
+                fill(0, 0, 0, 30);
+                (rect)(this.x-12.5, this.y+12, 25, 25, 0, 0, 0, 30);
+                arc(this.x, this.y, 50, 50, -180, -90);
+                break;
+            case 'Tree':
+                for(var i = 0; i < 360; i += 20){
+                    fill(21, 173, 72);
+                    ellipse(this.x + sin(i)*25, this.y + cos(i)*25, 20, 20);
+                    if(i > 180){
+                        fill(0, 0, 0, 30);
+                        ellipse(this.x + sin(i)*25, this.y + cos(i)*25, 20, 20);
+                    }
+                }
+                fill(21, 173, 72);
+                ellipse(this.x, this.y, 50, 50);
+                fill(0, 0, 0, 30);
+                arc(this.x, this.y, 50, 50, -270, -90);
+                break;
+        }
+    }
+    
+    this.y -= 3;
+};
+
+var Finish = function(y){
+    this.x = 300;
+    this.y = y;
+    this.w = width;
+    this.h = 60;
+};
+Finish.prototype.draw = function() {
+    for(var i = 20; i < width-15; i += 30){
+        for(var j = 15; j < 50; j += 30){
+            fill(25);
+            rect(i, j + this.y, 15, 15);
+            rect(i + 15, j + 15 + this.y, 15, 15);
+        }
+    }
+    this.y -= 3;
+};
+var finish;
+
+var levelMap = [
+    [
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '....      ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '   ---    ',
+        '   ---    ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '      ....',
+        '          ',
+        ' .        ',
+        '  .       ',
+        '   .      ',
+        '   ...    ',
+        '          ',
+        '          ',
+        '          ',
+        '   ---    ',
+        '---       ',
+        '--        ',
+        '          ',
+        '    .     ',
+        '     .    ',
+        '    .     ',
+        '          ',
+        '          ',
+        '          ',
+        '       .. ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        'FFFFFFFFFF',
+    ],
+    [
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '....      ',
+        '.--..     ',
+        '.--..     ',
+        '.---..    ',
+        '.---..    ',
+        '.----..   ',
+        '.---..    ',
+        '.---..    ',
+        '.--..     ',
+        '..        ',
+        '          ',
+        '          ',
+        '      ....',
+        '          ',
+        '          ',
+        '     .    ',
+        '     .    ',
+        '     .    ',
+        '     .    ',
+        '     .    ',
+        '     .    ',
+        '     -    ',
+        '-         ',
+        '--        ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '       .. ',
+        '          ',
+        '          ',
+        '----  ----',
+        '          ',
+        'FFFFFFFFFF',
+    ],
+    [
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '...    ...',
+        '...    ...',
+        '          ',
+        '          ',
+        '          ',
+        '------    ',
+        '....-     ',
+        '...-      ',
+        '..-       ',
+        '.-       -',
+        '-    -----',
+        '      -...',
+        '       -..',
+        '        -.',
+        '..      -.',
+        '...     -.',
+        '....     -',
+        '...      -',
+        '  -      -',
+        '         -',
+        '----      ',
+        '         -',
+        '         -',
+        '--      --',
+        '          ',
+        '          ',
+        '   ....   ',
+        '          ',
+        '       ...',
+        '.   .    .',
+        '          ',
+        ' .     .  ',
+        '          ',
+        '    .     ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        'FFFFFFFFFF',
+    ],
+    [
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '...    ...',
+        '....    ..',
+        '.....    .',
+        '......   -',
+        '......   -',
+        '          ',
+        '    .     ',
+        '..      ..',
+        '    .     ',
+        '..      ..',
+        '    .    -',
+        '---    ---',
+        '---    ---',
+        '-   -    -',
+        '.   -     ',
+        '  -----   ',
+        '  -----   ',
+        ' -------  ',
+        '  .....   ',
+        '  .....   ',
+        '-------   ',
+        '         -',
+        '         -',
+        '--      --',
+        '  -      -',
+        '  -    - -',
+        '----     -',
+        '         -',
+        '         -',
+        '         -',
+        '     -----',
+        '--      --',
+        '  -      -',
+        'FFFFFFFFFF'
+    ],
+    [
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '    ..    ',
+        '    ..    ',
+        '    ..    ',
+        '    ..    ',
+        '    ..    ',
+        '   .  ....',
+        '    ..    ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '    ..    ',
+        '    ..    ',
+        '    ..    ',
+        '   ....   ',
+        '  . ..    ',
+        ' .       .',
+        '.         ',
+        '          ',
+        '   ----   ',
+        '   ---    ',
+        '   --     ',
+        '   -      ',
+        '   -      ',
+        '   -      ',
+        '   -      ',
+        '   -      ',
+        '   -      ',
+        '     .... ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        '          ',
+        'FFFFFFFFFF'
+    ],
+];
+var getMap = function(level){
+    Rocks = [];
+    for(var i in levelMap[level]){
+        for(var j in levelMap[level][i].split('')){
+            var thingy = levelMap[level][i].split('');
+            var letter = thingy[j];
+            
+            switch(letter){
+                case '-':
+                    Rocks.push(new Rock(50 + j * 55, i * 100, 'Rock'));
+                    break;
+                case '.':
+                    Rocks.push(new Rock(50 + j * 55, i * 100, 'Tree'));
+                    break;
+                case 'F':
+                    finish = new Finish(i * 100);
+                    break;
+            }
+        }
+    }
+};
+
+var select; // pre-define the select screen so I can call it
+
+var Player = function(){
+    this.x = 300;
+    this.y = 300;
+    this.w = 60;
+    this.h = 130;
+    
+    this.xvel = 0;
+    
+    this.MAX_VEL = 4;
+    
+    this.collidable = true;
+    
+    this.trail = function(x, y, sz){
+        this.x = x;
+        this.y = y;
+        this.sz = sz;
+    };
+    this.trails = [];
+    this.trail.prototype.draw = function() {
+        fill(235, 235, 235);
+        ellipse(this.x, this.y, this.sz, this.sz);
+        
+        this.y -= 3;
+    };
+};
+Player.prototype.draw = function() {
+    for(var i in this.trails){
+        this.trails[i].draw();
+        if(this.trails[i].y < -50){
+            this.trails.splice(i, 1);
+        }
+    }
+    fill(0);
+    //rect(this.x, this.y, this.w, this.h);
+    pushMatrix();
+    translate(this.x, this.y - 5);
+    if(system.skis === 'Gold'){
+        this.h = 90;
+        translate(0, 20);
+    }
+    scale(0.3);
+    rotate(this.xvel*2);
+    stroke(25);
+    strokeWeight(10);
+    line(-100, 20, -200, (-(frameCount*5) % 250) + 200);
+    line(100, 20, 200, (-(frameCount*5) % 250) + 200);
+    noStroke();
+    if(system.skis === 'Wooden'){
+        fill(150, 120, 71);
+    } else if (system.skis === 'Silver'){
+        fill(181, 181, 181);
+    } else if (system.skis === 'Gold'){
+        fill(235, 207, 80);
+    } else if (system.skis === 'Magic'){
+        fill(196, 80, 217);
+    }
+    pushMatrix();
+    rotate(5);
+    (rect)(-20, 175, 40, 240, 0, 0, 30, 30); // Left ski
+    popMatrix();
+    pushMatrix();
+    rotate(-5);
+    (rect)(20, 175, 40, 240, 0, 0, 30, 30); // Right ski
+    popMatrix();
+    fill(83, 165, 219);
+    rect(0, 70, 100, 125, 40); // Body
+    fill(74, 137, 176);
+    (rect)(0, 115, 100, 40, 0, 0, 80, 80); // Leg(s)?
+    fill(235, 179, 94);
+    rect(0, 0, 50, 30, 10); // Neck
+    ellipse(-100, 20, 50, 50); // Left hand
+    ellipse(100, 20, 50, 50); // Right hand
+    fill(0, 0, 0, 30);
+    rect(0, -2, 50, 10); // Neck shadow
+    fill(235, 179, 94);
+    ellipse(0, -100, 200, 200); // Head
+    fill(36, 36, 36);
+    ellipse(-40, -100, 50, 50); // Left eye
+    ellipse(40, -100, 50, 50); // Right eye
+    fill(255, 255, 255, 100);
+    ellipse(-50, -110, 20, 20); // Left eye highlight
+    ellipse(30, -110, 20, 20); // Right eye highlight
+    fill(235, 179, 94);
+    ellipse(-30, -75, 50, 20); // Skin under left eye
+    ellipse(30, -75, 50, 20); // Skin under right eye
+    strokeWeight(5);
+    stroke(50);
+    fill(255);
+    arc(0, -70, 100, 100, 0, 180); // Mouth
+    line(-50, -70, 50, -70); // Mouth top
+    noStroke();
+    fill(50);
+    arc(0, -50, 90, 60, 0, 180); // Mouth
+    fill(112, 112, 112);
+    (rect)(-35, 165, 40, 30, 15, 15, 0, 0); // Left shoe
+    (rect)(35, 165, 40, 30, 15, 15, 0, 0); // Right shoe
+    fill(199, 199, 199);
+    (rect)(-35, 175, 40, 10); // Left shoe bottom
+    (rect)(35, 175, 40, 10); // Right shoe bottom
+    popMatrix();
+    
+    if(frameCount % 3 === 0){
+        this.trails.push(new this.trail(this.x - 15, 375, 20));
+        this.trails.push(new this.trail(this.x + 15, 375, 20));
+    }
+    
+    this.x += this.xvel;
+    if(keys[RIGHT]){
+        this.xvel += 0.1;
+    }
+    if(keys[LEFT]){
+        this.xvel -= 0.1;
+    }
+    
+    if(this.xvel > this.MAX_VEL){
+        this.xvel = this.MAX_VEL;
+    }
+    if(this.xvel < -this.MAX_VEL){
+        this.xvel = -this.MAX_VEL;
+    }
+    
+    if(this.x + 30 > width || this.x - 30 < 0){
+        this.xvel = -this.xvel;
+    }
+};
+var player = new Player();
+
+var Game = function(){
+    this.rewind = false;
+    
+    this.texture = function(x, y){
+        this.x = x;
+        this.y = y;
+        this.trans = random(10);
+    };
+    this.textureRects = [];
+    for(var i = 10; i < 600; i += 20){
+        for(var j = 10; j < 640; j += 20){
+            this.textureRects.push(new this.texture(i, j));
+        }
+    }
+    this.texture.prototype.draw = function() {
+        fill(0, 0, 0, this.trans);
+        rect(this.x, this.y, 20, 20);
+        
+        this.y -= 3;
+        if(this.y < -20){
+            this.y = 620;
+        }
+    };
+};
+Game.prototype.draw = function() {
+    background(255, 255, 255);
+    if(!reduceLag){
+        for(var i in this.textureRects){
+            this.textureRects[i].draw();
+        }
+    }
+    
+    finish.draw();
+    if(system.collide(finish, player) && !this.rewind){
+        select.mountains[system.level + 1] = false;
+        system.nextScene = 'Complete';
+        system.switchingScenes = true;
+    }
+    
+    for(var i in Rocks){
+        Rocks[i].draw();
+        if(system.collide(Rocks[i], player) && player.collidable){
+            // Reset stuff
+            this.rewind = true;
+        }
+    }
+    
+    if(this.rewind){
+        for(var i in Rocks){
+            if(Rocks[i].y < Rocks[i].originalY){
+                Rocks[i].y += 50;
+            } else {
+                this.rewind = false;
+            }
+        }
+        finish.y += 50;
+        player.x = 300;
+        player.xvel = 0;
+        player.trails = [];
+    }
+    
+    player.draw();
+    
+    pushMatrix();
+    translate(30, 30);
+    scale(0.5);
+    noFill();
+    stroke(51);
+    strokeWeight(5);
+    ellipse(0, 0, 30, 30);
+    strokeWeight(3);
+    pushMatrix();
+    rotate(frameCount*5);
+    line(0, 0, 0, -8);
+    popMatrix();
+    pushMatrix();
+    rotate(frameCount);
+    line(0, 0, -5, 4);
+    popMatrix();
+    line(-11, 14, -13, 17);
+    line(11, 14, 13, 17);
+    strokeWeight(1);
+    for(var i = 0; i < 360; i += 30){
+        line(sin(i)*15, cos(i)*15, sin(i)*10, cos(i)*10);
+    }
+    noStroke();
+    fill(51);
+    arc(-12, -14, 18, 18, -220, -40);
+    arc(12, -14, 18, 18, -140, 40);
+    popMatrix();
+    fill(45);
+    textSize(15);
+    text(system.time, 55, 30);
+    
+    if(frameCount % 20 === 0){ 
+        system.time ++;
+    }
+};
+var game = new Game();
+
+var Complete = function(){
+    this.txts = [
+        'Nice on!',
+        'Good job!',
+        'Nice!',
+        'Natural born skier!',
+        'Nice job!',
+        'Good one!',
+        'You\'re a pro!',
+        'Bravo!',
+        'Kudos to you!',
+        'Congrats!',
+        'That\'s a wrap.',
+        'Good work!',
+        'That\'s the way!',
+        '\'Attaskier!',
+        'That\'s the way!',
+        'On Victory Lane',
+        'Down that mountain',
+        'Way to go!',
+        'Awesome!',
+        'Awesome job!', 
+        'A mighty fine job!', 
+        'Fantastic!',
+        'Good for you!',
+        'Good stuff!',
+        'Hip, hip, hooray!',
+        'Keep it up!',
+        'Nicely done!',
+        'Super duper!',
+        'Simply smashing!',
+        'There you go!',
+        'Very good.',
+    ];
+    this.which = floor(random(0, this.txts.length));
+    
+    this.textureRects = [];
+    for(var i = 10; i < 600; i += 20){
+        for(var j = 10; j < 640; j += 20){
+            this.textureRects.push({x: i, y: j, trans: random(15)});
+        }
+    }
+    
+    this.resetRot = 360;
+    this.spin = false;
+};
+Complete.prototype.draw = function() {
+    if(system.time < system.bestTimes[system.level]){
+        system.bestTimes[system.level] = system.time;
+    }
+    
+    background(255);
+    
+    noStroke();
+    for(var i in this.textureRects){
+        fill(0, 0, 0, this.textureRects[i].trans);
+        rect(this.textureRects[i].x, this.textureRects[i].y, 20, 20);
+    }
+    
+    fill(66, 66, 66);
+    textSize(60);
+    text(this.txts[this.which], 300, 300);
+    textSize(20);
+    text('TIME: ' + system.time, 300, 350);
+    text('BEST TIME: ' + system.bestTimes[system.level], 300, 370);
+    
+    noFill();
+    stroke(200);
+    strokeWeight(8);
+    pushMatrix();
+    translate(300, 450);
+    rotate(360 - this.resetRot);
+    if(dist(mouseX, mouseY, 300, 450) < 27){
+        this.spin = true;
+        if(mouse.clicked){
+            system.time = 0;
+            game.rewind = true;
+            system.nextScene = 'Game';
+            system.switchingScenes = true;
+        }
+    }
+    if(this.spin){
+        this.resetRot /= 1.1;
+    }
+    if(this.resetRot < 10){
+        this.resetRot = 360;
+        this.spin = false;
+    }
+    arc(0, 0, 50, 50, -180, 130);
+    line(-15, 19, -2, 14);
+    line(-16, 20, -8, 34);
+    popMatrix();
+    
+    pushMatrix();
+    translate(200, 450);
+    if(mouseX > 180 && mouseX < 220 && mouseY > 430 && mouseY < 470){
+        scale(1.2);
+        if(mouse.clicked){
+            system.nextScene = 'Menu';
+            system.switchingScenes = true;
+        }
+    }
+    line(-20, -20, 20, -20);
+    line(-20, 0, 20, 0);
+    line(-20, 20, 20, 20);
+    popMatrix();
+    
+    pushMatrix();
+    translate(400, 460);
+    if(mouseX > 375 && mouseX < 425 && mouseY > 430 && mouseY < 470){
+        scale(1.2);
+        if(mouse.clicked){
+            system.nextScene = 'Levels';
+            system.switchingScenes = true;
+        }
+    }
+    triangle(0, -30, -25, 20, 25, 20);
+    line(-10, -10, 10, -10);
+    popMatrix();
+};
+var complete = new Complete();
+
+var Menu = function(){
+    this.peek = false;
+};
+Menu.prototype.draw = function() {
+    noStroke();
+    background(250);
+    fill(213, 237, 242);
+    ellipse(300, 300, 450, 450);
+    
+    fill(235, 196, 77, 20);
+    for(var i = 200; i < 300; i += 20){
+        ellipse(390, 360, i, i);
+    }
+    fill(235, 196, 77);
+    ellipse(390, 360, 200, 200);
+    
+    fill(37, 161, 199);
+    rect(381, 447, 200, 30, 30);
+    
+    pushMatrix();
+    translate(-55, 120);
+    scale(1, 0.7);
+    fill(88, 197, 219);
+    triangle(200, 450, 350, 450, 275, 250);
+    fill(235);
+    beginShape();
+    vertex(275, 250);
+    vertex(250, 315);
+    vertex(260, 305);
+    vertex(265, 315);
+    vertex(270, 310);
+    vertex(275, 320);
+    vertex(285, 305);
+    vertex(290, 315);
+    vertex(294, 310);
+    vertex(300, 315);
+    endShape();
+    fill(0, 0, 0, 20);
+    triangle(275, 450, 200, 450, 275, 250);
+    popMatrix();
+    
+    fill(88, 197, 219);
+    triangle(200, 450, 350, 450, 275, 250);
+    fill(235);
+    beginShape();
+    vertex(275, 250);
+    vertex(250, 315);
+    vertex(260, 305);
+    vertex(265, 315);
+    vertex(270, 310);
+    vertex(275, 320);
+    vertex(285, 305);
+    vertex(290, 315);
+    vertex(294, 310);
+    vertex(300, 315);
+    endShape();
+    fill(0, 0, 0, 20);
+    triangle(275, 450, 200, 450, 275, 250);
+    
+    fill(181, 221, 235);
+    pushMatrix();
+    translate(505, 167);
+    scale(-1, 0.8);
+    beginShape();
+    vertex(1, 335);
+    bezierVertex(46, 157, 90, 316, 192, 335);
+    endShape(CLOSE);
+    popMatrix();
+    
+    fill(221, 235, 240);
+    pushMatrix();
+    translate(245, 100);
+    beginShape();
+    vertex(1, 335);
+    bezierVertex(46, 157, 90, 316, 192, 335);
+    endShape(CLOSE);
+    popMatrix();
+    
+    fill(250);
+    pushMatrix();
+    translate(98, 100);
+    beginShape();
+    vertex(1, 306);
+    bezierVertex(46, 181, 72, 285, 126, 330);
+    bezierVertex(221, 277, 289, 386, 370, 351);
+    bezierVertex(354, 392, 210, 515, 62, 392);
+    endShape(CLOSE);
+    popMatrix();
+    
+    fill(247, 247, 247);
+    ellipse(150, 300, 35, 35);
+    ellipse(130, 300, 25, 25);
+    ellipse(170, 295, 20, 20);
+    ellipse(183, 300, 15, 15);
+    ellipse(300, 300, 30, 30);
+    ellipse(280, 298, 25, 25);
+    ellipse(317, 302, 15, 15);
+    ellipse(420, 350, 30, 30);
+    ellipse(403, 350, 15, 15);
+    ellipse(437, 352, 18, 18);
+    
+    fill(0, 0, 0, 10);
+    arc(300, 300, 500, 500, -270, -90);
+    
+    noFill();
+    stroke(250);
+    strokeWeight(51);
+    ellipse(300, 300, 500, 500);
+    
+    textSize(70);
+    fill(0, 0, 0, 10);
+    for(var i = 0; i < 360; i += 30){
+        text('D E S C E N T', 300 + sin(i)*5, 203 + cos(i)*5);
+    }
+    fill(255, 255, 255);
+    text('D E S C E N T', 300, 200);
+    textSize(19);
+    fill(0, 0, 0, 40);
+    text('chester banks || khantober 2016 || click to begin', 300, 245);
+    
+    if(mouse.clicked && system.active){
+        system.nextScene = system.watchedStory ? 'Levels' : 'Story';
+        system.switchingScenes = true;
+    }
+    
+    if(keyIsPressed && key.toString().toLowerCase() === 'j'){
+        this.peek = true;
+    }
+    if(this.peek){
+        scale(1.5);
+        translate(-40, -40);
+        scale(0.8);
+        noStroke();
+        background(250);
+        fill(213, 237, 242);
+        ellipse(300, 300, 450, 450);
+        
+        fill(235, 196, 77, 20);
+        for(var i = 200; i < 300; i += 20){
+            ellipse(390, 360, i, i);
+        }
+        fill(235, 196, 77);
+        ellipse(390, 360, 200, 200);
+        
+        fill(37, 161, 199);
+        rect(381, 447, 200, 30, 30);
+        
+        pushMatrix();
+        translate(-55, 120);
+        scale(1, 0.7);
+        fill(88, 197, 219);
+        triangle(200, 450, 350, 450, 275, 250);
+        fill(235);
+        beginShape();
+        vertex(275, 250);
+        vertex(250, 315);
+        vertex(260, 305);
+        vertex(265, 315);
+        vertex(270, 310);
+        vertex(275, 320);
+        vertex(285, 305);
+        vertex(290, 315);
+        vertex(294, 310);
+        vertex(300, 315);
+        endShape();
+        fill(0, 0, 0, 20);
+        triangle(275, 450, 200, 450, 275, 250);
+        popMatrix();
+        
+        fill(88, 197, 219);
+        triangle(200, 450, 350, 450, 275, 250);
+        fill(235);
+        beginShape();
+        vertex(275, 250);
+        vertex(250, 315);
+        vertex(260, 305);
+        vertex(265, 315);
+        vertex(270, 310);
+        vertex(275, 320);
+        vertex(285, 305);
+        vertex(290, 315);
+        vertex(294, 310);
+        vertex(300, 315);
+        endShape();
+        fill(0, 0, 0, 20);
+        triangle(275, 450, 200, 450, 275, 250);
+        
+        fill(181, 221, 235);
+        pushMatrix();
+        translate(505, 167);
+        scale(-1, 0.8);
+        beginShape();
+        vertex(1, 335);
+        bezierVertex(46, 157, 90, 316, 192, 335);
+        endShape(CLOSE);
+        popMatrix();
+        
+        fill(221, 235, 240);
+        pushMatrix();
+        translate(245, 100);
+        beginShape();
+        vertex(1, 335);
+        bezierVertex(46, 157, 90, 316, 192, 335);
+        endShape(CLOSE);
+        popMatrix();
+        
+        fill(250);
+        pushMatrix();
+        translate(98, 100);
+        beginShape();
+        vertex(1, 306);
+        bezierVertex(46, 181, 72, 285, 126, 330);
+        bezierVertex(221, 277, 289, 386, 370, 351);
+        bezierVertex(354, 392, 210, 515, 62, 392);
+        endShape(CLOSE);
+        popMatrix();
+        
+        fill(247, 247, 247);
+        ellipse(150, 300, 35, 35);
+        ellipse(130, 300, 25, 25);
+        ellipse(170, 295, 20, 20);
+        ellipse(183, 300, 15, 15);
+        ellipse(300, 300, 30, 30);
+        ellipse(280, 298, 25, 25);
+        ellipse(317, 302, 15, 15);
+        ellipse(420, 350, 30, 30);
+        ellipse(403, 350, 15, 15);
+        ellipse(437, 352, 18, 18);
+        
+        fill(0, 0, 0, 10);
+        arc(300, 300, 500, 500, -270, -90);
+        
+        noFill();
+        stroke(250);
+        strokeWeight(51);
+        ellipse(300, 300, 500, 500);
+        
+        textSize(70);
+        fill(0, 0, 0, 10);
+        for(var i = 0; i < 360; i += 30){
+            text('D E S C E N T', 300 + sin(i)*5, 203 + cos(i)*5);
+        }
+        fill(255, 255, 255);
+        text('D E S C E N T', 300, 200);
+        resetMatrix();
+    }
+};
+var menu = new Menu();
+
+var Story = function(){
+    this.page = 0;
+    this.frames = 0;
+    
+    this.houseY = 0;
+    this.houseSc = 1.0;
+    this.snowballY = -2000;
+    this.snowballSp = 16;
+    
+    this.snow = function(){
+        this.x = random(width);
+        this.y = -30;
+        this.sz = random(3, 10);
+    };
+    this.snow.prototype.draw = function() {
+        noStroke();
+        fill(235);
+        rect(this.x, this.y, this.sz, this.sz);
+        
+        this.y += this.sz * 2;
+        this.x += this.sz;
+        
+        if(this.y > 650){
+            this.y = -30;
+        }
+        if(this.x > 620){
+            this.x = -20;
+        }
+    };
+    this.snows = [];
+    
+    while(this.snows.length < 30){
+        this.snows.push(new this.snow());
+    }
+};
+Story.prototype.draw = function() {
+    system.watchedStory = true;
+    switch(this.page){
+        case 0:
+            // Background
+            noStroke();
+            background(88, 188, 219);
+            for(var i = 0; i < 500; i += 3){
+                strokeWeight(3);
+                stroke(0, 0, 0, 90 - (i/5));
+                line(0, i, 600, i);
+            }
+            for(var i in this.snows){
+                this.snows[i].draw();
+            }
+            fill(255, 255, 255);
+            rect(300, 550, 600, 100);
+            
+            pushMatrix();
+            translate(0, this.houseY);
+            scale(1.0, this.houseSc);
+            // Basic House
+            fill(250, 196, 137);
+            rect(300, 440, 280, 200);
+            triangle(160, 340, 440, 340, 300, 250);
+            
+            // Door
+            fill(140, 49, 26);
+            rect(300, 487, 70, 105);
+            fill(158, 62, 38);
+            rect(300, 490, 60, 100);
+            fill(0, 0, 0, 150);
+            ellipse(315, 500, 10, 10);
+            
+            // Window #1
+            fill(158, 62, 38);
+            rect(230, 380, 60, 70);
+            fill(153, 227, 232);
+            rect(230, 380, 50, 60);
+            fill(255, 255, 255, 150);
+            triangle(205, 350, 255, 350, 205, 410);
+            fill(158, 62, 38);
+            rect(230, 380, 5, 60);
+            rect(230, 380, 50, 5);
+            
+            // Window #2
+            fill(158, 62, 38);
+            rect(370, 380, 60, 70);
+            fill(153, 227, 232);
+            rect(370, 380, 50, 60);
+            fill(255, 255, 255, 150);
+            triangle(345, 350, 395, 350, 345, 410);
+            fill(158, 62, 38);
+            rect(370, 380, 5, 60);
+            rect(370, 380, 50, 5);
+            
+            // Shadows
+            fill(0, 0, 0, 20);
+            rect(230, 440, 140, 200);
+            triangle(160, 340, 300, 340, 300, 250);
+            
+            // Roof
+            strokeCap(SQUARE);
+            strokeWeight(20);
+            stroke(0, 0, 0, 30);
+            line(160, 345, 305, 250);
+            line(440, 339, 295, 250);
+            stroke(153, 0, 0);
+            line(140, 345, 305, 240);
+            line(460, 345, 295, 240);
+            popMatrix();
+            
+            // Snowball
+            noStroke();
+            pushMatrix();
+            translate(300, this.snowballY);
+            rotate(frameCount*this.snowballSp);
+            fill(235);
+            ellipse(0, 0, 400, 400);
+            for(var i = 0; i < 360; i += 11){
+                ellipse(sin(i)*200 + noise(i, 0.05)*10, cos(i)*185 + noise(i, 2.52)*8, 50, 50);
+            }
+            popMatrix();
+            
+            // Ground
+            fill(255);
+            rect(300, 580, 600, 70);
+            
+            this.snowballY += this.snowballSp;
+            if(this.snowballY > 420){
+                this.snowballSp = 0;
+            }
+            if(this.snowballY > 100){
+                this.houseY += 30;
+                this.houseSc -= 0.05;
+            }
+            if(this.houseSc < -3){
+                this.page ++;
+            }
+            break;
+        case 1:
+            noStroke();
+            background(40, 137, 166);
+            for(var i = 0; i < 500; i += 3){
+                strokeWeight(3);
+                stroke(0, 0, 0, 90 - (i/5));
+                line(0, i, 600, i);
+            }
+            for(var i in this.snows){
+                this.snows[i].draw();
+            }
+            
+            pushMatrix();
+            translate(436, 575);
+            scale(1.2);
+            rotate(this.xvel*2);
+            noStroke();
+            fill(83, 165, 219);
+            rect(0, 70, 100, 125, 40); // Body
+            fill(74, 137, 176);
+            (rect)(0, 115, 100, 40, 0, 0, 80, 80); // Leg(s)?
+            fill(235, 179, 94);
+            rect(0, 0, 50, 30, 10); // Neck
+            ellipse(-100, 20, 50, 50); // Left hand
+            ellipse(100, 20, 50, 50); // Right hand
+            fill(0, 0, 0, 30);
+            rect(0, -2, 50, 10); // Neck shadow
+            fill(235, 179, 94);
+            ellipse(0, -100, 200, 200); // Head
+            fill(36, 36, 36);
+            ellipse(-40, -100, 50, 50); // Left eye
+            ellipse(40, -100, 50, 50); // Right eye
+            fill(116, 215, 232);
+            ellipse(-35, -80, 30, 20); // Skin under left eye
+            ellipse(35, -80, 30, 20); // Skin under right eye
+            fill(255, 255, 255, 100);
+            ellipse(-50, -110, 20, 20); // Left eye highlight
+            ellipse(30, -110, 20, 20); // Right eye highlight
+            fill(235, 179, 94);
+            ellipse(-30, -75, 50, 20); // Skin under left eye
+            ellipse(30, -75, 50, 20); // Skin under right eye
+            strokeWeight(5);
+            stroke(0, 0, 0);
+            fill(0, 0, 0);
+            ellipse(0, -50, 50, 50); // Mouth
+            popMatrix();
+            noStroke();
+            fill(245);
+            ellipse(250, 200, 400, 300);
+            triangle(320, 400, 250, 350, 300, 340);
+            fill(25);
+            textSize(50);
+            text('Our house!', 250, 200);
+            
+            this.frames ++;
+            if(this.frames > 100){
+                this.frames = 0;
+                this.page ++;
+            }
+            break;
+        case 2:
+            noStroke();
+            background(40, 137, 166);
+            for(var i = 0; i < 500; i += 3){
+                strokeWeight(3);
+                stroke(0, 0, 0, 90 - (i/5));
+                line(0, i, 600, i);
+            }
+            for(var i in this.snows){
+                this.snows[i].draw();
+            }
+            
+            stroke(158, 84, 19);
+            fill(176, 108, 41);
+            strokeWeight(5);
+            rect(150, 500, 30, 200);
+            rect(450, 500, 30, 200);
+            strokeWeight(20);
+            rect(300, 300, 500, 300);
+            noStroke();
+            fill(0, 0, 0, 30);
+            triangle(60, 440, 540, 160, 60, 160);
+            triangle(135, 600, 135, 460, 165, 460);
+            triangle(435, 600, 435, 460, 465, 460);
+            textSize(210);
+            fill(150, 90, 35);
+            text('SKI', 300, 270);
+            textSize(200);
+            fill(117, 64, 0);
+            for(var i = 0; i < 360; i += 30){
+                text('SKI', 300 + sin(i)*5, 260 + cos(i)*5);
+            }
+            fill(255, 255, 255);
+            text('SKI', 300, 260);
+            textSize(40);
+            text('TOURNAMENT', 300, 370);
+            fill(255, 255, 51);
+            textSize(30);
+            pushMatrix();
+            translate(386, 400);
+            rotate(-10);
+            text('HUGE CA$H PRIZES!', 0, 0);
+            popMatrix();
+            
+            this.frames ++;
+            if(this.frames > 80){
+                this.frames = 0;
+                this.page ++;
+            }
+            break;
+        case 3:
+            noStroke();
+            background(40, 137, 166);
+            for(var i = 0; i < 500; i += 3){
+                strokeWeight(3);
+                stroke(0, 0, 0, 90 - (i/5));
+                line(0, i, 600, i);
+            }
+            for(var i in this.snows){
+                this.snows[i].draw();
+            }
+            
+            pushMatrix();
+            translate(300, 575);
+            scale(1.5);
+            rotate(this.xvel*2);
+            noStroke();
+            fill(83, 165, 219);
+            rect(0, 70, 100, 125, 40); // Body
+            fill(74, 137, 176);
+            (rect)(0, 115, 100, 40, 0, 0, 80, 80); // Leg(s)?
+            fill(235, 179, 94);
+            rect(0, 0, 50, 30, 10); // Neck
+            ellipse(-100, 20, 50, 50); // Left hand
+            ellipse(100, 20, 50, 50); // Right hand
+            fill(0, 0, 0, 30);
+            rect(0, -2, 50, 10); // Neck shadow
+            fill(235, 179, 94);
+            ellipse(0, -100, 200, 200); // Head
+            fill(36, 36, 36);
+            ellipse(-40, -100, 50, 50); // Left eye
+            ellipse(40, -100, 50, 50); // Right eye
+            fill(255, 255, 255, 100);
+            ellipse(-50, -110, 20, 20); // Left eye highlight
+            ellipse(30, -110, 20, 20); // Right eye highlight
+            fill(235, 179, 94);
+            ellipse(-30, -75, 50, 20); // Skin under left eye
+            ellipse(30, -75, 50, 20); // Skin under right eye
+            
+            noFill();
+            strokeWeight(5);
+            stroke(0, 0, 0);
+            line(-10, -50, 30, -50);
+            arc(30, -55, 10, 10, 4, 90);
+            popMatrix();
+            
+            // Speech bubble
+            noStroke();
+            fill(245);
+            ellipse(300, 150, 530, 200);
+            triangle(434, 326, 500, 210, 440, 225);
+            fill(25);
+            textSize(40);
+            text('I know what I must do', 300, 150);
+            
+            this.frames ++;
+            if(this.frames > 100){
+                system.switchingScenes = true;
+                system.nextScene = 'Levels';
+            }
+            break;
+    }
+};
+var story = new Story();
+
+var selectX = 0;
+var Select = function(){
+    this.MAX_X = -1000;
+    this.mountains = [false, false, true, true, true];
+    
+    this.mountain = function(x, y, sz, colo, name, level, still, locked){
+        noStroke();
+        
+        if(mouseX > (selectX + x) - sz*5 && mouseX < (selectX + x) + sz*5 && !still && !locked){
+            fill(255, 255, 255, 100);
+            rect(x, 300, sz*14, 600);
+            fill(colo);
+            textSize(30);
+            text(name, x, y - (sz*25));
+            if(mouse.clicked){
+                system.level = level;
+                system.switchingLevels = true;
+                system.nextScene = 'Game';
+                system.switchingScenes = true;
+            }
+        }
+        
+        pushMatrix();
+        translate(x, y);
+        scale(sz / 10);
+        fill(52, 152, 186);
+        if(colo){
+            fill(colo);
+        }
+        triangle(-75, 0, 75, 0, 0, -200);
+        fill(235);
+        beginShape();
+        vertex(0, -200);
+        vertex(-25, -135);
+        vertex(-15, -145);
+        vertex(-10, -135);
+        vertex(-5, -140);
+        vertex(0, -130);
+        vertex(15, -145);
+        vertex(15, -135);
+        vertex(18, -140);
+        vertex(25, -135);
+        endShape();
+        fill(0, 0, 0, 20);
+        triangle(0, 0, -75, 0, 0, -200);
+        if(locked){
+            pushMatrix();
+            translate(0, -50);
+            rotate(-10);
+            scale(1.2);
+            noFill();
+            stroke(115);
+            strokeWeight(5);
+            arc(0, -7, 20, 20, -180, 0);
+            stroke(143);
+            arc(0, -10, 20, 20, -180, 0);
+            stroke(0, 0, 0, 30);
+            arc(0, -10, 20, 20, -180, -90);
+            noStroke();
+            fill(115, 115, 115);
+            rect(0, 3, 30, 20, 5);
+            fill(143, 143, 143);
+            rect(0, 0, 30, 20, 5);
+            fill(0, 0, 0, 30);
+            (rect)(-7.5, 0, 15, 20, 5, 0, 0, 5);
+            popMatrix();
+        }
+        popMatrix();
+    };
+};
+Select.prototype.draw = function() {
+    system.time = 0;
+    
+    background(213, 237, 242);
+    
+    pushMatrix();
+    translate(selectX, 0);
+    for(var i = 26; i < 2000; i += 60){
+        this.mountain(i, 600, 10, color(59, 59, 59), '', 0, true);
+    }
+    this.mountain(280, 600, 18, color(100),'Mt. Gerrard', 0, false, this.mountains[0]);
+    this.mountain(530, 600, 18, color(98, 139, 168), 'Mt. Whitley', 1, false, this.mountains[1]);
+    this.mountain(780, 600, 19, color(48, 103, 140), 'Flurry Heights', 2, false, this.mountains[2]);
+    this.mountain(1060, 600, 20, color(142, 182, 209), 'White Peak', 3, false, this.mountains[3]);
+    this.mountain(1350, 600, 21, color(186, 186, 186), 'Arctic Rise', 4, false, this.mountains[4]);
+    noStroke();
+    if(mouseX > selectX && mouseX < selectX + 150){
+        fill(255, 255, 255, 100);
+        rect(80, 300, 160, height);
+        if(mouse.clicked){
+            system.nextScene = 'Shop';
+            system.switchingScenes = true;
+        }
+    }
+    fill(189, 112, 53);
+    rect(80, 550, 150, 100);
+    fill(173, 102, 48);
+    triangle(5, 500, 80, 450, 155, 500);
+    for(var i = 500; i < 600; i += 20){
+        rect(65, i, 120, 3);
+        rect(95, i + 10, 120, 3);
+    }
+    fill(145, 80, 40);
+    rect(80, 580, 25, 40);
+    textSize(25);
+    pushMatrix();
+    translate(80, 530);
+    rotate(-5);
+    fill(133, 71, 32);
+    rect(0, 0, 94, 34);
+    fill(166, 92, 43);
+    rect(0, 0, 90, 30);
+    fill(107, 61, 29);
+    text('SHOP', 0, 2);
+    fill(140, 81, 36);
+    text('SHOP', 0, 0);
+    popMatrix();
+    popMatrix();
+    
+    if(mouseX > 550 && selectX > this.MAX_X){
+        selectX -= 10;
+    }
+    if(mouseX < 50 && selectX < 0){
+        selectX += 10;
+    }
+};
+select = new Select();
+
+var Shop = function(){
+    this.button = function(x, y, w, h, colo, name, info, price){
+        stroke(255, 255, 255, 100);
+        strokeWeight(5);
+        fill(255, 255, 255, 50);
+        rect(x, y, w, h, 10);
+        pushMatrix();
+        translate(x, y - 10);
+        rotate(15);
+        noStroke();
+        fill(colo);
+        (rect)(0, 0, 15, 130, 10, 10, 2, 2);
+        fill(255, 255, 255, 100);
+        (rect)(0, 0, 5, 130, 10, 10, 0, 0);
+        fill(0, 0, 0, 25);
+        (rect)(0, 0, 15, 130, 10, 10, 2, 2);
+        popMatrix();
+        pushMatrix();
+        translate(x, y - 10);
+        rotate(-15);
+        noStroke();
+        fill(colo);
+        (rect)(0, 0, 15, 130, 10, 10, 2, 2);
+        fill(255, 255, 255, 100);
+        (rect)(0, 0, 5, 130, 10, 10, 0, 0);
+        popMatrix();
+        fill(255, 255, 255);
+        textSize(25);
+        text(name.toUpperCase(), x, y + 75);
+        
+        if(mouseX > x - (w/2) && mouseX < x + (w/2) && mouseY > y - (h/2) && mouseY < y + (h/2)){
+            noStroke();
+            fill(255, 255, 255, 150);
+            rect(x, y, w, h, 10);
+            fill(100);
+            textSize(18);
+            text(info + '\n\nPrice: ' + price + '\n\nClick to buy', x - (w/2)  + 5, y - (h / 2), w - 10, h);
+            if(mouse.clicked){
+                system.skis = name;
+            }
+        }
+    };
+};
+Shop.prototype.draw = function() {
+    background(189, 112, 53);
+    noStroke();
+    fill(173, 102, 48);
+    for(var i = 0; i < 600; i += 20){
+        rect(250, i, 500, 3);
+        rect(350, i + 10, 500, 3);
+    }
+    fill(255);
+    textSize(70);
+    text('S H O P', 300, 50);
+    this.button(195, 195, 200, 200, color(110, 80, 46), 'Wooden', 'Lets you ski', 0);
+    this.button(405, 195, 200, 200, color(205), 'Silver', 'Makes you ski slower', 10);
+    this.button(195, 405, 200, 200, color(224, 237, 124), 'Gold', 'Can withstand damage', 20);
+    this.button(405, 405, 200, 200, color(173, 79, 207), 'Magic', 'Slows down time', 25);
+    
+    textSize(40);
+    if(mouseX > 45 && mouseX < 165 && mouseY > 530 && mouseY < 570){
+        textSize(45);
+        if(mouse.clicked){
+            system.nextScene = 'Levels';
+            system.switchingScenes = true;
+        }
+    }
+    fill(255);
+    text('BACK', 100, 550);
+    
+    pushMatrix();
+    translate(300, 300);
+    rotate(-45);
+    textSize(100);
+    fill(0, 0, 0);
+    for(var i = 0; i < 360; i += 30){
+        text('CLOSED', sin(i)*5, cos(i)*5);
+    }
+    fill(255, 0, 0);
+    text('CLOSED', 0, 0);
+    popMatrix();
+};
+var shop = new Shop();
+
+draw = function() {
+    if(system.switchingLevels){
+        getMap(system.level);
+        system.switchingLevels = false;
+    }
+    
+    switch(system.scene){
+        case 'Menu':
+            menu.draw();
+            break;
+        case 'Story':
+            story.draw();
+            break;
+        case 'Levels':
+            select.draw();
+            break;
+        case 'Game':
+            game.draw();
+            break;
+        case 'Complete':
+            complete.draw();
+            break;
+        case 'Shop':
+            shop.draw();
+            break;
+        default:
+            println("Sorry to be that annoying println(), but there's no scene called \"" + system.scene + "\". ;)");
+            noLoop();
+            break;
+    }
+    
+    noStroke();
+    fill(255, 255, 255, system.blackness);
+    rect(300, 300, width, height);
+    if(system.switchingScenes){
+        system.blackSpeed = +10;
+    }
+    if(system.blackness > 255){
+        system.scene = system.nextScene;
+        system.switchingScenes = false;
+        system.blackSpeed = -system.blackSpeed;
+    }
+    if(system.blackness < 0){ system.blackness = 0; }
+    system.blackness += system.blackSpeed;
+    
+    // Reset mouse events
+    mouse.clicked = false;
+    mouse.overButton = false;
+};
+
+/**
+ * @IDEAS
+    - Mountains (levels):
+        1. Mt. Gerrard
+        2. Mt. Whitley
+        3. Flurry Heights
+        4. White Peak
+        5. Arctic Rise
+    -- not made --
+        6. Snowy Slopes
+        7. Avalanche Point
+        8. Neverest Summit
+        9. Olympus Mons (mountain on mars)
+        
+        ideas: ["avalanche", "volcanoes", "underwater mountains"]
+    - Buy-able skis??
+    - Unlockable outfits?
+    - Achievements??
+    - Power ups??
+        - Minus Time
+        - Ghost
+        - Shrink
+        - Slow Down
+*/
