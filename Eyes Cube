@@ -1,0 +1,1689 @@
+/**
+ * Eyes Cube
+ * avmswimmer | Chester Banks | Green Ghost
+ * May 23 2018
+ * 
+ * My first game released in a long while! This game was made as a collab with avmswimmer and Green Ghost. It is based off of a Ketchapp game by the same name. Good work, guys! :D
+*/
+
+/*
+    T A B L E   O F   C O N T E N T S
+    
+    VARIABLES........................71
+    General variables................72
+    Game variables...................77
+    Mouse properties.................84
+    
+    PROCESSING EVENTS................88
+    Key events.......................89
+    mouseClicked.....................94
+    
+    ACHIEVEMENT & TRANSITION INFO....101
+    Achievements.....................102
+    Achievement notifs...............122
+    Transition object................155
+    
+    FONTS & COLORS...................167
+    Colors...........................168
+    Changeable colors................175
+    Google Font loading..............196
+    Fonts............................219
+    
+    GRAPHICS RELATED THINGS..........225
+    Background.......................226
+    Quad functions for "3D" effects..245
+    Menu text........................281
+    Buttons..........................343
+    Each button......................389
+    Framework for a basic scene......508
+    
+    PRE-GAME SCENES..................545
+    Logo.............................546
+    Menu.............................825
+    
+    GAME MECHANICS...................869
+    The rectangle collision function.870
+    Blocks...........................878
+    Coins............................928
+    Eyes.............................948
+    Game scene.......................1089
+    Reset game variables.............1195
+    
+    MORE SCENES......................1209
+    Shop mechanics...................1210
+    Shop.............................1427
+    Achievements scene...............1442
+    Colors scene.....................1551
+    End scene........................1526
+    
+    EXTRA ABSTRACTIONS...............1547
+    Achievement checking function....1548
+    Transition functino..............1595
+    
+    DRAW FUNCTION....................1627
+    Reset mouse properties...........1629
+    Draw the scenes..................1633
+    Check the achievements...........1674
+    Achievement notifs...............1676
+    Transition.......................1687
+*/
+
+/** VARIABLES */
+// General variables
+var scene = 'logo';
+var items = [];
+var egg = {r: 1, s: 1, trans: 100, animate: false};
+
+// Game variables
+var score = 0, record = 0; 
+var speed = 4;
+var playerCoins = 0;
+var boostTimer = 0, boost = false;
+var currentCoins = 0, currentBoosts;
+
+// Mouse properties
+var click = false;
+var overButton = false;
+
+/** PROCESSING EVENTS */
+// Key events
+var keys = [];
+keyPressed = function(){ keys[keyCode] = true; };
+keyReleased = function(){ keys[keyCode] = false; };
+
+// mouseClicked
+mouseClicked = function() {
+    click = true;
+};
+
+smooth();
+
+/** ACHIEVEMENTS & TRANSITION INFO */
+// Achievements
+var achievements = [
+    {name: 'Explorer', desc: 'Visit all the pages', achieved: false},
+    {name: 'Binoculars', desc: 'Find the easter egg', achieved: false},
+    {name: 'Crosseyed', desc: 'Get a boost', achieved: false},
+    {name: 'Collector', desc: 'Grab 10 coins in one run', achieved: false},
+    {name: 'Endurance', desc: 'Go 20 distance', achieved: false},
+    {name: 'Rich', desc: 'Reach a total of 40 coins', achieved: false},
+    {name: 'Endurance II', desc: 'Go 50 distance', achieved: false},
+    {name: 'Millionaire', desc: 'Reach a total of 100 coins', achieved: false},
+    {name: 'Shopping Spree', desc: 'Purchase something from the shop', achieved: false},
+    {name: 'Triple Boost', desc: 'Get three boosts in one run', achieved: false},
+    {name: 'Endurance III', desc: 'Go 100 distance', achieved: false},
+    {name: 'Spending Like Crazy', desc: 'Purchase everything from the shop', achieved: false},
+    {name: 'Moneybags', desc: 'Grab 30 coins in one run', achieved: false},
+    {name: 'Insane Endurance', desc: 'Go 150 distance', achieved: false},
+    {name: 'Winner', desc: 'Get all the achievements', achieved: false},
+];
+var sceneTracker = [false, false, false, false, false];
+
+// Achievement notifs
+var Notif = function(achievement){
+    this.y = 700;
+    this.w = 1;
+    this.h = 1;
+    this.achievement = achievement;
+};
+Notif.prototype.updateStatus = function() {
+    achievements[this.achievement].achieved = true;
+};
+Notif.prototype.draw = function() {
+    pushMatrix();
+    translate(200, this.y);
+    scale(this.w, this.h);
+    fill(0);
+    textSize(30);
+    for(var i = 0; i < 360; i += 60){
+        text(achievements[this.achievement].name, sin(i) * 3, cos(i) * 3);
+    }
+    fill(255);
+    text(achievements[this.achievement].name, 0, 0);
+    textSize(15);
+    text('achievement unlocked!', 0, -20);
+    popMatrix();
+    
+    this.y += (550 - this.y) / 15;
+    if(this.y < 550.1){
+        this.w *= 1.1;
+        this.h /= 1.5;
+    }
+};
+var Notifs = [];
+
+// Transition object
+var trans = {
+    active: false,
+    out: false,
+    nextScene: '',
+    sizeDivide: 0.1,
+};
+var switchScene = function(next) {
+    trans.active = true;
+    trans.nextScene = next;
+};
+
+/** FONTS & COLORS */
+// Colors
+var colors = [
+    color(255, 90, 150),
+    color(135, 190, 255),
+    color(205, 30, 80)
+];
+
+// Changeable colors
+var theColor = 0;
+var characterColors = [
+    [
+        color(255, 90, 150),
+        color(135, 190, 255)
+    ], [
+        color(0, 220, 0),
+        color(140, 15, 240)
+    ], [
+        color(255, 130, 0),
+        color(255, 255, 255)
+    ], [
+        color(255, 255, 0),
+        color(50, 50, 50)
+    ], [
+        color(255, 0, 0),
+        color(0, 240, 0)
+    ]
+];
+
+// Google Font loading
+var loadGoogleFont = (function () {
+    return this.Function ("gfName", 
+    "gfName = gfName.replace ( /\\s+/g, '+' );" + 
+    "var subsets = Array.prototype.slice.call ( arguments, 1, arguments.length - 1 );" + 
+    "var url = 'https://fonts.googleapis.com/css?family=' + gfName + ( subsets.length > 0 ? '&amp;subset=' + subsets : '' ), callback = arguments [ arguments.length - 1 ];" +
+    "var gfs = document.querySelectorAll('link[href=\"' + url+'\"]');" + 
+    "if (!gfs.length) {" + 
+        "var f = document.createElement('link');" + 
+        "f.setAttribute('rel', 'stylesheet');" + 
+        "f.setAttribute('type', 'text/css');" + 
+        "f.onload = callback;" +    
+        "f.setAttribute('href', url);" + 
+        "document.head.appendChild(f);" + 
+    "} else if (typeof callback === 'function') {" + 
+        "callback.call(gfs[0]);" + 
+    "}"
+);
+})();
+
+loadGoogleFont("Aldrich");
+loadGoogleFont("Chelsea Market");
+
+// Fonts
+var fonts = [
+    createFont("Aldrich"),
+    createFont("serif")
+];
+
+/** GRAPHICS RELATED THINGS */
+// Background
+var bg = function (color){
+    background(color);
+    noFill();
+    for (var i = 0; i < 400; i+= 5) {
+        strokeWeight(5);
+        stroke(0, 0, 0, i / 3);
+        beginShape();
+        vertex(400 - i, 0);
+        vertex(400 - i, 400 + i);
+        vertex(600, 400 + i);
+        endShape();
+    }
+    noStroke();
+    fill(0, 0, 0, 50);
+    rect(20, 20, 360, 560);
+    triangle(20, 20, 380, 20, 20, 380);
+};
+
+// Quad functions, for "3D" effects
+var co, co2;
+var darkQuad = function(x, y, w, c, theOddOneOut) {
+    co = c || 0;
+    
+    if(theOddOneOut){
+    fill(red(colors[co]) / 1.7, green(colors[co]) / 1.7, blue(colors[co]) /1.7);
+        quad(x, y, x + w, y + w, x - 400, y + 400 + w, x - 400, y + 400);
+    } else {
+    fill(red(colors[co]) / 2, green(colors[co]) / 2, blue(colors[co]) /2);
+        quad(x, y, x + w, y, x - 400, y + 400 + w, x - 400, y + 400);
+    }
+    
+};
+var lightQuad = function(x, y, h, c) {
+    co = c || 0;
+    
+    fill(red(colors[co]) / 1.2, green(colors[co]) / 1.2, blue(colors[co]) / 1.2);
+    quad(x, y, x, y + h, x - 400, y + 400 + h, x - 400, y + 400);
+};
+
+var darkQuad2 = function(x, y, w, c, c2) {
+    co = c || 0;
+    co2 = c2 || 0;
+    
+    fill(red(characterColors[co][co2]) / 2, green(characterColors[co][co2]) / 2, blue(characterColors[co][co2]) / 2);
+    quad(x, y, x + w, y, x - 400, y + 400 + w, x - 400, y + 400);
+};
+var lightQuad2 = function(x, y, h, c, c2) {
+    co = c || 0;
+    co2 = c2 || 0;
+    
+    fill(red(characterColors[co][co2]) / 1.2, green(characterColors[co][co2]) / 1.2, blue(characterColors[co][co2]) / 1.2);
+    quad(x, y, x, y + h, x - 400, y + 400 + h, x - 400, y + 400);
+};
+
+// Menu text
+var txt = function(t, x, y, s) {
+    // S
+    darkQuad(280, 77, 42);
+    darkQuad(317, 87, 11);
+    darkQuad(280, 108, 42);
+    darkQuad(280, 138, 42);
+    lightQuad(276, 70, 36);
+    lightQuad(273, 118, 15);
+    
+    // E
+    darkQuad(206, 79, 51);
+    darkQuad(206, 108, 45);
+    darkQuad(206, 137, 52);
+    lightQuad(206, 67, 69);
+    
+    // Y
+    darkQuad(158, 137, 10);
+    darkQuad(131, 69, 36, 0, true);
+    lightQuad(158, 110, 28);    
+    
+    // E
+    darkQuad(73, 79, 49);
+    darkQuad(82, 108, 34);
+    darkQuad(72, 137, 52);
+    lightQuad(72, 67, 71);
+    
+    // CUBE
+    // E
+    darkQuad(288, 176, 50);
+    darkQuad(288, 206, 44);
+    darkQuad(288, 236, 50);
+    lightQuad(288, 164, 71);
+    
+    // B
+    lightQuad(262, 198, 16);
+    lightQuad(262, 206, 16);
+    darkQuad(220, 175, 47);
+    darkQuad(220, 202, 47);
+    darkQuad(220, 231, 47);
+    lightQuad(216, 166, 70);
+    
+    // U
+    lightQuad(138, 166, 67);
+    lightQuad(188, 166, 67);
+    darkQuad(141, 231, 56);
+    
+    // C
+    darkQuad(65, 233, 55);
+    darkQuad(65, 176, 55);
+    darkQuad(111, 185, 12);
+    lightQuad(66, 169, 60);
+    lightQuad(112, 173, 12);
+    
+    fill(colors[0]);
+    text(t, x, y);
+};
+
+var Smooth = function(pos, dest, div) {
+    return (dest -pos) / div;
+};
+
+// Buttons
+var resetGame;
+var Button = function(x, y, size, color, pic, func, num) {
+    this.x = 0;
+    this.y = y + x;
+    this.color = color;
+    this.xTo = x;
+    this.yTo = y;
+    this.size = size;
+    this.pic = pic;
+    this.func = func;
+    this.speed = 8;
+    this.num = num;
+};
+Button.prototype.display = function() {
+    noStroke();
+    this.x += Smooth(this.x, this.xTo, 10);
+    this.y += Smooth(this.y, this.yTo, 10);
+    pushMatrix();
+    if (scene === 'menu' || scene === "end") {
+        translate(-sin(frameCount * this.speed + this.xTo + this.yTo) * 5, sin(frameCount * this.speed + this.xTo + this.yTo) * 5);
+    }
+    fill(colors[this.color]);
+    rect(this.x, this.y, this.size, this.size);
+    fill(red(colors[this.color]) / 1.2, green(colors[this.color]) / 1.2, blue(colors[this.color]) / 1.2);
+    quad(this.x, this.y, this.x, this.y + this.size, 0, this.y + this.x + this.size, 0, this.y + this.x);
+    fill(red(colors[this.color]) / 2, green(colors[this.color]) / 2, blue(colors[this.color]) / 2);
+    quad(this.x + this.size, this.y + this.size, this.x, this.y + this.size, 0, this.y + this.x + this.size, 0, this.y + this.x + this.size * 2);
+    
+    this.pic(this.x + this.size / 2, this.y + this.size / 2, this.num);
+    popMatrix();
+    
+    if (this.check(mouseX, mouseY)) {
+        overButton = true;
+        if (click) {
+            this.func(this.num);
+        }
+    }
+};
+Button.prototype.check = function(x, y) {
+    if (scene === "menu" || scene === "end") {
+        return x > this.x - sin(frameCount * this.speed + this.xTo + this.yTo) * 5 && y > this.y + sin(frameCount * this.speed + this.xTo + this.yTo) * 5 && x < this.x + this.size - sin(frameCount * this.speed + this.xTo + this.yTo) * 5 && y < this.y + this.size + sin(frameCount * this.speed + this.xTo + this.yTo) * 5;
+    }
+    return x > this.x && y > this.y && x < this.x + this.size && y < this.y + this.size;
+};
+
+// Each button
+{
+    
+var play = new Button(150, 250, 100, 0, function(x, y) {
+    fill(colors[2]);
+    triangle(x + 30, y, x - 20, y - 25, x - 20, y + 25);
+}, function() {
+    resetGame();
+    switchScene("game");
+});
+
+var how = new Button(150, 360, 40, 0, function(x, y) {
+    fill(colors[2]);
+    textAlign(CENTER, CENTER);
+    textFont(fonts[0], 30);
+    text("?", this.x + 20, this.y + 20);
+}, function() {
+    switchScene("how");
+});
+
+var toInfo = new Button(205, 360, 40, 0, function(x, y) {
+    fill(colors[2]);
+    textAlign(CENTER, CENTER);
+    textFont(fonts[1], 30);
+    text("i", this.x + 20, this.y + 20);
+}, function() {
+    switchScene("info");
+});
+
+var toShop = new Button(260, 305, 40, 0, function(x, y) {
+    fill(colors[2]);
+    textAlign(CENTER, CENTER);
+    textFont(fonts[0], 30);
+    text("$", this.x + 20, this.y + 20);
+}, function() {
+    switchScene("shop");
+});
+
+var toColors = new Button(260, 360, 40, 0, function(x, y) {
+    fill(colors[2]);
+    arc(x, y, 25, 25, -200, 130);
+    for (var i = 0; i < 5; i++) {
+        fill(colors[0]);
+        ellipse(x + sin(i * 40 - 20) * 8, y - cos(i * 40 - 20) * 8, 4, 4);
+    }
+}, function() {
+    switchScene("colors");
+});
+
+var toAchievements = new Button(260, 250, 40, 0, function(x, y) {
+    fill(colors[2]);
+    arc(x, y - 10, 15, 30, 0, 181);
+    rect(x - 2, y - 10, 4, 20);
+    triangle(x, y + 5, x - 5, y + 10, x + 5, y + 10);
+    stroke(colors[2]);
+    strokeWeight(2);
+    noFill();
+    ellipse(x, y - 6, 25, 10);
+}, function() {
+    switchScene("achievements");
+});
+
+var back1 = new Button(290, 500, 60, 0, function(x, y) {
+    fill(0, 0, 0, 50);
+    triangle(x - 15, y, x + 10, y - 15, x + 10, y + 15);
+}, function() {
+    switchScene("menu");
+});
+
+var back2 = new Button(290, 500, 60, 1, function(x, y) {
+    fill(0, 0, 0, 50);
+    triangle(x - 15, y, x + 10, y - 15, x + 10, y + 15);
+}, function() {
+    switchScene("menu");
+});
+
+var retry = new Button(150, 250, 100, 0, function(x, y) {
+    fill(255, 255, 255);
+    textAlign(CENTER, CENTER);
+    textFont(fonts[0], 30);
+    text(score, x, y + 10);
+    textSize(20);
+    text("Best: " + record, x, y + 35);
+    noFill();
+    stroke(colors[2]);
+    strokeWeight(5);
+    strokeCap(ROUND);
+    arc(x, y - 25, 30, 30, -90, 200);
+    line(x, y - 40, x + 3, y - 33);
+    line(x, y - 40, x + 7, y - 44);
+}, function() {
+    switchScene("game");
+    resetGame();
+    currentCoins = 0;
+    speed = 4;
+    score = 0;
+    boostTimer = 0;
+    currentBoosts = 0;
+});
+
+var selects = [];
+var selectDisplay = function(x, y, num) {
+    fill(255, 255, 255, 50);
+    rect(x - 30, y - 30, 60, 60);
+    fill(characterColors[num][0]);
+    triangle(x - 25, y - 25, x + 25, y - 25, x + 25, y + 25);
+    fill(characterColors[num][1]);
+    triangle(x - 25, y - 25, x - 25, y + 25, x + 25, y + 25);
+};
+var selectAction = function(num) {
+    theColor = num;
+};
+
+for (var i = 0; i < characterColors.length; i++) {
+    selects.push(new Button(125, 150 + i * 65, 60, 0, 
+    selectDisplay, selectAction, i));
+}
+}
+
+// Framework for a basic scene
+var basicScene = function(title, txt, color) {
+    bg(colors[color]);
+    textFont(fonts[0], 100);
+    textAlign(CENTER, CENTER);
+    //f
+    fill(colors[color]);
+    rect(50, 50, 300, 450);
+    darkQuad(50, 500, 300, color);
+    lightQuad(50, 50, 450, color);
+    
+    fill(255);
+    textSize(30);
+    text(title, 200, 100);
+    
+    stroke(255);
+    strokeWeight(5);
+    line(70, 130, 330, 130);
+    strokeWeight(2);
+    line(70, 138, 330, 138);
+    
+    textAlign(CENTER, TOP);
+    textSize(15);
+    text(txt, 65, 160, 280, 480);
+    
+    if(color === 0){
+        back1.display();
+    } else {
+        back2.display();
+    }
+    
+    noFill();
+    stroke(colors[color]);
+    strokeWeight(20);
+    rect(10, 10, 380, 580);
+};
+
+/** PRE-GAME SCENES */
+// Logo
+var Logo = function() {
+    this.x = -159;
+    this.y = -107;
+    this.s = 1.6;
+    
+    this.fishX = -200;
+    this.timer = 0;
+    
+    this.star = function(x, y, sz, r){
+        strokeCap(SQUARE);
+        stroke(255, 255, 255, sz * 20);
+        for(var i = 0; i < 360; i += 360 / 5){
+            pushMatrix();
+            translate(x, y);
+            scale(sz);
+            rotate(i + r);
+            line(3, 0, 28, 0);
+            line(3, 0, 18, 0);
+            line(3, 0, 15, 0);
+            popMatrix();
+        }
+    };
+    this.stars = [];
+    for(var i = 0; i < 70; i ++){
+        this.stars.push({x: random(400), y: random(-200, -500), sz: random(0.5), r: random(360)});
+    }
+    
+    this.finish = false;
+};
+Logo.prototype.draw = function() {
+    background(29, 60, 84);
+    
+    pushMatrix();
+    translate(this.x, this.y);
+    scale(this.s);
+    
+    // Sea
+    noStroke();
+    fill(44, 156, 184, 200);
+    rect(-100, 0, 600, 700);
+    fill(255, 255, 255, 10);
+    rect(-100, 0, 600, 7);
+    rect(-100, 0, 600, 47);
+    quad(50, 0, 100, 0, 318, 700, 50, 700);
+    quad(279, 0, 304, 0, 218, 700, 50, 700);
+    quad(193, 0, 235, 0, 524, 687, 355, 700);
+    
+    // Fish
+    pushMatrix();
+    translate(255 + this.fishX, 222 + cos(frameCount * 5) * 20);
+    rotate(sin(frameCount * 5) * 20);
+    fill(255);
+    beginShape();
+    vertex(46, -23);
+    bezierVertex(17, -56, -57, 10, -51, -18);
+    vertex(-58, 10);
+    bezierVertex(-46, -4, 15, 40, 42, 15);
+    bezierVertex(67, -4, 44, -30, 44, -22);
+    endShape();
+    
+    // orange stripes
+    fill(232, 143, 42);
+    beginShape();
+    vertex(29, -32);
+    bezierVertex(20, -4, 25, 2, 30, 22);
+    bezierVertex(72, 8, 51, -29, 37, -30);
+    endShape();
+    beginShape();
+    vertex(8, -32);
+    bezierVertex(4, -4, 3, 2, 13, 22);
+    bezierVertex(-3, 45, -22, 17, -16, 16);
+    bezierVertex(-6, 6, -15, -11, -17, -23);
+    bezierVertex(-30, -35, -3, -51, 8, -32);
+    endShape();
+    beginShape();
+    vertex(-55, -10);
+    bezierVertex(-53, -4, -47, 2, -52, 7);
+    bezierVertex(-66, 14, -46, 13, -36, 11);
+    bezierVertex(-29, 9, -34, -14, -36, -13);
+    bezierVertex(-51, -22, -62, -15, -54, -8);
+    endShape();
+    
+    // fins
+    fill(179, 104, 50);
+    beginShape();
+    vertex(-12, -8);
+    bezierVertex(-34, -4, -18, 2, -10, 7);
+    bezierVertex(-23, 0, -18, 25, 3, 11);
+    bezierVertex(-1, 9, -2, -7, 0, -13);
+    bezierVertex(-13, -22, -29, -14, -13, -8);
+    endShape();
+    pushMatrix();
+    translate(-52, -2);
+    beginShape();
+    vertex(-12, 3);
+    bezierVertex(-22, 0, -18, 17, -9, 14);
+    bezierVertex(11, 9, 12, -7, 0, -13);
+    bezierVertex(-13, -23, -29, -14, -13, 1);
+    endShape();
+    popMatrix();
+    
+    // eyes
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    bezier(38, -9, 41, -16, 43, -22, 46, -9);
+    bezier(33, -4, 37, 6, 49, 7, 53, 4);
+    
+    // "avmswimmer"
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    fill(255, 255, 255, 200);
+    textFont(createFont('Chelsea Market'), 20);
+    text('avmswimmer', -4, 55);
+    popMatrix();
+    
+    // Chester logo
+    var logoColors = [
+        color(204, 240, 245),
+        color(149, 203, 240),
+        color(125, 165, 179),
+        color(215, 231, 242),
+    ];
+    
+    pushMatrix();
+    translate(202, -33 + sin(frameCount * 5) * 10);
+    rotate(11);
+    scale(0.5);
+    noFill();
+    strokeCap(SQUARE);
+    stroke(194, 194, 194);
+    strokeWeight(39);
+    arc(0, 10, 170, 170, 29, 329);
+    stroke(227, 227, 227);
+    arc(0, 7, 170, 170, 29, 329);
+    stroke(0, 0, 0, 50);
+    strokeWeight(50);
+    arc(0, 13, 170, 170, 26, 334);
+    strokeWeight(11);
+    // Outer layer
+    stroke(logoColors[0]);
+    arc(0, 0, 200, 200, -85, -30);
+    arc(0, 0, 180, 180, -75, -30);
+    arc(0, 0, 200, 200, -300, -240);
+    arc(0, 0, 180, 180, -285, -250);
+    stroke(logoColors[1]);
+    arc(0, 0, 200, 200, -125, -85);
+    arc(0, 0, 180, 180, -115, -75);
+    arc(0, 0, 200, 200, -200, -160);
+    arc(0, 0, 180, 180, -200, -150);
+    stroke(logoColors[2]);
+    arc(0, 0, 200, 200, -160, -125);
+    arc(0, 0, 180, 180, -150, -116);
+    arc(0, 0, 200, 200, -330, -300);
+    arc(0, 0, 180, 180, -330, -286);
+    stroke(logoColors[3]);
+    arc(0, 0, 200, 200, -240, -200);
+    arc(0, 0, 180, 180, -250, -200);
+    
+    // Inner layer
+    stroke(logoColors[0]);
+    arc(0, 0, 160, 160, -200, -160);
+    arc(0, 0, 140, 140, -200, -150);
+    stroke(logoColors[1]);
+    arc(0, 0, 160, 160, -300, -240);
+    arc(0, 0, 140, 140, -285, -250);
+    stroke(logoColors[2]);
+    arc(0, 0, 160, 160, -240, -200);
+    arc(0, 0, 140, 140, -250, -200);
+    arc(0, 0, 160, 160, -125, -85);
+    arc(0, 0, 140, 140, -115, -75);
+    stroke(logoColors[3]);
+    arc(0, 0, 160, 160, -85, -30);
+    arc(0, 0, 140, 140, -75, -30);
+    arc(0, 0, 160, 160, -330, -300);
+    arc(0, 0, 140, 140, -330, -286);
+    arc(0, 0, 160, 160, -160, -125);
+    arc(0, 0, 140, 140, -150, -116);
+    
+    stroke(0, 0, 0, 50);
+    strokeWeight(20);
+    arc(0, 0, 150, 150, 30, 330);
+    stroke(255);
+    strokeWeight(5);
+    arc(0, 0, 140, 140, 37, 74);
+    arc(0, 0, 200, 200, 204, 263);
+
+    popMatrix();
+    
+    textSize(16);
+    fill(255, 255, 255, 100);
+    text('chester banks', 200 + sin(frameCount * 8) * 5, 55);
+    
+    // Green Ghost
+    noStroke();
+    for(var i = 0; i < 512; i += 100){
+        fill(7, 13, 15, 20);
+        rect(-39, -515, 617, i);
+    }
+    // moon
+    pushMatrix();
+    translate(162, -444);
+    fill(227, 227, 227);
+    ellipse(0, 0, 50, 50);
+    fill(255, 255, 255);
+    ellipse(2, -1, 40, 40);
+    for(var i = 0; i < 132; i += 17){
+        fill(255, 255, 255, 15);
+        ellipse(0, 0, i,i);
+    }
+    popMatrix();
+    
+    stroke(255);
+    for(var i = 0; i < this.stars.length; i ++){
+        this.star(this.stars[i].x, this.stars[i].y, this.stars[i].sz, this.stars[i].r);
+    }
+    
+    // ghost
+    pushMatrix();
+    translate(200 + sin(frameCount * 5) * 40, -300 + cos(frameCount * 5) * 20);
+    rotate(17);
+    noStroke();
+    fill(158, 250, 45, 100 + sin(frameCount * 5) * 20);
+    beginShape();
+    vertex(-30, 30);
+    vertex(-30, 0);
+    bezierVertex(-30, -40, 30, -40, 30, 0);
+    vertex(30, 30);
+    for(var i = 30; i >= -30; i -= 5){
+        vertex(i, 47 + abs((i / 5)%2) * 8);
+    }
+    textSize(16);
+    text('g r e e n\ng h o s t', 1, -69);
+    endShape();
+    
+    // eyes
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    for(var i = 0; i < 2; i ++){
+        pushMatrix();
+        translate(-51 + i * 21, 27);
+        bezier(38, -9, 41, -16, 43, -22, 46, -9);
+        popMatrix();
+    }
+    bezier(-9, 20, -5, 31, 7, 31, 12, 20);
+    
+    popMatrix();
+    
+    popMatrix();
+    
+    this.timer += 2;
+    this.fishX += 2;
+    if(this.timer > 200){
+        this.x += (-280 - this.x) / 25;
+        this.s += (2.3 - this.s) / 25;
+        this.y += (290 - this.y) / 25;
+    }
+    if(this.timer > 500){
+        this.x += (-4 - this.x) / 25;
+        this.s += (0.7 - this.s) / 25;
+        this.y += (1175 - this.y) / 25;
+    }
+    if(this.timer > 900 && !this.finish){
+        this.finish = true;
+        this.fishX = -101;
+    }
+    if(this.finish){
+        this.x += (300 - this.x) / 25;
+        this.s += (-0.5 - this.s) / 25;
+        this.y += (-400 - this.y) / 25;
+    }
+    if(this.timer > 1100 || click){
+        switchScene("menu");
+    }
+};
+var logo = new Logo();
+
+// Menu
+var menu = function() {
+    bg(colors[0]);
+    textFont(fonts[0], 100);
+    textAlign(CENTER, CENTER);
+    textLeading(98);
+    txt("EYES\nCUBE", 200, 150, 80);
+    toAchievements.display();
+    toShop.display();
+    toColors.display();
+    play.display();
+    toInfo.display();
+    how.display();
+    noFill();
+    stroke(colors[0]);
+    strokeWeight(20);
+    rect(10, 10, 380, 580);
+    
+    if(egg.trans > 5){
+        noStroke();
+        fill(255, 255, 255, 0);
+        if(dist(mouseX, mouseY, 50, 550) < 20){
+            overButton = true;
+            fill(255, 255, 255, egg.trans);
+            if(click && !achievements[1].achieved){
+                egg.animate = true;
+                Notifs.push(new Notif(1));
+            }
+        }
+        pushMatrix();
+        translate(50, 550);
+        rotate(egg.r);
+        scale(egg.s);
+        arc(0, 0, 30, 50, -179, 0);
+        arc(0, 0, 30, 30, 0, 180);
+        popMatrix();
+        if(egg.animate){
+            egg.s *= 1.05;
+            egg.r *= 2;
+            egg.trans /= 1.1;
+        }
+    }
+};
+
+/** GAME MECHANICS */
+// The rectangle collision function
+var rectCollide = function(one, two) {
+    return one.x + one.w > two.x && 
+    one.y + one.h > two.y && 
+    one.x < two.x + two.w && 
+    one.y < two.y + two.h;
+};
+
+// Blocks
+var Block = function(left) {
+    this.possiblePos = left ? [20, 80] : [220, 280];
+    
+    this.x = this.possiblePos[floor(random(this.possiblePos.length))];
+    this.y = 600;
+    this.w = 100;
+    this.h = 25;
+    
+    this.Particle = function(x, y, xvel){
+        this.x = x;
+        this.y = y;
+        this.yvel = random(0, 1);
+        this.xvel = xvel || 0;
+    };
+    this.Particle.prototype.draw = function() {
+        fill(this.x < 200 ? characterColors[theColor][0] : characterColors[theColor][1]);
+        rect(this.x, this.y, 15, 15);
+        darkQuad(this.x, this.y + 15, 15, this.x < 200 ? 0 : 1);
+        lightQuad(this.x, this.y, 15, this.x < 200 ? 0 : 1);
+        
+        this.x += this.xvel;
+        this.y += this.yvel;
+        this.yvel += 0.2;
+    };
+    this.Particles = [];
+    this.broken = false;
+};
+Block.prototype.draw = function() {
+    if(!this.broken){
+        noStroke();
+        fill(this.x < 200 ? characterColors[theColor][0] : characterColors[theColor][1]);
+        rect(this.x, this.y, this.w, this.h);
+        darkQuad2(this.x, this.y + this.h, this.w, theColor, this.x < 200 ? 0 : 1);
+        lightQuad2(this.x, this.y, this.h, theColor, this.x < 200 ? 0 : 1);
+    } else {
+        for(var i = this.Particles.length - 1; i >= 0; i --) {
+            this.Particles[i].draw();
+            if(this.Particles[i].y > 600){
+                this.Particles.splice(i, 1);
+            }
+        }
+        
+        this.y += (speed * 4);
+    }
+    
+    this.y -= (boost ? (speed * 2) : speed);
+};
+var Blocks = [];
+
+// Coins
+var Coin = function(leftC) {
+    this.x = leftC ? random(20, 150) : random (220,350);
+    this.y=random(640,840);
+    this.w=30;
+    this.h=30;
+};
+Coin.prototype.draw = function() {
+    noStroke();
+    fill(255, 199, 46);
+    rect(this.x+10,this.y,21,21);
+    fill(222, 171, 42);
+    quad(this.x+10,this.y+21,this.x+31,this.y+21,this.x+21,this.y+30,this.x+1,this.y+30);
+    fill(232, 180, 49);
+    quad(this.x+10,this.y,this.x+10,this.y+22,this.x+1,this.y+30,this.x+1,this.y+10);
+
+   this.y -= (boost ? (speed * 2) : speed);
+};
+var Coins = [];
+
+// Eyes
+var Eye = function(leftEye){
+    this.x = leftEye ? 150 : 220;
+    this.y = 260;
+    this.w = 30;
+    this.h = 30;
+    this.leftEye = leftEye;
+};
+Eye.prototype.draw = function() {
+    noStroke();
+    fill(this.leftEye ? characterColors[theColor][1] : characterColors[theColor][0]);
+    rect(this.x, this.y, this.w, this.h);
+    darkQuad2(this.x, this.y + this.h, this.w, theColor, this.leftEye ? 1 : 0);
+    lightQuad2(this.x, this.y, this.w, theColor, this.leftEye ? 1 : 0);
+    
+    if (items[0].equipped || items[1].equipped || items[2].equipped || items[4].equipped) {
+        fill(255);
+        ellipse(this.x + this.w / 2, this.y + this.h / 2, 20, 20);
+        fill(25);
+        pushMatrix();
+        translate(this.x + 15, this.y + 15);
+        rotate(atan2(mouseY - (this.y + 15), mouseX - (this.x + 15)));
+        ellipse(5, 0, 8, 8);
+        fill(255);
+        ellipse(4, 0, 2, 2);
+        popMatrix();
+    }
+    
+    if (items[1].equipped) {
+        noFill();
+        stroke(0, 0, 0);
+        strokeWeight(3);
+        if(this.leftEye){
+        line(this.x+this.w/1.2,this.y+this.h/2.7,this.x+this.w/1.8,this.y+this.h/9.5);
+    } else {
+        line(this.x+this.w/4.8,this.y+this.h/2.7,this.x+this.w/2.0,this.y+this.h/9.5);
+    }
+    noStroke();
+    }
+    if (items[2].equipped) {
+        stroke(0, 0, 0);
+        strokeWeight(2);
+        noFill();
+    if (this.leftEye) {
+        arc(this.x+this.w/2.8,this.y+this.w/3.7,15,10,120,175);
+        arc(this.x+this.w/3.3,this.y+this.w/2.3,15,10,120,175);
+    }
+    else {
+        arc(this.x+this.w/1.53,this.y+this.w/3.7,15,10,10,65);
+        arc(this.x+this.w/1.42,this.y+this.w/2.3,15,10,10,65);
+    }
+    noStroke();
+    }
+    if (items[3].equipped) {
+        fill(0, 0, 0);
+        ellipse(this.x + this.w / 2, this.y + this.h / 2, 20,20);
+        fill(255, 255, 255);
+        ellipse(this.x + 18 , this.y +this.h/2 -3, 6, 6);
+        fill(255);
+        ellipse(this.x + 21, this.y +this.h/2 +1, 2, 2);
+    
+        noFill();
+        stroke(255, 255, 255);
+        strokeWeight(2);
+        arc(this.x+18,this.y+15,20,16,125,170);
+        strokeWeight(1);
+        noStroke();
+    }
+    if (items[4].equipped) {
+        noFill();
+        stroke(0, 0, 0);
+        strokeWeight(2.5);
+        rect(this.x+3,this.y+3,this.w-6,this.h-6);
+        
+        if (this.leftEye) {
+            line(this.x+1,this.y+10,this.x+-14,this.y+25);
+            arc(this.x+-13,this.y+30,5,11,157,248);
+        }
+        noStroke();
+    }
+    if (items[5].equipped) {
+        fill(255, 255, 255,30);
+        for(var i=0;i<40;i+=2){
+        ellipse(this.x+this.w/2.8,this.y+this.h/2.1,i/2,i/1.4);
+        ellipse(this.x+this.w/1.8,this.y+this.h/2.0,i/2,i/1.4);
+        }
+        fill(0, 0, 0,100);
+        
+        pushMatrix();
+        translate(this.x + 15, this.y + 15);
+        rotate(atan2(mouseY - (this.y + 15), mouseX - (this.x + 15)));
+        
+        ellipse(4,-1.3,7,7);
+        ellipse(5,1,7,7);
+        popMatrix();
+    }
+    
+    
+    if (this.leftEye) {
+        if (keys[LEFT] || (mouseIsPressed & mouseX < 200)) {
+            this.x += Smooth(this.x, 20, 5);
+        } else {
+            this.x += Smooth(this.x, 150, 5);
+        }
+    } else {
+        if (keys[RIGHT] || (mouseIsPressed & mouseX > 200)) {
+            this.x += Smooth(this.x, 350, 5);
+        } else {
+            this.x += Smooth(this.x, 220, 5);
+        }
+    }
+    
+    for (var i = Blocks.length - 1; i >= 0; i--) {
+        if(rectCollide(this, Blocks[i])){
+            if(boost){
+                if(!Blocks[i].broken){
+                    for(var k = 0; k < Blocks[i].w; k += 15){
+                        Blocks[i].Particles.push(new Blocks[i].Particle(Blocks[i].x + k, Blocks[i].y + 15, (Blocks[i].x + k - (Blocks[i].x + Blocks[i].w / 1.5)) / 60));
+                        Blocks[i].Particles.push(new Blocks[i].Particle(Blocks[i].x + k, Blocks[i].y, (Blocks[i].x + k - (Blocks[i].x + Blocks[i].w / 1.5)) / 60));
+                    }
+                    Blocks[i].broken = true;
+                }
+            } else {
+                this.y = Blocks[i].y - this.h;
+            }
+        }
+    }
+        
+    for(var i=0;i<Coins.length;i++){
+        if(rectCollide(Coins[i], this)){
+            playerCoins++;
+            currentCoins++;
+            Coins.splice(i,1);
+        }
+    }
+    
+    this.y += (260 - this.y) / 50;
+};
+var leftEye = new Eye(true);
+var rightEye = new Eye(false);
+
+// Game scene
+var game = function() {
+    // First draw the right side, then the left side over it.
+    
+    if(frameCount % (boost ? 30 : 60) === 0){
+        Blocks.push(new Block(true), new Block(false));
+        score ++;
+    }
+    if(frameCount % 240 === 0){
+        Coins.push(new Coin(false));
+    }
+    if(frameCount % 240 === 60){
+        Coins.push(new Coin(true));
+    }
+    
+    noStroke();
+    
+    fill(red(characterColors[theColor][1]) - 50, green(characterColors[theColor][1]) - 50, blue(characterColors[theColor][1]) - 50);
+    rect(200, 0, 200, 600);
+    fill(0, 0, 0, 30);
+    triangle(200, 0, 415, 0, 200, 200);
+    
+    for(var i = Blocks.length - 1; i >= 0; i --){
+        if(Blocks[i].x > 200 && Blocks[i].y <= rightEye.y + 1){
+            Blocks[i].draw();
+        }
+    }
+    rightEye.draw();
+    for(var i = Blocks.length - 1; i >= 0; i --){
+        if(Blocks[i].x >= 200 && Blocks[i].y > rightEye.y){
+            Blocks[i].draw();
+        }
+    }
+    
+    fill(characterColors[theColor][1]);
+    rect(200, 0, 200, 30);
+    rect(200, 0, 20, 600);
+    rect(380, 0, 20, 600);
+    
+    fill(red(characterColors[theColor][0]) - 50, green(characterColors[theColor][0]) - 50, blue(characterColors[theColor][0]) - 50);
+    rect(-1, 0, 200, 600);
+    fill(0, 0, 0, 30);
+    triangle(0, 0, 215, 0, 0, 200);
+    for(var i = Blocks.length - 1; i >= 0; i --){
+        if(Blocks[i].x <= 200 && Blocks[i].y <= leftEye.y + 1){
+            Blocks[i].draw();
+        }
+    }
+    leftEye.draw();
+    for(var i = Blocks.length - 1; i >= 0; i --){
+        if(Blocks[i].x <= 200 && Blocks[i].y > leftEye.y){
+            Blocks[i].draw();
+        }
+    }
+    
+    fill(characterColors[theColor][0]);
+    rect(0, 0, 200, 30);
+    rect(0, 0, 20, 600);
+    rect(180, 0, 20, 600);
+    
+    for(var i = Blocks.length - 1; i >= 0; i --){
+        if(Blocks[i].y < -200){
+           Blocks.splice(i, 1);
+        }
+    }
+    
+    for(var i = Coins.length - 1; i >= 0; i--){
+        Coins[i].draw();
+        if (Coins[i].y < -15) {
+            Coins.splice(i,1);
+        }
+    }
+    
+    if(leftEye.x > 149 && rightEye.x < 221 && !boost){
+        boostTimer ++;
+    } else if (boostTimer > 0 && !boost) {
+        boostTimer -= 0.5;
+    } else if (boost){
+        boostTimer --;
+    }
+    
+    if(boostTimer > 160){
+        currentBoosts ++;
+        boost = true;
+    }
+    if(boost && boostTimer < 0){
+        boost = false;
+    }
+    
+    fill(255, 255, 255);
+    textSize(18);
+    text("DISTANCE: " + score, 100, 15);
+    text("COINS : " + playerCoins, 300, 15);
+    
+    fill(255, 255, 255, 30);
+    rect(180 - boostTimer, 30, boostTimer, 15);
+    rect(220, 30, boostTimer, 15);
+    
+    if (leftEye.y < 0 || rightEye.y < 0) {
+        record = Math.max(record, score);
+        switchScene("end");
+    }
+    
+    speed += 0.001;
+};
+
+// Reset game variables
+resetGame = function() {
+    leftEye.x = 150;
+    leftEye.y = 260;
+    rightEye.x = 220;
+    rightEye.y = 260;
+    Blocks = [];
+    Coins = [];
+    score = 0;
+    speed = 4;
+    boostTimer = 0;
+    boost = false;
+};
+
+/** MORE SCENES */
+// Shop mechanics
+var clear = function(){
+    for(var i=0;i<items.length;i++){
+        items[i].equipped=false;
+    }
+};
+var ShopItem = function(x, y, price, name, e) {
+    this.x = x;
+    this.y = y;
+    this.origX = this.x;
+    this.origY = this.y;
+    this.moveX = this.x - 5;
+    this.moveY = this.y - 5;
+    
+    this.w = 90;
+    this.h = 90;
+    this.origW = this.w;
+    this.origH = this.h;
+    this.bigW = this.w + 10;
+    this.bigH = this.h + 10;
+    
+    this.bought = false;
+    this.price = price;
+    this.name = name;
+    this.equipped = e;
+};
+ShopItem.prototype.draw = function() {
+    noStroke();
+    fill(255, 255, 255, 100);
+    rect(this.x, this.y, this.w, this.h, 10);
+    
+    if (this.name === "Regular") {
+         
+        fill(255);
+        ellipse(this.x + this.w / 3.2, this.y + this.h / 2, 10 +this.w/10, 10+this.h/10);
+        fill(25);
+        ellipse(this.x + 4 + this.w/3.2, this.y +this.h/2, 4 + this.w/20, 4+this.h/20);
+        fill(255);
+        ellipse(this.x + 5 + this.w/3.2, this.y +this.h/2, 1 +this.w/90, 1+this.h/90);
+        
+        fill(255);
+        ellipse(this.x + this.w/ 1.6, this.y + this.h / 2, 10+this.w/10, 10+this.w/10);
+        fill(25);
+        ellipse(this.x + 4 + this.w/1.6, this.y +this.h/2, 4+this.w/20, 4 + this.h/20);
+        fill(255);
+        ellipse(this.x + 5 + this.w/1.6, this.y +this.h/2, 1+this.w/90, 1+this.w/90);
+        
+            
+        this.bought = true;
+    }
+    if (this.name === "Cute") {
+        fill(0, 0, 0);
+        ellipse(this.x + this.w / 3.2, this.y + this.h / 2, 10 +this.w/10, 10+this.h/10);
+        fill(255, 255, 255);
+        ellipse(this.x + 5 + this.w/3.5, this.y +this.h/2 -3, 2 + this.w/25, 2+this.h/25);
+        fill(255);
+        ellipse(this.x + 6 + this.w/3.2, this.y +this.h/2 +1, 1 +this.h/90, 1+this.h/90);
+        
+        fill(0, 0, 0);
+        ellipse(this.x + this.w/ 1.6, this.y + this.h / 2, this.w/10 +10, 10 +this.h/10);
+        fill(255, 255, 255);
+        ellipse(this.x + 5 + this.w/1.7, this.y +this.h/2 -3, 2+this.w/25, 2+this.h/25);
+        fill(255);
+        ellipse(this.x + 5 + this.w/1.6, this.y +this.h/2 +1, 1+this.h/90, 1+this.h/90);
+        
+        noFill();
+        stroke(255, 255, 255);
+        strokeWeight(2);
+        arc(this.x+this.w/3.2,this.y+this.w/1.95,this.w/7,this.h/9,120,175);
+        arc(this.x+this.w/1.6,this.y+this.w/1.95,this.w/7,this.h/9,120,175);
+        strokeWeight(1);
+        noStroke();
+    }
+    if (this.name === "Evil") {
+        fill(255);
+        ellipse(this.x + this.w / 3.2, this.y + this.h / 2, 10 + this.w/10, 10+this.h/10);
+        fill(25);
+        ellipse(this.x + this.w/3.2, this.y +this.h/2, 4 + this.w/20, 4+this.h/20);
+        fill(255);
+        ellipse(this.x + this.w/3.2, this.y +this.h/2, 1 + this.w/90, 1+this.h/90);
+        
+        fill(255);
+        ellipse(this.x + this.w/ 1.6, this.y + this.h / 2, 10+this.w/10, 10+this.w/10);
+        fill(25);
+        ellipse(this.x  + this.w/1.6, this.y + this.h / 2, 4 + this.w/20, 4 + this.h/20);
+        fill(255);
+        ellipse(this.x  + this.w/1.6, this.y + this.h / 2, 1 + this.w/90, 1+this.w/90);
+        
+        noFill();
+        stroke(0, 0, 0);
+        strokeWeight(3);
+        line(this.x+this.w/2.4,this.y+this.h/2.3,this.x+this.w/3.6,this.y+this.h/2.8);
+        line(this.x+this.w/1.9,this.y+this.h/2.3,this.x+this.w/1.5,this.y+this.h/2.8);
+        noStroke();
+    }
+    if (this.name === "Eyelashes") {
+        fill(255);
+        ellipse(this.x + this.w / 3.2, this.y + this.h / 2, 10 +this.w/10, 10+this.h/10);
+        fill(25);
+        ellipse(this.x + 3 + this.w / 3.2, this.y +this.h/2, 4 + this.w/20, 4+this.h/20);
+        fill(255);
+        ellipse(this.x + 4 + this.w / 3.2, this.y +this.h/2, 1 +this.w/90, 1+this.h/90);
+        
+        fill(255);
+        ellipse(this.x + this.w/ 1.6, this.y + this.h / 2, 10+this.w/10, 10+this.w/10);
+        fill(25);
+        ellipse(this.x + 3 + this.w/1.6, this.y +this.h/2, 4+this.w/20, 4 + this.h/20);
+        fill(255);
+        ellipse(this.x + 4 + this.w/1.6, this.y +this.h/2, 1+this.w/90, 1+this.w/90);
+        
+        stroke(0, 0, 0);
+        strokeWeight(2);
+        noFill();
+        arc(this.x+this.w/3.7,this.y+this.w/2.4,this.w/7.4,this.h/9,120,175);
+        arc(this.x+this.w/4.1,this.y+this.w/2.2,this.w/7.4,this.h/9,120,175);
+        
+        arc(this.x+this.w/1.44,this.y+this.w/2.4,this.w/7.4,this.h/9,10,65);
+        arc(this.x+this.w/1.42,this.y+this.w/2.15,this.w/7.4,this.h/9,10,65);
+        noStroke();
+    }
+    if (this.name === "Glasses") {
+        fill(255);
+        ellipse(this.x + this.w / 3.2, this.y + this.h / 2, 10 +this.w/10, 10+this.h/10);
+        fill(25);
+        ellipse(this.x + 4 + this.w/3.2, this.y +this.h/2, 4 + this.w/20, 4+this.h/20);
+        fill(255);
+        ellipse(this.x + 5 + this.w/3.2, this.y +this.h/2, 1 +this.w/90, 1+this.h/90);
+        
+        fill(255);
+        ellipse(this.x + this.w/ 1.6, this.y + this.h / 2, 10+this.w/10, 10+this.w/10);
+        fill(25);
+        ellipse(this.x + 4 + this.w/1.6, this.y +this.h/2, 4+this.w/20, 4 + this.h/20);
+        fill(255);
+        ellipse(this.x + 5 + this.w/1.6, this.y +this.h/2, 1+this.w/90, 1+this.w/90);
+        
+        noFill();
+        stroke(0, 0, 0);
+        strokeWeight(2.5);
+        rect(this.x+this.w/5.4,this.y+this.h/2.6,this.w/4.2,this.h/4.2);
+        rect(this.x+this.w/2.0,this.y+this.h/2.6,this.w/4.2,this.h/4.2);
+        noStroke();
+    }
+    if (this.name === ":zoomEyes:") {
+        fill(255, 255, 255, 30);
+        for(var i=0;i<40;i+=2){
+            ellipse(this.x+this.w/3.3,this.y+this.h/2.2,i/2,i/1.5);
+            ellipse(this.x+this.w/3.0,this.y+this.h/2.0,i/2,i/1.5);
+            
+            ellipse(this.x+this.w/1.5,this.y+this.h/2.2,i/2,i/1.5);
+            ellipse(this.x+this.w/1.45,this.y+this.h/2.0,i/2,i/1.5);
+        }
+        fill(0, 0, 0,100);
+        ellipse(this.x+this.w/3.35,this.y+this.h/2.1,7,7);
+        ellipse(this.x+this.w/3.43,this.y+this.h/2.0,7,7);
+        ellipse(this.x+this.w/1.5,this.y+this.h/2.1,7,7);
+        ellipse(this.x+this.w/1.52,this.y+this.h/2.0,7,7);
+            
+    }
+    
+    fill(255, 255, 255);
+    textFont(fonts[0],4+this.h/7);
+    if (this.name === ":zoomEyes:") {
+        textFont(fonts[0],4+this.h/8);
+    }
+    text(this.name,this.x+this.w/2,this.y+this.h/5);
+        
+    if (!this.bought) {
+        fill(255, 255, 255);
+        textFont(fonts[0],4+this.h/7);
+        text("Buy ("+this.price +")",this.x+this.w/2,this.y+this.h-10);
+    }
+    if (this.bought) {
+        if (this.equipped) {
+            fill(255, 255, 255);
+            text("Equipped",this.x+this.w/2,this.y+this.h-10);
+        } else {
+            fill(255, 255, 255);
+            text("Equip",this.x+this.w/2,this.y+this.h-10);
+        }
+    }
+    
+    if (this.mouseOver()) {
+        overButton = true;
+        this.w = this.bigW;
+        this.h = this.bigH;
+        this.x = this.moveX;
+        this.y = this.moveY;
+        if (click) {
+            if (!this.bought && playerCoins >= this.price) {
+                this.bought = true;
+                playerCoins -= this.price;
+            }
+            if (this.bought && !this.equipped) {
+                clear();
+                this.equipped = true;
+            }
+        }
+    } else {
+        this.w = this.origW;
+        this.h = this.origH;
+        this.x = this.origX;
+        this.y = this.origY;
+    }
+    
+};
+ShopItem.prototype.mouseOver = function(){
+    return mouseX>this.x&&mouseX<this.x+this.w&&mouseY>this.y&&mouseY<this.y+this.h;
+};
+items = [
+    new ShopItem (80, 150, 0, "Regular", true), 
+    new ShopItem (210, 150, 20, "Evil", false),
+    new ShopItem (80, 255, 40, "Eyelashes", false),
+    new ShopItem (210, 255, 60, "Cute", false),
+    new ShopItem (80, 360, 80, "Glasses", false),
+    new ShopItem (210, 360, 100, ":zoomEyes:", false)
+];
+
+// Shop
+var shop = function() {
+    basicScene('SHOP', '', 1);
+    
+    textAlign(CENTER);
+    fill(255, 255, 255);
+    textFont(fonts[0], 20);
+    text("Coins: " + playerCoins, 200, 480);
+    
+    for(var i = 0; i < items.length; i++) {
+        items[i].draw();
+    }
+    textAlign(CENTER, CENTER);
+};
+
+// Achievements scene
+var achievementsPage = function() {
+    basicScene('Achievements', '', 0);
+    
+    fill(255, 255, 255, 200);
+    textSize(13);
+    text('[ hover on a button to see its info ]', 200, 462);
+    
+    for(var i = 0; i < 3; i ++){
+        for(var j = 0; j < 5; j ++){
+            var x = 140 + i * 58;
+            var y = 165 + j * 58;
+            var which = (3 * j) + i;
+            
+            pushMatrix();
+            translate(x, y);
+            noStroke();
+            for(var r = -15; r <= 15; r += 30){
+                pushMatrix();
+                rotate(r);
+                fill(achievements[which].achieved ? color(199, 209, 61) : color(red(colors[2]) - 50, green(colors[2]) - 30, blue(colors[2]) - 30));
+                rect(-7, 0, 14, 35);
+                triangle(-7, 33, -7, 43, 0, 35);
+                triangle(7, 33, 7, 43, 0, 35);
+                fill(0, 0, 0, 30);
+                rect(-7, 0, 14, 32);
+                popMatrix();
+            }
+            fill(achievements[which].achieved ? color(226, 237, 76) : colors[2]);
+            ellipse(0, 10, 40, 40);
+            stroke(0, 0, 0, 30);
+            noFill();
+            strokeWeight(2);
+            ellipse(0, 10, 32, 32);
+            fill(0, 0, 0, 50);
+            textSize(19);
+            text('\u2605', 0, -3);
+            
+            popMatrix();
+        }
+    }
+    
+    for(var i = 0; i < 3; i ++){
+        for(var j = 0; j < 5; j ++){
+            var x = 140 + i * 58;
+            var y = 165 + j * 58;
+            
+            pushMatrix();
+            translate(x, y);
+            noStroke();
+            if(dist(mouseX, mouseY, x, y) < 20){
+                pushMatrix();
+                translate(mouseX - x - (mouseX > 200 ? 200 : 0), mouseY - y);
+                strokeWeight(2);
+                stroke(255, 255, 255, 30);
+                fill(0, 0, 0, 100);
+                rect(0, 0, 220, 50);
+                fill(255, 255, 255);
+                textSize(18);
+                text(achievements[(3 * j) + i].name, 110, 2);
+                textSize(11);
+                text(achievements[(3 * j) + i].desc, 110, 22);
+                popMatrix();
+            }
+            popMatrix();
+        }
+    }
+};
+
+// Colors scene
+var colorSelect = function() {
+    basicScene('Colors', '', 0);
+    for (var i = 0; i < selects.length; i++) {
+        selects[i].display();
+    }
+    fill(255, 255, 255);
+    textFont(fonts[0], 50);
+    text("<", 230, selects[theColor].y);
+    noFill();
+    stroke(colors[0]);
+    strokeWeight(20);
+    rect(10, 10, 380, 580);
+};
+
+// End scene
+var end = function() {
+    background(colors[0]);
+    bg();
+    
+    toAchievements.display();
+    toShop.display();
+    toColors.display();
+    retry.display();
+    toInfo.display();
+    how.display();
+    noFill();
+    stroke(colors[0]);
+    strokeWeight(20);
+    rect(10, 10, 380, 580);
+    fill(colors[0]);
+    textAlign(CENTER, CENTER);
+    textFont(fonts[0], 80);
+    text("Game\nOver", 200, 100);
+};
+
+/** EXTRA ABSTRACTIONS */
+// Achievement checking function
+var checkAchievements = function(){
+    // Check all the achievements
+    if(sceneTracker[0] && sceneTracker[1] && sceneTracker[2] && sceneTracker[3] && sceneTracker[4] && !achievements[0].achieved){
+        Notifs.push(new Notif(0));
+    }
+    if(boost && !achievements[2].achieved){
+        Notifs.push(new Notif(2));
+    }
+    if(currentCoins >= 10 && !achievements[3].achieved){
+        Notifs.push(new Notif(3));
+    }
+    if(score >= 20 && !achievements[4].achieved){
+        Notifs.push(new Notif(4));
+    }
+    if(playerCoins >= 40 && !achievements[5].achieved){
+        Notifs.push(new Notif(5));
+    }
+    if(score >= 50 && !achievements[6].achieved){
+        Notifs.push(new Notif(6));
+    }
+    if(playerCoins >= 100 && !achievements[7].achieved){
+        Notifs.push(new Notif(7));
+    }
+    if((items[1].bought || items[2].bought || items[3].bought || items[4].bought || items[5].bought) && !achievements[8].achieved){
+        Notifs.push(new Notif(8));
+    }
+    if(currentBoosts >= 3 && !achievements[9].achieved){
+        Notifs.push(new Notif(9));
+    }
+    if(score >= 100 && !achievements[10].achieved){
+        Notifs.push(new Notif(10));
+    }
+    if(items[1].bought && items[2].bought && items[3].bought && items[4].bought && items[5].bought && !achievements[11].achieved){
+        Notifs.push(new Notif(11));
+    }
+    if(currentCoins >= 30 && !achievements[12].achieved){
+        Notifs.push(new Notif(12));
+    }
+    if(score >= 150 && !achievements[13].achieved){
+        Notifs.push(new Notif(13));
+    }
+    if(achievements[0].achieved && achievements[1].achieved && achievements[2].achieved && achievements[3].achieved && achievements[4].achieved && achievements[5].achieved && achievements[6].achieved && achievements[7].achieved && achievements[8].achieved && achievements[9].achieved && achievements[10].achieved && achievements[11].achieved && achievements[12].achieved && achievements[13].achieved && !achievements[14].achieved){
+        Notifs.push(new Notif(14));
+    }
+};
+
+// Transition functino
+var transition = function(){
+    // Transition
+    if(trans.active){
+        for(var i = 0; i < 845; i += 50){
+            var weight = 64 - (i / trans.sizeDivide);
+            
+            noFill();
+            strokeWeight(weight);
+            (stroke)(colors[(i / 50) % 2], weight * 5);
+            if(weight > 0){
+                ellipse(200, 300, i, i);
+            }
+        }
+        
+        if(!trans.out){
+            trans.sizeDivide ++;
+            if(trans.sizeDivide > 22){
+                scene = trans.nextScene;
+                trans.out = true;
+            }
+        } else {
+            trans.sizeDivide --;
+            if(trans.sizeDivide < 0.2){
+                trans.sizeDivide = 0.2;
+                trans.active = false;
+                trans.out = false;
+            }
+        }
+    }
+};
+
+/** DRAW FUNCTION */
+draw = function() {
+    // Reset mouse properties
+    cursor(overButton ? "pointer" : "default");
+    overButton = false;
+    
+    // Draw the scenes
+    switch(scene){
+        case 'logo':
+            logo.draw();
+        break;
+        case 'menu':
+            menu();
+        break;
+        case 'how':
+            sceneTracker[0] = true;
+            
+            basicScene('HOW TO PLAY', 'press the left arrow key to move the left eye to the outside, release to bring it back in\n\npress the right arrow key to move the right eye to the outside, release to bring it back in\n\nkeep both eyes in the middle to get a boost\n\ncollect coins to buy new themes in the shop\n\nDO NOT get pushed off of the screen', 1);
+            if(click){ switchScene("menu"); }
+        break;
+        case 'info':
+            sceneTracker[1] = true;
+            basicScene('ABOUT', 'This game was created in a week as a collaboration between avmswimmer, Chester Banks, and Green Ghost in May 2018.\n\nThe game is based off of a Ketchapp game by the same name.', 0);
+            if(click){ switchScene("menu"); }
+        break;
+        case 'shop':
+            sceneTracker[2] = true;
+            shop();
+        break;
+        case 'achievements':
+            sceneTracker[3] = true;
+            achievementsPage();
+        break;
+        case 'colors':
+            sceneTracker[4] = true;
+            colorSelect();
+        break;
+        case 'game':
+            game();
+        break;
+        case 'end':
+            end();
+        break;
+    }
+    click = false;
+    
+    // Check the achievements
+    checkAchievements();
+    
+    // Achievement notifs
+    for(var i = 0; i < Notifs.length; i ++){
+        Notifs[i].updateStatus();
+    }
+    if(Notifs[0]){
+        Notifs[0].draw();
+        if(Notifs[0].h < 0.1){
+            Notifs.splice(0, 1);
+        }
+    }
+    
+    // Transition
+    transition();
+};
